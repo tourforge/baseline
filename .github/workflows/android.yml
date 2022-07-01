@@ -31,11 +31,13 @@ jobs:
     - run: flutter pub get
     - run: flutter build apk
     - run: flutter build appbundle
-    - uses: actions/upload-artifact@v3
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
       with:
         name: apk
-        path: build/app/outputs/flutter-apk/app-release.apk
-    - uses: actions/upload-artifact@v3
+        path: app/build/app/outputs/flutter-apk/app-release.apk
+    - name: Upload App Bundle artifact
+      uses: actions/upload-artifact@v3
       with:
         name: appbundle
-        path: build/app/outputs/bundle/release/app-release.aab
+        path: app/build/app/outputs/bundle/release/app-release.aab
