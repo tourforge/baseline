@@ -13,4 +13,4 @@ jobs:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       uses: Ilshidur/action-discord@master
       with:
-        args: 'New issue opened by {{ EVENT_PAYLOAD.issue.user.login }} in {{ github.event.repository.name }}: {{ EVENT_PAYLOAD.issue.title }} ({{ EVENT_PAYLOAD.issue.html_url }})'
+        args: 'New issue opened by {{ EVENT_PAYLOAD.issue.user.login }} in {{ EVENT_PAYLOAD.repository.name }}: {{ EVENT_PAYLOAD.issue.title }} ({{ EVENT_PAYLOAD.issue.html_url }})'
