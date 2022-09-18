@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'theme.dart';
+
 import 'screens/gallery.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -11,10 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const Homepage(title: "I'm bad at frontend, homepage btw"),
+      theme: themeData,
+      home: const Homepage(title: "Homepage"),
     );
   }
 }
@@ -33,7 +34,7 @@ class Homepage extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const TourGallery(title: "Horrible looking Tour Gallery")),
+              MaterialPageRoute(builder: (context) => const TourGallery(title: "Tour Gallery")),
             );
           },
           child: const Text('Go to tour gallery'),

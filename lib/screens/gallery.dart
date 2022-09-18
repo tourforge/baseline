@@ -5,56 +5,103 @@ import 'package:flutter/material.dart';
 // }
 class TourGallery extends StatelessWidget {
   const TourGallery({super.key, required this.title});
+
   final String title;
+
   @override
   Widget build(BuildContext context) {
+    List<TourListItem> items = <TourListItem>[];
+    items.add(TourListItem(
+        title: "This Right Here Is An Extremely Long Tour Title As An Example For Rigorous Testing",
+        thumbnail: Image.asset("assets/images/placeholder.webp"),
+        eta: 0)
+    );
+    items.add(TourListItem(
+        title: "Short Title",
+        thumbnail: Image.asset("assets/images/placeholder.webp"),
+        eta: 0)
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
       ),
-      body: CustomScrollView(
-        primary: false,
-        slivers: <Widget>[
-          DefaultTextStyle(
-            style: const TextStyle(fontSize: 30),
-            child: SliverPadding(
-              padding: const EdgeInsets.all(20),
-              sliver: SliverGrid.count(
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                crossAxisCount: 2,
-                children: <Widget>[
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: Colors.green[100],
-                    child: const Text("He'd have you all unravel at the"),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: Colors.green[200],
-                    child: const Text('Heed not the rabble'),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: Colors.green[300],
-                    child: const Text('Sound of screams but the'),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: Colors.green[400],
-                    child: const Text('Who scream'),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: Colors.green[500],
-                    child: const Text('Revolution is coming...'),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    color: Colors.green[600],
-                    child: const Text('Revolution, they...'),
-                  ),
-                ],
+      body: TourListView(items: items),
+    );
+  }
+}
+
+
+class TourListView extends StatelessWidget {
+  const TourListView({super.key, required this.items});
+
+  final List<TourListItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(5),
+      itemCount: items.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Card(child: items[index]);
+      },
+    );
+  }
+}
+
+
+class TourListItem extends StatelessWidget {
+  const TourListItem({super.key, required this.title,
+    required this.thumbnail, required this.eta});
+
+  final String title;
+  final Image thumbnail;
+  final int eta;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 150,
+      child: Stack(
+        children: <Widget>[
+          Align(
+            alignment: AlignmentDirectional.topStart,
+            child: Container(
+              width: 150,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset("assets/images/placeholder.webp"),
+              ),
+            ),
+          ),
+
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: Container(
+              padding: const EdgeInsets.all(5),
+              width: 220,
+              child: Flexible(
+                child: Stack(
+                  children: <Widget>[
+                    Align(
+                      alignment: AlignmentDirectional.center,
+                      child: Flexible(
+                        child: Text(
+                          title,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: AlignmentDirectional.bottomCenter,
+                      child: Flexible(
+                        child: Text(
+                          "Estimated Time: ${eta}m",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -63,7 +110,3 @@ class TourGallery extends StatelessWidget {
     );
   }
 }
-
-// class TourItem extends StatelessElement {
-//   TourItem(super.widget);
-// }
