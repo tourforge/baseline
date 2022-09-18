@@ -14,7 +14,7 @@ class TourGallery extends StatelessWidget {
     items.add(TourListItem(
         title: "This Right Here Is An Extremely Long Tour Title As An Example For Rigorous Testing",
         thumbnail: Image.asset("assets/images/placeholder.webp"),
-        eta: 0)
+        eta: 999)
     );
     items.add(TourListItem(
         title: "Short Title",
@@ -77,7 +77,7 @@ class TourListItem extends StatelessWidget {
           Align(
             alignment: AlignmentDirectional.centerEnd,
             child: Container(
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
               width: 220,
               child: Flexible(
                 child: Stack(
