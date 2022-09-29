@@ -12,8 +12,7 @@ class TourGallery extends StatelessWidget {
       body: TourListView(
         items: [
           TourListItem(
-            title: "This Right Here Is An Extremely Long Tour Title"
-                " As An Example For Rigorous Testing",
+            title: "This is a Tour with a Name of Maximum Typical Length",
             thumbnail: Image.asset("assets/images/placeholder.webp"),
             eta: 999,
           ),
@@ -36,21 +35,22 @@ class TourListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(8),
       itemCount: items.length,
       itemBuilder: (BuildContext context, int index) {
-        return Card(child: items[index]);
+        return items[index];
       },
     );
   }
 }
 
 class TourListItem extends StatelessWidget {
-  const TourListItem(
-      {super.key,
-      required this.title,
-      required this.thumbnail,
-      required this.eta});
+  const TourListItem({
+    super.key,
+    required this.title,
+    required this.thumbnail,
+    required this.eta,
+  });
 
   final String title;
   final Image thumbnail;
@@ -58,46 +58,52 @@ class TourListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 150,
-      child: Stack(
-        children: <Widget>[
-          Align(
-            alignment: AlignmentDirectional.topStart,
-            child: SizedBox(
-              width: 150,
+    return Card(
+      child: SizedBox(
+        height: 125,
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              width: 125,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
                 child: Image.asset("assets/images/placeholder.webp"),
               ),
             ),
-          ),
-          Align(
-            alignment: AlignmentDirectional.centerEnd,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
-              width: 220,
-              child: Stack(
-                children: <Widget>[
-                  Align(
-                    alignment: AlignmentDirectional.center,
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.bodyLarge,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 50,
+                      child: Center(
+                        child: Text(
+                          title,
+                          style: Theme.of(context).textTheme.subtitle1,
+                          maxLines: 2,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
-                  ),
-                  Align(
-                    alignment: AlignmentDirectional.bottomCenter,
-                    child: Text(
-                      "Estimated Time: ${eta}m",
-                      style: Theme.of(context).textTheme.bodyLarge,
+                    const Expanded(child: SizedBox()),
+                    Text(
+                      "$eta minute${eta == 1 ? "" : "s"}",
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: Colors.grey),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
