@@ -83,29 +83,23 @@ class TourListItem extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
               width: 220,
-              child: Flexible(
-                child: Stack(
-                  children: <Widget>[
-                    Align(
-                      alignment: AlignmentDirectional.center,
-                      child: Flexible(
-                        child: Text(
-                          title,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
+              child: Stack(
+                children: <Widget>[
+                  Align(
+                    alignment: AlignmentDirectional.center,
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    Align(
-                      alignment: AlignmentDirectional.bottomCenter,
-                      child: Flexible(
-                        child: Text(
-                          "Estimated Time: ${eta}m",
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
+                  ),
+                  Align(
+                    alignment: AlignmentDirectional.bottomCenter,
+                    child: Text(
+                      "Estimated Time: ${eta}m",
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
