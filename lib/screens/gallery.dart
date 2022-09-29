@@ -11,21 +11,25 @@ class TourGallery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<TourListItem> items = <TourListItem>[];
-    items.add(TourListItem(
-        title:
-            "This Right Here Is An Extremely Long Tour Title As An Example For Rigorous Testing",
-        thumbnail: Image.asset("assets/images/placeholder.webp"),
-        eta: 999));
-    items.add(TourListItem(
-        title: "Short Title",
-        thumbnail: Image.asset("assets/images/placeholder.webp"),
-        eta: 0));
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
       ),
-      body: TourListView(items: items),
+      body: TourListView(
+        items: [
+          TourListItem(
+            title: "This Right Here Is An Extremely Long Tour Title"
+                "As An Example For Rigorous Testing",
+            thumbnail: Image.asset("assets/images/placeholder.webp"),
+            eta: 999,
+          ),
+          TourListItem(
+            title: "Short Title",
+            thumbnail: Image.asset("assets/images/placeholder.webp"),
+            eta: 0,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -66,7 +70,7 @@ class TourListItem extends StatelessWidget {
         children: <Widget>[
           Align(
             alignment: AlignmentDirectional.topStart,
-            child: Container(
+            child: SizedBox(
               width: 150,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
