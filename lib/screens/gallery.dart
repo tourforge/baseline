@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 
-//import 'package:http/http.dart' as http;
-// Future<http.Response> fetchAlbum() {
-//   return http.get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
-// }
 class TourGallery extends StatelessWidget {
-  const TourGallery({super.key, required this.title});
-
-  final String title;
+  const TourGallery({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: const Text("Evresi"),
       ),
       body: TourListView(
         items: [
