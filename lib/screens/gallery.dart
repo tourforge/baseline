@@ -19,7 +19,7 @@ class TourGallery extends StatelessWidget {
         items: [
           TourListItem(
             title: "This Right Here Is An Extremely Long Tour Title"
-                "As An Example For Rigorous Testing",
+                " As An Example For Rigorous Testing",
             thumbnail: Image.asset("assets/images/placeholder.webp"),
             eta: 999,
           ),
