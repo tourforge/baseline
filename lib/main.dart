@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class Homepage extends StatelessWidget {
   const Homepage({Key? key, required this.title}) : super(key: key);
   final String title;
@@ -34,7 +35,9 @@ class Homepage extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const TourGallery(title: "Tour Gallery")),
+              MaterialPageRoute(
+                  builder: (context) =>
+                      const TourGallery(title: "Tour Gallery")),
             );
           },
           child: const Text('Go to tour gallery'),

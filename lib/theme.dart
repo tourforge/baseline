@@ -35,7 +35,6 @@ var themeData = ThemeData(
       fontSize: 14.0,
       fontWeight: FontWeight.w500,
     ),
-
   ),
   colorScheme: colorScheme,
 );

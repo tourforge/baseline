@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 //import 'package:http/http.dart' as http;
 // Future<http.Response> fetchAlbum() {
 //   return http.get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
@@ -12,15 +13,14 @@ class TourGallery extends StatelessWidget {
   Widget build(BuildContext context) {
     List<TourListItem> items = <TourListItem>[];
     items.add(TourListItem(
-        title: "This Right Here Is An Extremely Long Tour Title As An Example For Rigorous Testing",
+        title:
+            "This Right Here Is An Extremely Long Tour Title As An Example For Rigorous Testing",
         thumbnail: Image.asset("assets/images/placeholder.webp"),
-        eta: 999)
-    );
+        eta: 999));
     items.add(TourListItem(
         title: "Short Title",
         thumbnail: Image.asset("assets/images/placeholder.webp"),
-        eta: 0)
-    );
+        eta: 0));
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
@@ -29,7 +29,6 @@ class TourGallery extends StatelessWidget {
     );
   }
 }
-
 
 class TourListView extends StatelessWidget {
   const TourListView({super.key, required this.items});
@@ -48,10 +47,12 @@ class TourListView extends StatelessWidget {
   }
 }
 
-
 class TourListItem extends StatelessWidget {
-  const TourListItem({super.key, required this.title,
-    required this.thumbnail, required this.eta});
+  const TourListItem(
+      {super.key,
+      required this.title,
+      required this.thumbnail,
+      required this.eta});
 
   final String title;
   final Image thumbnail;
@@ -73,7 +74,6 @@ class TourListItem extends StatelessWidget {
               ),
             ),
           ),
-
           Align(
             alignment: AlignmentDirectional.centerEnd,
             child: Container(
