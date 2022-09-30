@@ -45,14 +45,17 @@ class _TourGalleryState extends State<TourGallery> {
                 for (var tourSummary in snapshot.data!)
                   TourListItem(
                     title: tourSummary.name,
-                    thumbnail: Image.asset(
-                      tourSummary.thumbnail.fullPath,
-                      fit: BoxFit.cover,
+                    thumbnail: Hero(
+                      tag: "tourThumbnail",
+                      child: Image.asset(
+                        tourSummary.thumbnail.fullPath,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     eta: 25,
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => TourDetails(tourSummary.id)));
+                          builder: (context) => TourDetails(tourSummary)));
                     },
                   ),
               ],
@@ -101,7 +104,7 @@ class TourListItem extends StatelessWidget {
   });
 
   final String title;
-  final Image thumbnail;
+  final Widget thumbnail;
   final int eta;
   final void Function() onTap;
 
