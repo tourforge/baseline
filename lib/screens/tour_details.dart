@@ -78,10 +78,11 @@ class _TourDetailsState extends State<TourDetails> {
                 child: Text(
                   widget.summary.name,
                   style: GoogleFonts.montserrat(
-                      fontSize: 30, fontWeight: FontWeight.bold),
+                      fontSize: 20, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
+              expandedTitleScale: 2,
             ),
           ),
           SliverToBoxAdapter(
@@ -114,7 +115,7 @@ class _TourDetailsState extends State<TourDetails> {
           ),
           SliverToBoxAdapter(
             child: Gallery(images: tour?.gallery ?? []),
-          )
+          ),
         ],
       ),
     );
