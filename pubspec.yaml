@@ -92,3 +92,6 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
     - assets/images/
+    - assets/tours/
+    - assets/tours/example/
+    - assets/tours/example/assets/

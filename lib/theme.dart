@@ -9,7 +9,6 @@ const colorScheme = ColorScheme.light(
 );
 
 var themeData = ThemeData(
-  useMaterial3: true,
   cardTheme: const CardTheme(
     color: Color(0xFFFFFFFF),
     surfaceTintColor: Colors.white,
