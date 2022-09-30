@@ -25,6 +25,16 @@ class _TourGalleryState extends State<TourGallery> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Evresi"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help),
+            tooltip: 'Help',
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text('TODO: Show help page'))); // TODO
+            },
+          ),
+        ],
       ),
       body: FutureBuilder<List<TourSummary>>(
         future: tours,
@@ -120,10 +130,9 @@ class TourListItem extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      const SizedBox(height: 10),
                       SizedBox(
                         height: 50,
                         child: Center(
@@ -137,7 +146,7 @@ class TourListItem extends StatelessWidget {
                       ),
                       const Expanded(child: SizedBox()),
                       Text(
-                        "$eta minute${eta == 1 ? "" : "s"}",
+                        "Duration: about $eta minute${eta == 1 ? "" : "s"}",
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium!

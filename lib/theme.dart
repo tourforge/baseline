@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const colorScheme = ColorScheme.light(
-  primary: Color.fromARGB(255, 55, 73, 233),
+  primary: Color.fromARGB(255, 29, 79, 145),
   onPrimary: Colors.white,
   secondary: Color.fromARGB(255, 20, 173, 122),
   onSecondary: Colors.white,
