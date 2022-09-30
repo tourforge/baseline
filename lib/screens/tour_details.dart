@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '/models.dart';
+import '/widgets/gallery.dart';
 
 // TODO: investigate performance of this page, it's pretty heavy
 
@@ -111,6 +112,9 @@ class _TourDetailsState extends State<TourDetails> {
               ),
             ),
           ),
+          SliverToBoxAdapter(
+            child: Gallery(images: tour?.gallery ?? []),
+          )
         ],
       ),
     );
