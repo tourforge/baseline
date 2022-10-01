@@ -29,7 +29,7 @@ var themeData = ThemeData(
     ),
   ),
   textTheme: TextTheme(
-    button: GoogleFonts.robotoCondensed().copyWith(
+    button: GoogleFonts.roboto().copyWith(
       letterSpacing: 1.25,
       fontSize: 14.0,
       fontWeight: FontWeight.w500,
