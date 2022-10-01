@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '/models.dart';
@@ -17,7 +18,8 @@ class TourDetails extends StatefulWidget {
   State<TourDetails> createState() => _TourDetailsState();
 }
 
-class _TourDetailsState extends State<TourDetails> {
+class _TourDetailsState extends State<TourDetails>
+    with SingleTickerProviderStateMixin {
   late Future<TourModel> tourFuture;
   TourModel? tour;
 
@@ -39,9 +41,20 @@ class _TourDetailsState extends State<TourDetails> {
             expandedHeight: 250.0,
             leading: InitialFadeIn(
               child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.arrow_back)),
+                onPressed: () => Navigator.of(context).pop(),
+                tooltip: "Back",
+                icon: const Icon(Icons.arrow_back),
+              ),
             ),
+            actions: [
+              InitialFadeIn(
+                child: IconButton(
+                  onPressed: () {},
+                  tooltip: "Preview",
+                  icon: const Icon(Icons.map),
+                ),
+              )
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.passthrough,
@@ -85,12 +98,16 @@ class _TourDetailsState extends State<TourDetails> {
               expandedTitleScale: 2,
             ),
           ),
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: StartTourButtonDelegate(tickerProvider: this),
+          ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Material(
                 elevation: 3,
-                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
@@ -115,6 +132,37 @@ class _TourDetailsState extends State<TourDetails> {
           ),
           SliverToBoxAdapter(
             child: Gallery(images: tour?.gallery ?? []),
+          ),
+          SliverList(
+            delegate: SliverChildBuilderDelegate((context, index) {
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                child: Material(
+                  elevation: 3,
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          tour?.waypoints[index].name ?? "",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                          "${tour?.waypoints[index].desc ?? ""}\n\n",
+                          style: GoogleFonts.poppins(
+                              fontSize: 13, color: Colors.grey),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }, childCount: tour?.waypoints.length ?? 0),
           ),
         ],
       ),
@@ -149,4 +197,73 @@ class _InitialFadeInState extends State<InitialFadeIn>
       child: widget.child,
     );
   }
+}
+
+class StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
+  const StartTourButtonDelegate({required this.tickerProvider});
+
+  final TickerProvider tickerProvider;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return SizedBox(
+      height: 80,
+      child: Padding(
+        padding: const EdgeInsets.only(
+            top: 12.0, left: 12.0, right: 12.0, bottom: 6.0),
+        child: ElevatedButton(
+          onPressed: () {},
+          style: ButtonStyle(
+            backgroundColor: MaterialStatePropertyAll(
+                Theme.of(context).colorScheme.secondary),
+            shape: MaterialStateProperty.all(
+              const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+            ),
+            padding: const MaterialStatePropertyAll(
+                EdgeInsets.symmetric(horizontal: 16)),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.explore),
+              const SizedBox(width: 12),
+              Text(
+                "Start Tour",
+                style: Theme.of(context)
+                    .textTheme
+                    .button!
+                    .copyWith(fontSize: 16, color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 80;
+
+  @override
+  double get minExtent => 80;
+
+  @override
+  TickerProvider get vsync => tickerProvider;
+
+  @override
+  FloatingHeaderSnapConfiguration get snapConfiguration =>
+      FloatingHeaderSnapConfiguration();
+
+  @override
+  PersistentHeaderShowOnScreenConfiguration get showOnScreenConfiguration =>
+      const PersistentHeaderShowOnScreenConfiguration();
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      false;
 }

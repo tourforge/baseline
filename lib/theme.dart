@@ -23,7 +23,7 @@ var themeData = ThemeData(
       overlayColor: MaterialStateProperty.all(const Color(0x20FFFFFF)),
       shape: MaterialStateProperty.all(
         const RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          borderRadius: BorderRadius.all(Radius.circular(16.0)),
         ),
       ),
     ),
