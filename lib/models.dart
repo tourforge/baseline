@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
 
 class TourSummary {
   TourSummary._({
@@ -37,6 +39,7 @@ class TourModel {
     required this.waypoints,
     required this.gallery,
     required this.pois,
+    required this.path,
   });
 
   static Future<TourModel> load(String id) async =>
@@ -56,6 +59,8 @@ class TourModel {
                 .map((e) => AssetModel._parse(tourId, e))),
         pois: List<PoiModel>.unmodifiable((json["pois"]! as List<dynamic>)
             .map((e) => PoiModel._parse(tourId, e))),
+        path: List.unmodifiable(mtk.PolygonUtil.decode(json["path"]! as String)
+            .map((e) => LatLng(e.latitude, e.longitude))),
       );
 
   final String name;
@@ -63,6 +68,7 @@ class TourModel {
   final List<WaypointModel> waypoints;
   final List<AssetModel> gallery;
   final List<PoiModel> pois;
+  final List<LatLng> path;
 }
 
 class WaypointModel {

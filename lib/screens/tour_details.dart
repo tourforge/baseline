@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '/models.dart';
+import '/screens/navigation.dart';
 import '/widgets/gallery.dart';
 
 // TODO: investigate performance of this page, it's pretty heavy
@@ -100,7 +101,13 @@ class _TourDetailsState extends State<TourDetails>
           ),
           SliverPersistentHeader(
             pinned: true,
-            delegate: StartTourButtonDelegate(tickerProvider: this),
+            delegate: StartTourButtonDelegate(
+              tickerProvider: this,
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => NavigationScreen(tour!)));
+              },
+            ),
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -200,9 +207,13 @@ class _InitialFadeInState extends State<InitialFadeIn>
 }
 
 class StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
-  const StartTourButtonDelegate({required this.tickerProvider});
+  const StartTourButtonDelegate({
+    required this.tickerProvider,
+    required this.onPressed,
+  });
 
   final TickerProvider tickerProvider;
+  final void Function() onPressed;
 
   @override
   Widget build(
@@ -213,7 +224,7 @@ class StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
         padding: const EdgeInsets.only(
             top: 12.0, left: 12.0, right: 12.0, bottom: 6.0),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: onPressed,
           style: ButtonStyle(
             backgroundColor: MaterialStatePropertyAll(
                 Theme.of(context).colorScheme.secondary),
