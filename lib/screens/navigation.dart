@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_dragmarker/dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 
+import '/controllers/narration_playback.dart';
 import '/controllers/navigation.dart';
 import '/location.dart';
 import '/models.dart';
@@ -25,6 +26,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   double played = 0;
   int? currentWaypoint;
   late NavigationController _navController;
+  late NarrationPlaybackController _playbackController;
   late Timer _controllerTickTimer;
 
   GlobalKey<_FakeGpsPositionState>? _fakeGpsKey;
@@ -62,21 +64,30 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     _controllerTickTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        _navController
-            .tick(context)
-            .then((waypoint) => setState(() => currentWaypoint = waypoint));
+        _navController.tick(context).then((waypoint) {
+          if (currentWaypoint != waypoint) {
+            _playbackController.arrivedAtWaypoint(waypoint);
+          }
+          setState(() => currentWaypoint = waypoint);
+        });
       } else {
         timer.cancel();
       }
     });
 
     _startGpsListening();
+
+    _playbackController = NarrationPlaybackController(
+      narrations: widget.tour.waypoints.map((e) => e.narration).toList(),
+    );
+    _playbackController.onPositionChanged.listen((position) {});
   }
 
   @override
   void dispose() {
     _controllerTickTimer.cancel();
     _locationStream.cancel();
+    _playbackController.dispose();
 
     super.dispose();
   }
@@ -127,6 +138,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
             bottom: bottomHeight,
             child: FlutterMap(
               options: MapOptions(
+                center: LatLng(34.000556, -81.034722),
                 interactiveFlags:
                     InteractiveFlag.pinchZoom | InteractiveFlag.drag,
               ),
@@ -208,12 +220,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 4.0),
-                      child: Slider(
-                        value: played,
-                        min: 0,
-                        max: 1,
-                        onChanged: (value) => setState(() => played = value),
-                      ),
+                      child: _AudioPositionSlider(
+                          playbackController: _playbackController),
                     ),
                   ],
                 ),
@@ -225,26 +233,127 @@ class _NavigationScreenState extends State<NavigationScreen> {
             right: 0.0,
             bottom: bottomHeight - 45,
             child: Center(
-              child: SizedBox(
-                height: 90,
-                width: 90,
-                child: Material(
-                  shape: const CircleBorder(),
-                  color: Theme.of(context).colorScheme.primary,
-                  child: IconButton(
-                    splashRadius: 45,
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.play_arrow,
-                      size: 48,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
+              child:
+                  _AudioControlButton(playbackController: _playbackController),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AudioPositionSlider extends StatefulWidget {
+  const _AudioPositionSlider({
+    Key? key,
+    required this.playbackController,
+  }) : super(key: key);
+
+  final NarrationPlaybackController playbackController;
+
+  @override
+  State<_AudioPositionSlider> createState() => _AudioPositionSliderState();
+}
+
+class _AudioPositionSliderState extends State<_AudioPositionSlider> {
+  late final StreamSubscription<double> _positionSubscription;
+
+  double position = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _positionSubscription =
+        widget.playbackController.onPositionChanged.listen((position) {
+      setState(() => this.position = position);
+    });
+  }
+
+  @override
+  void dispose() {
+    _positionSubscription.cancel();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Slider(
+      value: position,
+      min: 0,
+      max: 1,
+      onChanged: (value) {
+        widget.playbackController.seek(value);
+      },
+    );
+  }
+}
+
+class _AudioControlButton extends StatefulWidget {
+  const _AudioControlButton({
+    Key? key,
+    required this.playbackController,
+  }) : super(key: key);
+
+  final NarrationPlaybackController playbackController;
+
+  @override
+  State<_AudioControlButton> createState() => _AudioControlButtonState();
+}
+
+class _AudioControlButtonState extends State<_AudioControlButton> {
+  @override
+  void initState() {
+    super.initState();
+
+    widget.playbackController.onStateChanged = () {
+      setState(() {});
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 90,
+      width: 90,
+      child: Material(
+        shape: const CircleBorder(),
+        color: Theme.of(context).colorScheme.primary,
+        child: IconButton(
+          splashRadius: 45,
+          onPressed: () {
+            switch (widget.playbackController.state) {
+              case PlaybackState.playing:
+                widget.playbackController.pause();
+                break;
+              case PlaybackState.paused:
+                widget.playbackController.resume();
+                break;
+              case PlaybackState.completed:
+                widget.playbackController.replay();
+                break;
+              case PlaybackState.stopped:
+                break;
+            }
+          },
+          icon: Icon(
+            (() {
+              switch (widget.playbackController.state) {
+                case PlaybackState.playing:
+                  return Icons.pause;
+                case PlaybackState.paused:
+                  return Icons.play_arrow;
+                case PlaybackState.completed:
+                  return Icons.replay;
+                case PlaybackState.stopped:
+                  return Icons.play_arrow;
+              }
+            })(),
+            size: 48,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

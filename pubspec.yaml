@@ -42,6 +42,7 @@ dependencies:
   maps_toolkit: ^2.0.1
   geolocator: ^9.0.2
   flutter_map_dragmarker: ^4.0.2
+  audioplayers: ^1.1.1
 
 dev_dependencies:
   flutter_test:
