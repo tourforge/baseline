@@ -122,8 +122,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 child: FlutterMap(
                   options: MapOptions(
                     center: LatLng(34.000556, -81.034722),
-                    interactiveFlags:
-                        InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+                    interactiveFlags: InteractiveFlag.pinchZoom |
+                        InteractiveFlag.pinchMove |
+                        InteractiveFlag.drag,
                   ),
                   children: [
                     TileLayer(
