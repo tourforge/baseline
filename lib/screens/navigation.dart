@@ -27,7 +27,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
   int? currentWaypoint;
   late NavigationController _navController;
   late NarrationPlaybackController _playbackController;
-  late Timer _controllerTickTimer;
 
   GlobalKey<_FakeGpsPositionState>? _fakeGpsKey;
   StreamSubscription<LatLng> _locationStream =
@@ -43,21 +42,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
       path: widget.tour.path,
       waypoints:
           widget.tour.waypoints.map((e) => LatLng(e.lat, e.lng)).toList(),
-      getLocation: (context) async => _currentLocation.value,
     );
 
-    _controllerTickTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (mounted) {
-        _navController.tick(context).then((waypoint) {
-          if (currentWaypoint != waypoint) {
-            _playbackController.arrivedAtWaypoint(waypoint);
-            setState(() => currentWaypoint = waypoint);
-          }
-        });
-      } else {
-        timer.cancel();
-      }
-    });
+    _currentLocation.addListener(_onCurrentLocationChanged);
 
     _startGpsListening();
 
@@ -69,9 +56,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   @override
   void dispose() {
-    _controllerTickTimer.cancel();
+    _currentLocation.removeListener(_onCurrentLocationChanged);
     _locationStream.cancel();
     _playbackController.dispose();
+    _currentLocation.dispose();
 
     super.dispose();
   }
@@ -88,6 +76,15 @@ class _NavigationScreenState extends State<NavigationScreen> {
   }
 
   void _stopGpsListening() => _locationStream.cancel();
+
+  void _onCurrentLocationChanged() {
+    _navController.tick(context, _currentLocation.value).then((waypoint) {
+      if (currentWaypoint != waypoint) {
+        _playbackController.arrivedAtWaypoint(waypoint);
+        setState(() => currentWaypoint = waypoint);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

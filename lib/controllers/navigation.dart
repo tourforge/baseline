@@ -15,7 +15,6 @@ class NavigationController {
   NavigationController({
     this.path = const <LatLng>[],
     required this.waypoints,
-    required this.getLocation,
   }) {
     for (var waypoint in waypoints) {
       var closest = 0;
@@ -34,18 +33,13 @@ class NavigationController {
   final List<LatLng> path;
   final List<int> waypointIndexToPathIndex = [];
   final List<LatLng> waypoints;
-  final Future<LatLng?> Function(BuildContext) getLocation;
 
   int? _prevWaypoint;
   LatLng? _location;
 
-  void start(BuildContext context) async {
-    _location = await getLocation(context);
-  }
-
-  Future<int?> tick(BuildContext context) async {
+  Future<int?> tick(BuildContext context, LatLng? location) async {
     var prevLocation = _location;
-    var location = _location = await getLocation(context);
+    _location = location;
 
     // can't do anything if we don't know the current location
     if (location == null) return null;
