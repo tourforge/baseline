@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '/models.dart';
 import '/screens/navigation.dart';
+import '/screens/waypoint_details.dart';
 import '/widgets/gallery.dart';
 
 // TODO: investigate performance of this page, it's pretty heavy
@@ -138,7 +139,10 @@ class _TourDetailsState extends State<TourDetails>
             ),
           ),
           SliverToBoxAdapter(
-            child: Gallery(images: tour?.gallery ?? []),
+            child: SizedBox(
+              height: 250,
+              child: Gallery(images: tour?.gallery ?? []),
+            ),
           ),
           const SliverToBoxAdapter(
             child: _DetailsHeader(
@@ -226,7 +230,12 @@ class _WaypointList extends StatelessWidget {
               elevation: 3,
               borderRadius: const BorderRadius.all(borderRadius),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context).push(DialogRoute(
+                      context: context,
+                      builder: (context) =>
+                          WaypointDetails(tour!.waypoints[index])));
+                },
                 borderRadius: const BorderRadius.all(borderRadius),
                 child: Row(
                   children: [

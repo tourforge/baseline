@@ -7,9 +7,11 @@ class Gallery extends StatefulWidget {
   const Gallery({
     super.key,
     required this.images,
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
   });
 
   final List<AssetModel> images;
+  final EdgeInsetsGeometry padding;
 
   @override
   State<Gallery> createState() => _GalleryState();
@@ -18,36 +20,34 @@ class Gallery extends StatefulWidget {
 class _GalleryState extends State<Gallery> {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 250,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        itemCount: widget.images.length,
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => GalleryPage(
-                    images: widget.images,
-                    initialImage: index,
-                  ),
+    return ListView.separated(
+      scrollDirection: Axis.horizontal,
+      padding: widget.padding,
+      itemCount: widget.images.length,
+      itemBuilder: (context, index) {
+        return InkWell(
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => GalleryPage(
+                  images: widget.images,
+                  initialImage: index,
                 ),
-              );
-            },
-            child: Material(
-              elevation: 3,
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
-              clipBehavior: Clip.antiAlias,
-              child: Image.asset(widget.images[index].fullPath),
-            ),
-          );
-        },
-        separatorBuilder: (context, index) {
-          return const SizedBox(width: 8);
-        },
-      ),
+              ),
+            );
+          },
+          child: Material(
+            elevation: 3,
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            clipBehavior: Clip.antiAlias,
+            child: Image.asset(widget.images[index].fullPath),
+          ),
+        );
+      },
+      separatorBuilder: (context, index) {
+        return const SizedBox(width: 8);
+      },
     );
   }
 }
