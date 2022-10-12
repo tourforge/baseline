@@ -124,6 +124,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     center: LatLng(34.000556, -81.034722),
                     interactiveFlags: InteractiveFlag.pinchZoom |
                         InteractiveFlag.pinchMove |
+                        InteractiveFlag.doubleTapZoom |
                         InteractiveFlag.drag,
                   ),
                   children: [
