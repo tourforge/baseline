@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_dragmarker/dragmarker.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 
 import '/controllers/narration_playback.dart';
 import '/controllers/navigation.dart';
 import '/location.dart';
 import '/models.dart';
+import '/models/current_location.dart';
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen(this.tour, {super.key});
@@ -33,7 +35,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   StreamSubscription<LatLng> _locationStream =
       const Stream<LatLng>.empty().listen((_) {});
 
-  LatLng? _currentLocation;
+  final CurrentLocationModel _currentLocation = CurrentLocationModel();
 
   @override
   void initState() {
@@ -59,7 +61,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       waypointIndexToPathIndex: waypoints,
       waypoints:
           widget.tour.waypoints.map((e) => LatLng(e.lat, e.lng)).toList(),
-      getLocation: (context) async => _currentLocation,
+      getLocation: (context) async => _currentLocation.value,
     );
 
     _controllerTickTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -67,8 +69,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
         _navController.tick(context).then((waypoint) {
           if (currentWaypoint != waypoint) {
             _playbackController.arrivedAtWaypoint(waypoint);
+            setState(() => currentWaypoint = waypoint);
           }
-          setState(() => currentWaypoint = waypoint);
         });
       } else {
         timer.cancel();
@@ -98,7 +100,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     if (stream != null) {
       _locationStream.cancel();
       _locationStream = stream.listen((ll) {
-        setState(() => _currentLocation = ll);
+        _currentLocation.value = ll;
       });
     }
   }
@@ -109,136 +111,155 @@ class _NavigationScreenState extends State<NavigationScreen> {
   Widget build(BuildContext context) {
     const bottomHeight = 100.0;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Navgiating"),
-        actions: [
-          if (kDebugMode)
-            IconButton(
-              onPressed: () {
-                if (_fakeGpsKey == null) {
-                  setState(() => _fakeGpsKey = GlobalKey());
-                  _stopGpsListening();
-                } else {
-                  setState(() => _fakeGpsKey = null);
-                  _startGpsListening();
-                }
-              },
-              icon: const Icon(Icons.bug_report),
-              tooltip: "Enable fake GPS debug mode",
-            ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0.0,
-            left: 0.0,
-            right: 0.0,
-            bottom: bottomHeight,
-            child: FlutterMap(
-              options: MapOptions(
-                center: LatLng(34.000556, -81.034722),
-                interactiveFlags:
-                    InteractiveFlag.pinchZoom | InteractiveFlag.drag,
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                  userAgentPackageName: "org.evresi.app",
+    return ChangeNotifierProvider<CurrentLocationModel>.value(
+      value: _currentLocation,
+      builder: (context, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("Navgiating"),
+            actions: [
+              if (kDebugMode)
+                IconButton(
+                  onPressed: () {
+                    if (_fakeGpsKey == null) {
+                      setState(() => _fakeGpsKey = GlobalKey());
+                      _stopGpsListening();
+                    } else {
+                      setState(() => _fakeGpsKey = null);
+                      _startGpsListening();
+                    }
+                  },
+                  icon: const Icon(Icons.bug_report),
+                  tooltip: "Enable fake GPS debug mode",
                 ),
-                PolylineLayer(
-                  polylines: [
-                    Polyline(
-                      points: widget.tour.path,
-                      strokeWidth: 4,
-                      color: Colors.red,
-                    ),
-                  ],
-                ),
-                MarkerLayer(
-                  markers: [
-                    for (var waypoint in widget.tour.waypoints.asMap().entries)
-                      Marker(
-                        point: LatLng(waypoint.value.lat, waypoint.value.lng),
-                        builder: (context) => _MarkerIcon(waypoint.key + 1),
-                      ),
-                  ],
-                ),
-                if (kDebugMode && _fakeGpsKey != null)
-                  _FakeGpsPosition(
-                    key: _fakeGpsKey,
-                    onPositionChanged: (ll) {
-                      setState(() => _currentLocation = ll);
-                    },
-                  ),
-                IgnorePointer(
-                  ignoring: kDebugMode && _fakeGpsKey != null,
-                  child: MarkerLayer(
-                    markers: [
-                      if (_currentLocation != null)
-                        Marker(
-                            point: _currentLocation!,
-                            width: 25,
-                            height: 25,
-                            builder: (context) => const DecoratedBox(
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.blue,
-                                      border: Border.fromBorderSide(BorderSide(
-                                          color: Colors.white, width: 3)),
-                                      boxShadow: [
-                                        BoxShadow(
-                                            blurRadius: 3,
-                                            color: Colors.black38)
-                                      ]),
-                                )),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
-          Positioned(
-            left: 0.0,
-            right: 0.0,
-            bottom: 0.0,
-            child: SizedBox(
-              height: bottomHeight,
-              child: Material(
-                elevation: 4,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          body: Stack(
+            children: [
+              Positioned(
+                top: 0.0,
+                left: 0.0,
+                right: 0.0,
+                bottom: bottomHeight,
+                child: FlutterMap(
+                  options: MapOptions(
+                    center: LatLng(34.000556, -81.034722),
+                    interactiveFlags:
+                        InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+                  ),
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0)
-                          .add(const EdgeInsets.symmetric(horizontal: 16.0)),
-                      child: currentWaypoint != null
-                          ? Text("Current waypoint: ${currentWaypoint! + 1}")
-                          : const Text("Not at waypoint"),
+                    TileLayer(
+                      urlTemplate:
+                          "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      userAgentPackageName: "org.evresi.app",
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: _AudioPositionSlider(
-                          playbackController: _playbackController),
+                    PolylineLayer(
+                      polylines: [
+                        Polyline(
+                          points: widget.tour.path,
+                          strokeWidth: 4,
+                          color: Colors.red,
+                        ),
+                      ],
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        for (var waypoint
+                            in widget.tour.waypoints.asMap().entries)
+                          Marker(
+                            point:
+                                LatLng(waypoint.value.lat, waypoint.value.lng),
+                            builder: (context) => _MarkerIcon(waypoint.key + 1),
+                          ),
+                      ],
+                    ),
+                    if (kDebugMode && _fakeGpsKey != null)
+                      _FakeGpsPosition(
+                        key: _fakeGpsKey,
+                        onPositionChanged: (ll) {
+                          _currentLocation.value = ll;
+                        },
+                      ),
+                    IgnorePointer(
+                      ignoring: kDebugMode && _fakeGpsKey != null,
+                      child: const _CurrentLocationMarkerLayer(),
                     ),
                   ],
                 ),
               ),
+              Positioned(
+                left: 0.0,
+                right: 0.0,
+                bottom: 0.0,
+                child: SizedBox(
+                  height: bottomHeight,
+                  child: Material(
+                    elevation: 4,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0).add(
+                              const EdgeInsets.symmetric(horizontal: 16.0)),
+                          child: currentWaypoint != null
+                              ? Text(
+                                  "Current waypoint: ${currentWaypoint! + 1}")
+                              : const Text("Not at waypoint"),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: _AudioPositionSlider(
+                              playbackController: _playbackController),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0.0,
+                right: 0.0,
+                bottom: bottomHeight - 45,
+                child: Center(
+                  child: _AudioControlButton(
+                      playbackController: _playbackController),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CurrentLocationMarkerLayer extends StatelessWidget {
+  const _CurrentLocationMarkerLayer({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var currentLocation = context.watch<CurrentLocationModel>();
+
+    return MarkerLayer(
+      markers: [
+        if (currentLocation.value != null)
+          Marker(
+            point: currentLocation.value!,
+            width: 25,
+            height: 25,
+            builder: (context) => const DecoratedBox(
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blue,
+                  border: Border.fromBorderSide(
+                      BorderSide(color: Colors.white, width: 3)),
+                  boxShadow: [BoxShadow(blurRadius: 3, color: Colors.black38)]),
             ),
           ),
-          Positioned(
-            left: 0.0,
-            right: 0.0,
-            bottom: bottomHeight - 45,
-            child: Center(
-              child:
-                  _AudioControlButton(playbackController: _playbackController),
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 }
