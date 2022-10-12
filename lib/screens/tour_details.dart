@@ -40,7 +40,7 @@ class _TourDetailsState extends State<TourDetails>
           SliverAppBar(
             pinned: true,
             expandedHeight: 250.0,
-            leading: InitialFadeIn(
+            leading: _InitialFadeIn(
               child: IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 tooltip: "Back",
@@ -48,7 +48,7 @@ class _TourDetailsState extends State<TourDetails>
               ),
             ),
             actions: [
-              InitialFadeIn(
+              _InitialFadeIn(
                 child: IconButton(
                   onPressed: () {},
                   tooltip: "Preview",
@@ -78,7 +78,7 @@ class _TourDetailsState extends State<TourDetails>
                         ),
                       ),
                       Positioned.fill(
-                        child: InitialFadeIn(
+                        child: _InitialFadeIn(
                           child: Container(
                               color: const Color.fromARGB(64, 0, 0, 0)),
                         ),
@@ -88,7 +88,7 @@ class _TourDetailsState extends State<TourDetails>
                 ],
               ),
               centerTitle: true,
-              title: InitialFadeIn(
+              title: _InitialFadeIn(
                 child: Text(
                   widget.summary.name,
                   style: GoogleFonts.montserrat(
@@ -101,7 +101,7 @@ class _TourDetailsState extends State<TourDetails>
           ),
           SliverPersistentHeader(
             pinned: true,
-            delegate: StartTourButtonDelegate(
+            delegate: _StartTourButtonDelegate(
               tickerProvider: this,
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
@@ -140,53 +140,176 @@ class _TourDetailsState extends State<TourDetails>
           SliverToBoxAdapter(
             child: Gallery(images: tour?.gallery ?? []),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              return Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                child: Material(
-                  elevation: 3,
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          tour?.waypoints[index].name ?? "",
-                          style: GoogleFonts.montserrat(
-                              fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
-                        Text(
-                          "${tour?.waypoints[index].desc ?? ""}\n\n",
-                          style: GoogleFonts.poppins(
-                              fontSize: 13, color: Colors.grey),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }, childCount: tour?.waypoints.length ?? 0),
+          const SliverToBoxAdapter(
+            child: _DetailsHeader(
+              title: "Tour Stops",
+            ),
           ),
+          _WaypointList(tour: tour),
         ],
       ),
     );
   }
 }
 
-class InitialFadeIn extends StatefulWidget {
-  const InitialFadeIn({super.key, required this.child});
+class _DetailsHeader extends StatelessWidget {
+  const _DetailsHeader({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 20.0,
+            bottom: 4.0,
+          ),
+          child: DecoratedBox(
+            decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 240, 240, 240),
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 2,
+                    offset: Offset(1, 1),
+                  ),
+                ]),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 32.0,
+                vertical: 12.0,
+              ),
+              child: Text(
+                title,
+                style: GoogleFonts.roboto(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: const Color.fromARGB(255, 77, 77, 77),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WaypointList extends StatelessWidget {
+  const _WaypointList({
+    Key? key,
+    required this.tour,
+  }) : super(key: key);
+
+  final TourModel? tour;
+
+  @override
+  Widget build(BuildContext context) {
+    const borderRadius = Radius.circular(20);
+
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        childCount: tour?.waypoints.length ?? 0,
+        (context, index) {
+          return Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+            child: Material(
+              elevation: 3,
+              borderRadius: const BorderRadius.all(borderRadius),
+              child: InkWell(
+                onTap: () {},
+                borderRadius: const BorderRadius.all(borderRadius),
+                child: Row(
+                  children: [
+                    if (tour != null &&
+                        tour!.waypoints[index].gallery.isNotEmpty)
+                      SizedBox(
+                        width: 90,
+                        height: 90,
+                        child: Stack(
+                          fit: StackFit.passthrough,
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: borderRadius,
+                                bottomLeft: borderRadius,
+                              ),
+                              child: Image.asset(
+                                tour!.waypoints[index].gallery.first.fullPath,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                "${index + 1}",
+                                style: GoogleFonts.robotoMono(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  shadows: const [
+                                    Shadow(
+                                      color: Colors.black,
+                                      blurRadius: 35,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              tour?.waypoints[index].name ?? "",
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 14, fontWeight: FontWeight.w500),
+                            ),
+                            Text(
+                              "${tour?.waypoints[index].desc ?? ""}\n\n",
+                              style: GoogleFonts.poppins(
+                                  fontSize: 13, color: Colors.grey),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _InitialFadeIn extends StatefulWidget {
+  const _InitialFadeIn({super.key, required this.child});
 
   final Widget child;
 
   @override
-  State<InitialFadeIn> createState() => _InitialFadeInState();
+  State<_InitialFadeIn> createState() => _InitialFadeInState();
 }
 
-class _InitialFadeInState extends State<InitialFadeIn>
+class _InitialFadeInState extends State<_InitialFadeIn>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     duration: const Duration(milliseconds: 600),
@@ -206,8 +329,8 @@ class _InitialFadeInState extends State<InitialFadeIn>
   }
 }
 
-class StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
-  const StartTourButtonDelegate({
+class _StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
+  const _StartTourButtonDelegate({
     required this.tickerProvider,
     required this.onPressed,
   });
