@@ -258,6 +258,7 @@ class _AudioPositionSlider extends StatefulWidget {
 class _AudioPositionSliderState extends State<_AudioPositionSlider> {
   late final StreamSubscription<double> _positionSubscription;
 
+  bool isDragging = false;
   double position = 0;
 
   @override
@@ -266,7 +267,9 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
 
     _positionSubscription =
         widget.playbackController.onPositionChanged.listen((position) {
-      setState(() => this.position = position);
+      setState(() {
+        if (!isDragging) this.position = position;
+      });
     });
   }
 
@@ -284,6 +287,13 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
       min: 0,
       max: 1,
       onChanged: (value) {
+        setState(() {
+          position = value;
+        });
+      },
+      onChangeStart: (_) => isDragging = true,
+      onChangeEnd: (value) {
+        isDragging = false;
         widget.playbackController.seek(value);
       },
     );
