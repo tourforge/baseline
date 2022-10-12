@@ -27,8 +27,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   int? currentWaypoint;
   late NavigationController _navController;
   late NarrationPlaybackController _playbackController;
-
-  GlobalKey<_FakeGpsPositionState>? _fakeGpsKey;
+  bool _fakeGpsEnabled = false;
   StreamSubscription<LatLng> _locationStream =
       const Stream<LatLng>.empty().listen((_) {});
 
@@ -100,11 +99,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
               if (kDebugMode)
                 IconButton(
                   onPressed: () {
-                    if (_fakeGpsKey == null) {
-                      setState(() => _fakeGpsKey = GlobalKey());
+                    if (!_fakeGpsEnabled) {
+                      setState(() => _fakeGpsEnabled = true);
                       _stopGpsListening();
                     } else {
-                      setState(() => _fakeGpsKey = null);
+                      setState(() => _fakeGpsEnabled = false);
                       _startGpsListening();
                     }
                   },
@@ -152,17 +151,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           ),
                       ],
                     ),
-                    if (kDebugMode && _fakeGpsKey != null)
+                    const _CurrentLocationMarkerLayer(),
+                    if (kDebugMode && _fakeGpsEnabled)
                       _FakeGpsPosition(
-                        key: _fakeGpsKey,
                         onPositionChanged: (ll) {
                           _currentLocation.value = ll;
                         },
                       ),
-                    IgnorePointer(
-                      ignoring: kDebugMode && _fakeGpsKey != null,
-                      child: const _CurrentLocationMarkerLayer(),
-                    ),
                   ],
                 ),
               ),
@@ -396,17 +391,22 @@ class _FakeGpsPositionState extends State<_FakeGpsPosition> {
     return DragMarkers(
       markers: [
         DragMarker(
+          width: 128,
+          height: 128,
           point: _point,
-          builder: (context) => Container(
-            color: _isDragging ? Colors.blue : Colors.blueGrey,
+          builder: (context) => DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(64)),
+              color: _isDragging
+                  ? Colors.blue.withAlpha(96)
+                  : Colors.blueGrey.withAlpha(32),
+            ),
           ),
           useLongPress: true,
           onLongDragStart: (p0, p1) {
             setState(() {
-              _point = p1;
               _isDragging = true;
             });
-            widget.onPositionChanged(_point);
           },
           onLongDragEnd: (p0, p1) {
             setState(() {
