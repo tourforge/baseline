@@ -15,6 +15,10 @@ class NarrationPlaybackController {
     _player.onDurationChanged.listen((duration) {
       _currentDuration = duration;
     });
+    _player.onPlayerStateChanged.listen((event) {
+      onStateChanged();
+    });
+    ;
   }
 
   final List<AssetModel?> narrations;
@@ -57,10 +61,12 @@ class NarrationPlaybackController {
 
   Future<void> pause() async {
     await _player.pause();
+    onStateChanged();
   }
 
   Future<void> resume() async {
     await _player.resume();
+    onStateChanged();
   }
 
   Future<void> seek(double position) async {
@@ -80,6 +86,7 @@ class NarrationPlaybackController {
 
     await _player.stop();
     await _player.play(AssetSource(narration.fullPath));
+    onStateChanged();
   }
 
   String? positionToString(double position) {
