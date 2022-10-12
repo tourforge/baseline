@@ -322,40 +322,44 @@ class _AudioControlButtonState extends State<_AudioControlButton> {
         color: Theme.of(context).colorScheme.primary,
         child: IconButton(
           splashRadius: 45,
-          onPressed: () {
-            switch (widget.playbackController.state) {
-              case PlaybackState.playing:
-                widget.playbackController.pause();
-                break;
-              case PlaybackState.paused:
-                widget.playbackController.resume();
-                break;
-              case PlaybackState.completed:
-                widget.playbackController.replay();
-                break;
-              case PlaybackState.stopped:
-                break;
-            }
-          },
+          onPressed: _onPressed,
           icon: Icon(
-            (() {
-              switch (widget.playbackController.state) {
-                case PlaybackState.playing:
-                  return Icons.pause;
-                case PlaybackState.paused:
-                  return Icons.play_arrow;
-                case PlaybackState.completed:
-                  return Icons.replay;
-                case PlaybackState.stopped:
-                  return Icons.play_arrow;
-              }
-            })(),
+            (_icon)(),
             size: 48,
             color: Colors.white,
           ),
         ),
       ),
     );
+  }
+
+  void _onPressed() {
+    switch (widget.playbackController.state) {
+      case PlaybackState.playing:
+        widget.playbackController.pause();
+        break;
+      case PlaybackState.paused:
+        widget.playbackController.resume();
+        break;
+      case PlaybackState.completed:
+        widget.playbackController.replay();
+        break;
+      case PlaybackState.stopped:
+        break;
+    }
+  }
+
+  IconData _icon() {
+    switch (widget.playbackController.state) {
+      case PlaybackState.playing:
+        return Icons.pause;
+      case PlaybackState.paused:
+        return Icons.play_arrow;
+      case PlaybackState.completed:
+        return Icons.replay;
+      case PlaybackState.stopped:
+        return Icons.play_arrow;
+    }
   }
 }
 
