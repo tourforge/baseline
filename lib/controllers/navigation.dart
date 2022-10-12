@@ -14,13 +14,25 @@ const _distanceOnPathThresholdMeters = 200;
 class NavigationController {
   NavigationController({
     this.path = const <LatLng>[],
-    required this.waypointIndexToPathIndex,
     required this.waypoints,
     required this.getLocation,
-  });
+  }) {
+    for (var waypoint in waypoints) {
+      var closest = 0;
+      var closestDistance = _distance(waypoint, path[0]);
+      for (var i = 1; i < path.length; i++) {
+        var distance = _distance(waypoint, path[i]);
+        if (distance < closestDistance) {
+          closest = i;
+          closestDistance = distance;
+        }
+      }
+      waypointIndexToPathIndex.add(closest);
+    }
+  }
 
   final List<LatLng> path;
-  final List<int> waypointIndexToPathIndex;
+  final List<int> waypointIndexToPathIndex = [];
   final List<LatLng> waypoints;
   final Future<LatLng?> Function(BuildContext) getLocation;
 

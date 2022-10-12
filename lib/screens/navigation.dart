@@ -22,8 +22,6 @@ class NavigationScreen extends StatefulWidget {
   State<NavigationScreen> createState() => _NavigationScreenState();
 }
 
-const _distance = Distance();
-
 class _NavigationScreenState extends State<NavigationScreen> {
   double played = 0;
   int? currentWaypoint;
@@ -40,25 +38,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
   @override
   void initState() {
     super.initState();
-    var waypoints = <int>[];
-
-    for (var waypoint in widget.tour.waypoints.asMap().entries) {
-      var waypointLatLng = LatLng(waypoint.value.lat, waypoint.value.lng);
-      var closest = 0;
-      var closestDistance = _distance(waypointLatLng, widget.tour.path[0]);
-      for (var i = 1; i < widget.tour.path.length; i++) {
-        var distance = _distance(waypointLatLng, widget.tour.path[i]);
-        if (distance < closestDistance) {
-          closest = i;
-          closestDistance = distance;
-        }
-      }
-      waypoints.add(closest);
-    }
 
     _navController = NavigationController(
       path: widget.tour.path,
-      waypointIndexToPathIndex: waypoints,
       waypoints:
           widget.tour.waypoints.map((e) => LatLng(e.lat, e.lng)).toList(),
       getLocation: (context) async => _currentLocation.value,
