@@ -41,7 +41,7 @@ dependencies:
   latlong2: ^0.8.1
   maps_toolkit: ^2.0.1
   geolocator: ^9.0.2
-  flutter_map_dragmarker: ^4.0.2
+  flutter_map_dragmarker: ^4.1.2
   audioplayers: ^1.1.1
   provider: ^6.0.4
 
