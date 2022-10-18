@@ -48,70 +48,81 @@ class _NavigationDrawerState extends State<NavigationDrawer>
       alignment: Alignment.bottomCenter,
       child: LayoutBuilder(builder: (context, constraints) {
         _expandedSize = constraints.maxHeight * 0.5;
-        return ClipRect(
-          child: Material(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            color: Theme.of(context).dividerColor, width: 2)),
-                  ),
-                  child: GestureDetector(
-                    onVerticalDragStart: _onVerticalDragStart,
-                    onVerticalDragEnd: _onVerticalDragEnd,
-                    onVerticalDragUpdate: _onVerticalDragUpdate,
-                    child: const DecoratedBox(
-                      decoration: BoxDecoration(color: Colors.transparent),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        child: UnconstrainedBox(
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Colors.grey,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(5)),
-                            ),
-                            child: SizedBox(
-                                height: handleHeight, width: handleWidth),
+        return Material(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border(
+                      bottom: BorderSide(
+                          color: Theme.of(context).dividerColor, width: 2)),
+                ),
+                child: GestureDetector(
+                  onTap: _onTap,
+                  onVerticalDragStart: _onVerticalDragStart,
+                  onVerticalDragEnd: _onVerticalDragEnd,
+                  onVerticalDragUpdate: _onVerticalDragUpdate,
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(color: Colors.transparent),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: UnconstrainedBox(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
                           ),
+                          child: SizedBox(
+                              height: handleHeight, width: handleWidth),
                         ),
                       ),
                     ),
                   ),
                 ),
-                SizeTransition(
-                  sizeFactor: _animation,
-                  child: SizedBox(
-                    height: _innerSize,
-                    child: ListView(
-                      children: [
-                        const SizedBox(height: 3),
-                        for (var x in widget.tour.waypoints.asMap().entries)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6.0,
-                              vertical: 3.0,
-                            ),
-                            child: WaypointCard(
-                              waypoint: x.value,
-                              index: x.key,
-                            ),
+              ),
+              SizeTransition(
+                sizeFactor: _animation,
+                child: SizedBox(
+                  height: _innerSize,
+                  child: ListView(
+                    children: [
+                      const SizedBox(height: 3),
+                      for (var x in widget.tour.waypoints.asMap().entries)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6.0,
+                            vertical: 3.0,
                           ),
-                        const SizedBox(height: 3),
-                      ],
-                    ),
+                          child: WaypointCard(
+                            waypoint: x.value,
+                            index: x.key,
+                          ),
+                        ),
+                      const SizedBox(height: 3),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       }),
     );
+  }
+
+  void _onTap() {
+    setState(() {
+      var factor = _animation.value * _innerSize / _expandedSize;
+
+      if (factor > 0.5) {
+        _controller.reverse(from: invCurve.transform(factor));
+      } else {
+        _innerSize = _expandedSize;
+        _controller.forward(from: invCurve.transform(factor));
+      }
+    });
   }
 
   void _onVerticalDragStart(DragStartDetails details) {
