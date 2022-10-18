@@ -21,39 +21,47 @@ class NavigationPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 8.0, bottom: 8.0),
-            child: _AudioControlButton(playbackController: playbackController),
-          ),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.only(top: 8.0, left: 16.0, bottom: 8.0),
-                  child: Text(
-                    currentWaypoint != null
-                        ? "${currentWaypoint! + 1}. ${tour.waypoints[currentWaypoint!].name}"
-                        : "No Waypoints Nearby",
-                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                        fontWeight:
-                            currentWaypoint != null ? FontWeight.bold : null,
-                        fontSize: 17,
-                        color: currentWaypoint == null ? Colors.grey : null,
-                        fontStyle:
-                            currentWaypoint == null ? FontStyle.italic : null),
-                  ),
-                ),
-                _AudioPositionSlider(playbackController: playbackController),
-              ],
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+              top: BorderSide(color: Theme.of(context).dividerColor, width: 2)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0, bottom: 8.0),
+              child:
+                  _AudioControlButton(playbackController: playbackController),
             ),
-          ),
-        ],
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 8.0, left: 16.0, bottom: 8.0),
+                    child: Text(
+                      currentWaypoint != null
+                          ? "${currentWaypoint! + 1}. ${tour.waypoints[currentWaypoint!].name}"
+                          : "No Waypoints Nearby",
+                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                          fontWeight:
+                              currentWaypoint != null ? FontWeight.bold : null,
+                          fontSize: 17,
+                          color: currentWaypoint == null ? Colors.grey : null,
+                          fontStyle: currentWaypoint == null
+                              ? FontStyle.italic
+                              : null),
+                    ),
+                  ),
+                  _AudioPositionSlider(playbackController: playbackController),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
