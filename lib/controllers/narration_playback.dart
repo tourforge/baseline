@@ -90,10 +90,14 @@ class NarrationPlaybackController {
   }
 
   String? positionToString(double position) {
-    var duration = _currentDuration;
-    if (duration == null) return null;
+    var fullDuration = _currentDuration;
+    if (fullDuration == null) return null;
 
-    var mins = "${duration.inMinutes}";
+    var duration = Duration(
+      milliseconds: (fullDuration.inMilliseconds.toDouble() * position).toInt(),
+    );
+
+    var mins = "${duration.inMinutes}".padLeft(2, "0");
     var secs =
         "${duration.inSeconds - duration.inMinutes * 60}".padLeft(2, "0");
 

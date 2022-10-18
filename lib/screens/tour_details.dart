@@ -5,9 +5,9 @@ import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '/models.dart';
-import '/screens/navigation.dart';
-import '/screens/waypoint_details.dart';
 import '/widgets/gallery.dart';
+import '/widgets/waypoint_card.dart';
+import '/screens/navigation/navigation.dart';
 
 // TODO: investigate performance of this page, it's pretty heavy
 
@@ -175,17 +175,9 @@ class _DetailsHeader extends StatelessWidget {
             top: 20.0,
             bottom: 4.0,
           ),
-          child: DecoratedBox(
-            decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 240, 240, 240),
-                borderRadius: BorderRadius.all(Radius.circular(12)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 2,
-                    offset: Offset(1, 1),
-                  ),
-                ]),
+          child: Material(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            elevation: 3,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 32.0,
@@ -217,8 +209,6 @@ class _WaypointList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const borderRadius = Radius.circular(20);
-
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         childCount: tour?.waypoints.length ?? 0,
@@ -226,81 +216,9 @@ class _WaypointList extends StatelessWidget {
           return Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-            child: Material(
-              elevation: 3,
-              borderRadius: const BorderRadius.all(borderRadius),
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context).push(DialogRoute(
-                      context: context,
-                      builder: (context) =>
-                          WaypointDetails(tour!.waypoints[index])));
-                },
-                borderRadius: const BorderRadius.all(borderRadius),
-                child: Row(
-                  children: [
-                    if (tour != null &&
-                        tour!.waypoints[index].gallery.isNotEmpty)
-                      SizedBox(
-                        width: 90,
-                        height: 90,
-                        child: Stack(
-                          fit: StackFit.passthrough,
-                          children: [
-                            ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: borderRadius,
-                                bottomLeft: borderRadius,
-                              ),
-                              child: Image.asset(
-                                tour!.waypoints[index].gallery.first.fullPath,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            Center(
-                              child: Text(
-                                "${index + 1}",
-                                style: GoogleFonts.robotoMono(
-                                  color: Colors.white,
-                                  fontSize: 32,
-                                  shadows: const [
-                                    Shadow(
-                                      color: Colors.black,
-                                      blurRadius: 35,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              tour?.waypoints[index].name ?? "",
-                              style: GoogleFonts.montserrat(
-                                  fontSize: 14, fontWeight: FontWeight.w500),
-                            ),
-                            Text(
-                              "${tour?.waypoints[index].desc ?? ""}\n\n",
-                              style: GoogleFonts.poppins(
-                                  fontSize: 13, color: Colors.grey),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            child: WaypointCard(
+              waypoint: tour!.waypoints[index],
+              index: index,
             ),
           );
         },

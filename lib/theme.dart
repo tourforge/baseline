@@ -36,4 +36,8 @@ var themeData = ThemeData(
     ),
   ),
   colorScheme: colorScheme,
+  sliderTheme: const SliderThemeData(
+    overlayShape: RoundSliderOverlayShape(overlayRadius: 16.0),
+    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8.0),
+  ),
 );
