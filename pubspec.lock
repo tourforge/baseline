@@ -145,7 +145,7 @@ packages:
       name: flutter_map_dragmarker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.2"
+    version: "4.1.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
