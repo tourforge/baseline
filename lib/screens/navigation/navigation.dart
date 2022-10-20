@@ -95,25 +95,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
       value: _currentLocation,
       builder: (context, child) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text("Navgiating"),
-            actions: [
-              if (kDebugMode)
-                IconButton(
-                  onPressed: () {
-                    if (!_fakeGpsEnabled) {
-                      setState(() => _fakeGpsEnabled = true);
-                      _stopGpsListening();
-                    } else {
-                      setState(() => _fakeGpsEnabled = false);
-                      _startGpsListening();
-                    }
-                  },
-                  icon: const Icon(Icons.bug_report),
-                  tooltip: "Enable fake GPS debug mode",
-                ),
-            ],
-          ),
           body: Stack(
             children: [
               Positioned(
@@ -124,6 +105,103 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 child: NavigationMap(
                   tour: widget.tour,
                   fakeGpsEnabled: _fakeGpsEnabled,
+                ),
+              ),
+              Positioned(
+                top: 5.0,
+                left: 0.0,
+                right: 0.0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Material(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(25)),
+                        child: SizedBox(
+                          height: 50,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Text(
+                                  "Navigating",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline5!
+                                      .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0.0,
+                left: 0.0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Material(
+                      borderRadius: const BorderRadius.all(Radius.circular(30)),
+                      color: Theme.of(context).colorScheme.primary,
+                      child: SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          iconSize: 32,
+                          splashRadius: 30,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          icon: Icon(Icons.adaptive.arrow_back),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0.0,
+                right: 0.0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Material(
+                      borderRadius: const BorderRadius.all(Radius.circular(30)),
+                      color: Theme.of(context).colorScheme.primary,
+                      child: SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: IconButton(
+                          onPressed: () {
+                            if (!_fakeGpsEnabled) {
+                              setState(() => _fakeGpsEnabled = true);
+                              _stopGpsListening();
+                            } else {
+                              setState(() => _fakeGpsEnabled = false);
+                              _startGpsListening();
+                            }
+                          },
+                          iconSize: 32,
+                          splashRadius: 30,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          icon: const Icon(Icons.bug_report),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Positioned(
