@@ -33,6 +33,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   final CurrentLocationModel _currentLocation = CurrentLocationModel();
 
+  final GlobalKey<NavigationDrawerState> _drawerKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -129,7 +131,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 left: 0.0,
                 right: 0.0,
                 bottom: bottomHeight,
-                child: NavigationDrawer(tour: widget.tour),
+                child: NavigationDrawer(key: _drawerKey, tour: widget.tour),
               ),
               Positioned(
                 left: 0.0,
@@ -137,10 +139,18 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 bottom: 0.0,
                 child: SizedBox(
                   height: bottomHeight,
-                  child: NavigationPanel(
-                    playbackController: _playbackController,
-                    currentWaypoint: _currentWaypoint,
-                    tour: widget.tour,
+                  child: GestureDetector(
+                    child: NavigationPanel(
+                      playbackController: _playbackController,
+                      currentWaypoint: _currentWaypoint,
+                      tour: widget.tour,
+                    ),
+                    onVerticalDragStart: (details) =>
+                        _drawerKey.currentState?.onVerticalDragStart(details),
+                    onVerticalDragEnd: (details) =>
+                        _drawerKey.currentState?.onVerticalDragEnd(details),
+                    onVerticalDragUpdate: (details) =>
+                        _drawerKey.currentState?.onVerticalDragUpdate(details),
                   ),
                 ),
               ),

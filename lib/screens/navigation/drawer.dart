@@ -10,13 +10,13 @@ class NavigationDrawer extends StatefulWidget {
   final TourModel tour;
 
   @override
-  State<NavigationDrawer> createState() => _NavigationDrawerState();
+  State<NavigationDrawer> createState() => NavigationDrawerState();
 }
 
-class _NavigationDrawerState extends State<NavigationDrawer>
+class NavigationDrawerState extends State<NavigationDrawer>
     with SingleTickerProviderStateMixin {
-  static const curve = Cubic(0.65, 0.0, 0.35, 1.0);
-  static const invCurve = Cubic(0.0, 0.65, 1.0, 0.35);
+  static const _curve = Cubic(0.65, 0.0, 0.35, 1.0);
+  static const _invCurve = Cubic(0.0, 0.65, 1.0, 0.35);
 
   late final AnimationController _controller = AnimationController(
     duration: const Duration(milliseconds: 200),
@@ -24,7 +24,7 @@ class _NavigationDrawerState extends State<NavigationDrawer>
   );
   late final Animation<double> _animation = CurvedAnimation(
     parent: _controller,
-    curve: curve,
+    curve: _curve,
   );
 
   Offset? _dragStart;
@@ -55,9 +55,9 @@ class _NavigationDrawerState extends State<NavigationDrawer>
             Material(
               child: GestureDetector(
                 onTap: _onTap,
-                onVerticalDragStart: _onVerticalDragStart,
-                onVerticalDragEnd: _onVerticalDragEnd,
-                onVerticalDragUpdate: _onVerticalDragUpdate,
+                onVerticalDragStart: onVerticalDragStart,
+                onVerticalDragEnd: onVerticalDragEnd,
+                onVerticalDragUpdate: onVerticalDragUpdate,
                 child: const DecoratedBox(
                   decoration: BoxDecoration(color: Colors.transparent),
                   child: Padding(
@@ -99,7 +99,7 @@ class _NavigationDrawerState extends State<NavigationDrawer>
                                         _innerSize /
                                         _expandedSize;
                                     _controller.reverse(
-                                        from: invCurve.transform(factor));
+                                        from: _invCurve.transform(factor));
                                   });
                                 }
 
@@ -143,15 +143,15 @@ class _NavigationDrawerState extends State<NavigationDrawer>
       var factor = _animation.value * _innerSize / _expandedSize;
 
       if (factor > 0.5) {
-        _controller.reverse(from: invCurve.transform(factor));
+        _controller.reverse(from: _invCurve.transform(factor));
       } else {
         _innerSize = _expandedSize;
-        _controller.forward(from: invCurve.transform(factor));
+        _controller.forward(from: _invCurve.transform(factor));
       }
     });
   }
 
-  void _onVerticalDragStart(DragStartDetails details) {
+  void onVerticalDragStart(DragStartDetails details) {
     setState(() {
       _controller.stop();
       _dragStart = details.globalPosition;
@@ -160,16 +160,16 @@ class _NavigationDrawerState extends State<NavigationDrawer>
     });
   }
 
-  void _onVerticalDragEnd(DragEndDetails details) {
+  void onVerticalDragEnd(DragEndDetails details) {
     setState(() {
       var startFactor = _dragStartSize! / _expandedSize;
       var factor = _innerSize / _expandedSize;
 
       if (factor > (startFactor > 0.5 ? 0.85 : 0.15)) {
         _innerSize = _expandedSize;
-        _controller.forward(from: invCurve.transform(factor));
+        _controller.forward(from: _invCurve.transform(factor));
       } else {
-        _controller.reverse(from: invCurve.transform(factor));
+        _controller.reverse(from: _invCurve.transform(factor));
       }
 
       _dragStart = null;
@@ -177,7 +177,7 @@ class _NavigationDrawerState extends State<NavigationDrawer>
     });
   }
 
-  void _onVerticalDragUpdate(DragUpdateDetails details) {
+  void onVerticalDragUpdate(DragUpdateDetails details) {
     setState(() {
       var dragStart = _dragStart!;
       var dragStartSize = _dragStartSize!;
