@@ -1,3 +1,4 @@
+import 'package:evresi/maplibre_native_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -20,44 +21,49 @@ class NavigationMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
-      options: MapOptions(
-        center: LatLng(34.000556, -81.034722),
-        interactiveFlags: InteractiveFlag.pinchZoom |
-            InteractiveFlag.pinchMove |
-            InteractiveFlag.doubleTapZoom |
-            InteractiveFlag.drag,
-      ),
+    return Stack(
       children: [
-        TileLayer(
-          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          userAgentPackageName: "org.evresi.app",
-        ),
-        PolylineLayer(
-          polylines: [
-            Polyline(
-              points: tour.path,
-              strokeWidth: 4,
-              color: Colors.red,
+        /*FlutterMap(
+          options: MapOptions(
+            center: LatLng(34.000556, -81.034722),
+            interactiveFlags: InteractiveFlag.pinchZoom |
+                InteractiveFlag.pinchMove |
+                InteractiveFlag.doubleTapZoom |
+                InteractiveFlag.drag,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+              userAgentPackageName: "org.evresi.app",
             ),
-          ],
-        ),
-        MarkerLayer(
-          markers: [
-            for (var waypoint in tour.waypoints.asMap().entries)
-              Marker(
-                point: LatLng(waypoint.value.lat, waypoint.value.lng),
-                builder: (context) => _MarkerIcon(waypoint.key + 1),
+            PolylineLayer(
+              polylines: [
+                Polyline(
+                  points: tour.path,
+                  strokeWidth: 4,
+                  color: Colors.red,
+                ),
+              ],
+            ),
+            MarkerLayer(
+              markers: [
+                for (var waypoint in tour.waypoints.asMap().entries)
+                  Marker(
+                    point: LatLng(waypoint.value.lat, waypoint.value.lng),
+                    builder: (context) => _MarkerIcon(waypoint.key + 1),
+                  ),
+              ],
+            ),
+            const _CurrentLocationMarkerLayer(),
+            if (kDebugMode && fakeGpsEnabled)
+              _FakeGpsPosition(
+                onPositionChanged: (ll) {
+                  context.read<CurrentLocationModel>().value = ll;
+                },
               ),
           ],
-        ),
-        const _CurrentLocationMarkerLayer(),
-        if (kDebugMode && fakeGpsEnabled)
-          _FakeGpsPosition(
-            onPositionChanged: (ll) {
-              context.read<CurrentLocationModel>().value = ll;
-            },
-          ),
+        ),*/
+        MapLibreMap(),
       ],
     );
   }
