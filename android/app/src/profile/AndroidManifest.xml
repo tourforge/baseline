@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.app">
+    package="org.evresi.app">
     <!-- Required for development and fetch tour data and assets from server -->
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -5,10 +7,11 @@ import 'package:flutter_map_dragmarker/dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
+import '/maplibre_native_view.dart';
 import '/models.dart';
 import '/models/current_location.dart';
 
-class NavigationMap extends StatelessWidget {
+class NavigationMap extends StatefulWidget {
   const NavigationMap({
     super.key,
     required this.tour,
@@ -19,40 +22,115 @@ class NavigationMap extends StatelessWidget {
   final bool fakeGpsEnabled;
 
   @override
+  State<NavigationMap> createState() => _NavigationMapState();
+}
+
+class _NavigationMapState extends State<NavigationMap> {
+  final GlobalKey<MapLibreMapState> _mapKey = GlobalKey();
+  final GlobalKey<_FakeGpsOverlayState> _fakeGpsKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<CurrentLocationModel>().addListener(_onLocationChanged);
+  }
+
+  void _onLocationChanged() {
+    var location = context.read<CurrentLocationModel>().value;
+
+    if (location != null) {
+      _mapKey.currentState?.updateLocation(location);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (Platform.isAndroid) {
+      return MapLibreMap(
+        key: _mapKey,
+        tour: widget.tour,
+        onCameraUpdate: (center, zoom) {
+          _fakeGpsKey.currentState?.updateCameraPosition(center, zoom);
+        },
+        fakeGpsOverlay: kDebugMode
+            ? _FakeGpsOverlay(
+                key: _fakeGpsKey,
+                fakeGpsEnabled: widget.fakeGpsEnabled,
+              )
+            : const SizedBox(),
+      );
+    } else {
+      return FlutterMap(
+        options: MapOptions(
+          center: LatLng(34.000556, -81.034722),
+          interactiveFlags: InteractiveFlag.pinchZoom |
+              InteractiveFlag.pinchMove |
+              InteractiveFlag.doubleTapZoom |
+              InteractiveFlag.drag,
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            userAgentPackageName: "org.evresi.app",
+          ),
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: widget.tour.path,
+                strokeWidth: 4,
+                color: Colors.red,
+              ),
+            ],
+          ),
+          MarkerLayer(
+            markers: [
+              for (var waypoint in widget.tour.waypoints.asMap().entries)
+                Marker(
+                  point: LatLng(waypoint.value.lat, waypoint.value.lng),
+                  builder: (context) => _MarkerIcon(waypoint.key + 1),
+                ),
+            ],
+          ),
+          const _CurrentLocationMarkerLayer(),
+          if (kDebugMode && widget.fakeGpsEnabled)
+            _FakeGpsPosition(
+              onPositionChanged: (ll) {
+                context.read<CurrentLocationModel>().value = ll;
+              },
+            ),
+        ],
+      );
+    }
+  }
+}
+
+// TODO: Implement this overlay *without* FlutterMap
+class _FakeGpsOverlay extends StatefulWidget {
+  const _FakeGpsOverlay({
+    Key? key,
+    required this.fakeGpsEnabled,
+  }) : super(key: key);
+
+  final bool fakeGpsEnabled;
+
+  @override
+  State<_FakeGpsOverlay> createState() => _FakeGpsOverlayState();
+}
+
+class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
+  final controller = MapController();
+
+  void updateCameraPosition(LatLng center, double zoom) {
+    controller.move(center, zoom);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FlutterMap(
-      options: MapOptions(
-        center: LatLng(34.000556, -81.034722),
-        interactiveFlags: InteractiveFlag.pinchZoom |
-            InteractiveFlag.pinchMove |
-            InteractiveFlag.doubleTapZoom |
-            InteractiveFlag.drag,
-      ),
+      mapController: controller,
+      options: MapOptions(interactiveFlags: InteractiveFlag.none),
       children: [
-        TileLayer(
-          urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-          userAgentPackageName: "org.evresi.app",
-        ),
-        PolylineLayer(
-          polylines: [
-            Polyline(
-              points: tour.path,
-              strokeWidth: 4,
-              color: Colors.red,
-            ),
-          ],
-        ),
-        MarkerLayer(
-          markers: [
-            for (var waypoint in tour.waypoints.asMap().entries)
-              Marker(
-                point: LatLng(waypoint.value.lat, waypoint.value.lng),
-                builder: (context) => _MarkerIcon(waypoint.key + 1),
-              ),
-          ],
-        ),
-        const _CurrentLocationMarkerLayer(),
-        if (kDebugMode && fakeGpsEnabled)
+        if (kDebugMode && widget.fakeGpsEnabled)
           _FakeGpsPosition(
             onPositionChanged: (ll) {
               context.read<CurrentLocationModel>().value = ll;
