@@ -7,16 +7,43 @@ import 'package:latlong2/latlong.dart';
 import '/models.dart';
 
 class MapLibreMap extends StatefulWidget {
-  const MapLibreMap({super.key, required this.tour});
+  const MapLibreMap({
+    super.key,
+    required this.tour,
+    required this.onCameraUpdate,
+    required this.fakeGpsOverlay,
+  });
 
   final TourModel tour;
+  final void Function(LatLng center, double zoom) onCameraUpdate;
+  final Widget fakeGpsOverlay;
 
   @override
-  State<MapLibreMap> createState() => _MapLibreMapState();
+  State<MapLibreMap> createState() => MapLibreMapState();
 }
 
-class _MapLibreMapState extends State<MapLibreMap> {
+class MapLibreMapState extends State<MapLibreMap> {
+  static const _channel = MethodChannel("evresi.org/app/map");
+
   late Future<String> mapTilerKey;
+
+  void updateLocation(LatLng location) {
+    _channel.invokeMethod<void>(
+      "updateLocation",
+      jsonEncode({
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [location.longitude, location.latitude],
+            },
+          },
+        ],
+      }),
+    );
+  }
 
   @override
   void initState() {
@@ -24,6 +51,19 @@ class _MapLibreMapState extends State<MapLibreMap> {
 
     mapTilerKey =
         DefaultAssetBundle.of(context).loadString('assets/maptiler.txt');
+
+    _channel.setMethodCallHandler((call) async {
+      switch (call.method) {
+        case "updateCameraPosition":
+          double lat = call.arguments["lat"];
+          double lng = call.arguments["lng"];
+          double zoom = call.arguments["zoom"];
+          widget.onCameraUpdate(LatLng(lat, lng), zoom);
+          break;
+      }
+
+      return null;
+    });
   }
 
   @override
@@ -41,11 +81,17 @@ class _MapLibreMapState extends State<MapLibreMap> {
             "pointsGeoJson": _waypointsToGeoJson(widget.tour.waypoints),
           };
 
-          return AndroidView(
-            viewType: viewType,
-            layoutDirection: TextDirection.ltr,
-            creationParams: creationParams,
-            creationParamsCodec: const StandardMessageCodec(),
+          return Stack(
+            fit: StackFit.passthrough,
+            children: [
+              AndroidView(
+                viewType: viewType,
+                layoutDirection: TextDirection.ltr,
+                creationParams: creationParams,
+                creationParamsCodec: const StandardMessageCodec(),
+              ),
+              widget.fakeGpsOverlay,
+            ],
           );
         } else {
           return const SizedBox();

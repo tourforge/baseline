@@ -11,7 +11,7 @@ import '/maplibre_native_view.dart';
 import '/models.dart';
 import '/models/current_location.dart';
 
-class NavigationMap extends StatelessWidget {
+class NavigationMap extends StatefulWidget {
   const NavigationMap({
     super.key,
     required this.tour,
@@ -22,10 +22,42 @@ class NavigationMap extends StatelessWidget {
   final bool fakeGpsEnabled;
 
   @override
+  State<NavigationMap> createState() => _NavigationMapState();
+}
+
+class _NavigationMapState extends State<NavigationMap> {
+  final GlobalKey<MapLibreMapState> _mapKey = GlobalKey();
+  final GlobalKey<_FakeGpsOverlayState> _fakeGpsKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<CurrentLocationModel>().addListener(_onLocationChanged);
+  }
+
+  void _onLocationChanged() {
+    var location = context.read<CurrentLocationModel>().value;
+
+    if (location != null) {
+      _mapKey.currentState?.updateLocation(location);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (Platform.isAndroid) {
       return MapLibreMap(
-        tour: tour,
+        key: _mapKey,
+        tour: widget.tour,
+        onCameraUpdate: (center, zoom) {
+          _fakeGpsKey.currentState?.updateCameraPosition(center, zoom);
+        },
+        fakeGpsOverlay: kDebugMode
+            ? _FakeGpsOverlay(
+                key: _fakeGpsKey,
+                fakeGpsEnabled: widget.fakeGpsEnabled,
+              )
+            : const SizedBox(),
       );
     } else {
       return FlutterMap(
@@ -44,7 +76,7 @@ class NavigationMap extends StatelessWidget {
           PolylineLayer(
             polylines: [
               Polyline(
-                points: tour.path,
+                points: widget.tour.path,
                 strokeWidth: 4,
                 color: Colors.red,
               ),
@@ -52,7 +84,7 @@ class NavigationMap extends StatelessWidget {
           ),
           MarkerLayer(
             markers: [
-              for (var waypoint in tour.waypoints.asMap().entries)
+              for (var waypoint in widget.tour.waypoints.asMap().entries)
                 Marker(
                   point: LatLng(waypoint.value.lat, waypoint.value.lng),
                   builder: (context) => _MarkerIcon(waypoint.key + 1),
@@ -60,7 +92,7 @@ class NavigationMap extends StatelessWidget {
             ],
           ),
           const _CurrentLocationMarkerLayer(),
-          if (kDebugMode && fakeGpsEnabled)
+          if (kDebugMode && widget.fakeGpsEnabled)
             _FakeGpsPosition(
               onPositionChanged: (ll) {
                 context.read<CurrentLocationModel>().value = ll;
@@ -69,6 +101,43 @@ class NavigationMap extends StatelessWidget {
         ],
       );
     }
+  }
+}
+
+// TODO: Implement this overlay *without* FlutterMap
+class _FakeGpsOverlay extends StatefulWidget {
+  const _FakeGpsOverlay({
+    Key? key,
+    required this.fakeGpsEnabled,
+  }) : super(key: key);
+
+  final bool fakeGpsEnabled;
+
+  @override
+  State<_FakeGpsOverlay> createState() => _FakeGpsOverlayState();
+}
+
+class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
+  final controller = MapController();
+
+  void updateCameraPosition(LatLng center, double zoom) {
+    controller.move(center, zoom);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FlutterMap(
+      mapController: controller,
+      options: MapOptions(interactiveFlags: InteractiveFlag.none),
+      children: [
+        if (kDebugMode && widget.fakeGpsEnabled)
+          _FakeGpsPosition(
+            onPositionChanged: (ll) {
+              context.read<CurrentLocationModel>().value = ll;
+            },
+          ),
+      ],
+    );
   }
 }
 
