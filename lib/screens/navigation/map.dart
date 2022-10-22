@@ -1,10 +1,13 @@
-import 'package:evresi/maplibre_native_view.dart';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_dragmarker/dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
+import '/maplibre_native_view.dart';
 import '/models.dart';
 import '/models/current_location.dart';
 
@@ -20,53 +23,52 @@ class NavigationMap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        /*FlutterMap(
-          options: MapOptions(
-            center: LatLng(34.000556, -81.034722),
-            interactiveFlags: InteractiveFlag.pinchZoom |
-                InteractiveFlag.pinchMove |
-                InteractiveFlag.doubleTapZoom |
-                InteractiveFlag.drag,
-          ),
-          children: [
-            TileLayer(
-              urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-              userAgentPackageName: "org.evresi.app",
-            ),
-            PolylineLayer(
-              polylines: [
-                Polyline(
-                  points: tour.path,
-                  strokeWidth: 4,
-                  color: Colors.red,
-                ),
-              ],
-            ),
-            MarkerLayer(
-              markers: [
-                for (var waypoint in tour.waypoints.asMap().entries)
-                  Marker(
-                    point: LatLng(waypoint.value.lat, waypoint.value.lng),
-                    builder: (context) => _MarkerIcon(waypoint.key + 1),
-                  ),
-              ],
-            ),
-            const _CurrentLocationMarkerLayer(),
-            if (kDebugMode && fakeGpsEnabled)
-              _FakeGpsPosition(
-                onPositionChanged: (ll) {
-                  context.read<CurrentLocationModel>().value = ll;
-                },
-              ),
-          ],
-        ),*/
-        MapLibreMap(
-          tour: tour,
+    if (Platform.isAndroid) {
+      return MapLibreMap(
+        tour: tour,
+      );
+    } else {
+      return FlutterMap(
+        options: MapOptions(
+          center: LatLng(34.000556, -81.034722),
+          interactiveFlags: InteractiveFlag.pinchZoom |
+              InteractiveFlag.pinchMove |
+              InteractiveFlag.doubleTapZoom |
+              InteractiveFlag.drag,
         ),
-      ],
-    );
+        children: [
+          TileLayer(
+            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            userAgentPackageName: "org.evresi.app",
+          ),
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: tour.path,
+                strokeWidth: 4,
+                color: Colors.red,
+              ),
+            ],
+          ),
+          MarkerLayer(
+            markers: [
+              for (var waypoint in tour.waypoints.asMap().entries)
+                Marker(
+                  point: LatLng(waypoint.value.lat, waypoint.value.lng),
+                  builder: (context) => _MarkerIcon(waypoint.key + 1),
+                ),
+            ],
+          ),
+          const _CurrentLocationMarkerLayer(),
+          if (kDebugMode && fakeGpsEnabled)
+            _FakeGpsPosition(
+              onPositionChanged: (ll) {
+                context.read<CurrentLocationModel>().value = ll;
+              },
+            ),
+        ],
+      );
+    }
   }
 }
 
