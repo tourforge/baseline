@@ -45,3 +45,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Using MapTiler in development, the key is stored here
+/assets/maptiler.txt

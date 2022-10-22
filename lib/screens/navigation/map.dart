@@ -1,5 +1,4 @@
 import 'package:evresi/maplibre_native_view.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_dragmarker/dragmarker.dart';
@@ -63,7 +62,9 @@ class NavigationMap extends StatelessWidget {
               ),
           ],
         ),*/
-        MapLibreMap(),
+        MapLibreMap(
+          tour: tour,
+        ),
       ],
     );
   }
