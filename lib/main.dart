@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'theme.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 
 import 'screens/gallery.dart';
+import 'theme.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  FlutterDisplayMode.setHighRefreshRate();
   runApp(const EvresiApp());
 }
 
