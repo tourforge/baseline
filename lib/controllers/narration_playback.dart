@@ -56,7 +56,7 @@ class NarrationPlaybackController {
 
     _currentNarration = narration;
     await _player.stop();
-    await _player.play(AssetSource(narration.fullPath));
+    await _player.play(DeviceFileSource(narration.fullPath));
   }
 
   Future<void> pause() async {
@@ -85,7 +85,7 @@ class NarrationPlaybackController {
     if (narration == null) return;
 
     await _player.stop();
-    await _player.play(AssetSource(narration.fullPath));
+    await _player.play(DeviceFileSource(narration.fullPath));
     onStateChanged();
   }
 

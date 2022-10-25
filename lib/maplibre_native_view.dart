@@ -25,7 +25,7 @@ class MapLibreMap extends StatefulWidget {
 class MapLibreMapState extends State<MapLibreMap> {
   static const _channel = MethodChannel("evresi.org/app/map");
 
-  late Future<String> mapTilerKey;
+  late Future<String> style;
 
   void updateLocation(LatLng location) {
     _channel.invokeMethod<void>(
@@ -49,8 +49,20 @@ class MapLibreMapState extends State<MapLibreMap> {
   void initState() {
     super.initState();
 
-    mapTilerKey =
-        DefaultAssetBundle.of(context).loadString('assets/maptiler.txt');
+    style = (() async {
+      var assetBundle = DefaultAssetBundle.of(context);
+      var styleText = await assetBundle.loadString('assets/style.json');
+      var key = await assetBundle.loadString('assets/maptiler.txt');
+
+      var styleJson = jsonDecode(styleText);
+
+      styleJson["sources"]["openmaptiles"]["url"] =
+          "mbtiles://${widget.tour.tilesPath}";
+      styleJson["glyphs"] =
+          "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=$key";
+
+      return jsonEncode(styleJson);
+    })();
 
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
@@ -69,14 +81,14 @@ class MapLibreMapState extends State<MapLibreMap> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-      future: mapTilerKey,
+      future: style,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           // This is used in the platform side to register the view.
           const String viewType = 'org.evresi.app.MapLibrePlatformView';
           // Pass parameters to the platform side.
           final Map<String, dynamic> creationParams = <String, dynamic>{
-            "mapTilerKey": snapshot.data,
+            "style": snapshot.data,
             "pathGeoJson": _pathToGeoJson(widget.tour.path),
             "pointsGeoJson": _waypointsToGeoJson(widget.tour.waypoints),
           };

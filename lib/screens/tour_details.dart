@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -61,23 +62,25 @@ class _TourDetailsState extends State<TourDetails>
               background: Stack(
                 fit: StackFit.passthrough,
                 children: [
-                  ImageFiltered(
-                    imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                    child: Image.asset(
-                      widget.summary.thumbnail.fullPath,
-                      fit: BoxFit.fitWidth,
+                  if (widget.summary.thumbnail != null)
+                    ImageFiltered(
+                      imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                      child: Image.file(
+                        File(widget.summary.thumbnail!.fullPath),
+                        fit: BoxFit.fitWidth,
+                      ),
                     ),
-                  ),
                   Stack(
                     fit: StackFit.passthrough,
                     children: [
-                      Hero(
-                        tag: "tourThumbnail",
-                        child: Image.asset(
-                          widget.summary.thumbnail.fullPath,
-                          fit: BoxFit.fitWidth,
+                      if (widget.summary.thumbnail != null)
+                        Hero(
+                          tag: "tourThumbnail",
+                          child: Image.file(
+                            File(widget.summary.thumbnail!.fullPath),
+                            fit: BoxFit.fitWidth,
+                          ),
                         ),
-                      ),
                       Positioned.fill(
                         child: _InitialFadeIn(
                           child: Container(

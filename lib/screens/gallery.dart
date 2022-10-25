@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '/models.dart';
@@ -45,13 +47,15 @@ class _TourGalleryState extends State<TourGallery> {
                 for (var tourSummary in snapshot.data!)
                   TourListItem(
                     title: tourSummary.name,
-                    thumbnail: Hero(
-                      tag: "tourThumbnail",
-                      child: Image.asset(
-                        tourSummary.thumbnail.fullPath,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    thumbnail: tourSummary.thumbnail != null
+                        ? Hero(
+                            tag: "tourThumbnail",
+                            child: Image.file(
+                              File(tourSummary.thumbnail!.fullPath),
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : const SizedBox(),
                     eta: 25,
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(

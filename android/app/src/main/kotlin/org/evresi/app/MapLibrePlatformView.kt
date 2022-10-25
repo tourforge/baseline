@@ -1,25 +1,20 @@
 package org.evresi.app
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.view.View
 import com.mapbox.geojson.FeatureCollection
 import io.flutter.plugin.platform.PlatformView
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.WellKnownTileServer
-import com.mapbox.mapboxsdk.camera.CameraUpdate
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.style.expressions.Expression
-import com.mapbox.mapboxsdk.style.layers.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import java.lang.IllegalArgumentException
 
 class MapLibrePlatformView(
     context: Context,
@@ -31,7 +26,6 @@ class MapLibrePlatformView(
     private val channel = MethodChannel(messenger, "evresi.org/app/map")
     private lateinit var locationSource: GeoJsonSource
     private var map: MapboxMap? = null
-    private var style: Style? = null
 
     override fun getView(): View {
         return mapView
@@ -40,87 +34,71 @@ class MapLibrePlatformView(
     override fun dispose() {}
 
     init {
-        channel.setMethodCallHandler { call, result ->
-            when (call.method) {
-                "updateLocation" -> {
-                    locationSource.setGeoJson(call.arguments as String)
-                }
-            }
+        if (creationParams == null) {
+            throw IllegalArgumentException()
         }
 
-        val mapTilerKey = creationParams!!["mapTilerKey"] as String
-        val styleUrl = "https://api.maptiler.com/maps/streets/style.json?key=${mapTilerKey}"
-        Mapbox.getInstance(context, mapTilerKey, WellKnownTileServer.MapLibre)
-        locationSource = GeoJsonSource("locationFeatureCollection")
+        channel.setMethodCallHandler { call, result -> handleMethodCall(call, result) }
+
+        val styleText = creationParams["style"] as String
+        val pathGeoJson = creationParams["pathGeoJson"] as String
+        val pointsGeoJson = creationParams["pointsGeoJson"] as String
+
+        // Initialize MapLibre
+        Mapbox.getInstance(context)
+
         mapView = MapView(context)
         mapView.getMapAsync { map ->
-            this.map = map
+            handleMapLoaded(
+                map = map,
+                styleText = styleText,
+                pathGeoJson = pathGeoJson,
+                pointsGeoJson = pointsGeoJson,
+            )
+        }
+    }
 
-            map.addOnCameraMoveListener {
-                val cameraPosition = map.cameraPosition
-                channel.invokeMethod("updateCameraPosition", mapOf(
+    private fun handleMapLoaded(
+        map: MapboxMap,
+        styleText: String,
+        pathGeoJson: String,
+        pointsGeoJson: String
+    ) {
+        this.map = map
+
+        map.uiSettings.setAttributionMargins(15, 0, 0, 15)
+        map.cameraPosition = CameraPosition.Builder()
+            .target(LatLng(34.0, -80.0))
+            .zoom(10.0)
+            .build()
+
+        locationSource = GeoJsonSource("current_location")
+        map.setStyle(Style.Builder()
+            .fromJson(styleText)
+            .withSource(locationSource)
+            .withSource(GeoJsonSource("tour_path",
+                FeatureCollection.fromJson(pathGeoJson)))
+            .withSource(GeoJsonSource("tour_points",
+                FeatureCollection.fromJson(pointsGeoJson))))
+
+        map.addOnCameraMoveListener {
+            val cameraPosition = map.cameraPosition
+            channel.invokeMethod(
+                "updateCameraPosition", mapOf(
                     "lat" to cameraPosition.target.latitude,
                     "lng" to cameraPosition.target.longitude,
                     "zoom" to cameraPosition.zoom + 1,
-                ))
-            }
-            // Set the style after mapView was loaded
-            map.setStyle(styleUrl) { style ->
-                this.style = style
-
-                map.uiSettings.setAttributionMargins(15, 0, 0, 15)
-                // Set the map view center
-                map.cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(34.0, -80.0))
-                    .zoom(10.0)
-                    .build()
-
-                val pathFeatureCollection =
-                    FeatureCollection.fromJson(creationParams["pathGeoJson"] as String)
-                style.addSource(GeoJsonSource("pathFeatureCollection", pathFeatureCollection))
-                style.addLayer(
-                    LineLayer("pathLineLayer", "pathFeatureCollection")
-                        .withProperties(
-                            PropertyFactory.lineCap(Property.LINE_CAP_ROUND),
-                            PropertyFactory.lineJoin(Property.LINE_JOIN_ROUND),
-                            PropertyFactory.lineOpacity(.7f),
-                            PropertyFactory.lineWidth(7f),
-                            PropertyFactory.lineColor("#ff0000")
-                        )
                 )
+            )
+        }
 
-                val pointsFeatureCollection =
-                    FeatureCollection.fromJson(creationParams["pointsGeoJson"] as String)
-                style.addSource(GeoJsonSource("pointsFeatureCollection", pointsFeatureCollection))
-                style.addLayer(
-                    CircleLayer("pointsCircleLayer", "pointsFeatureCollection")
-                        .withProperties(
-                            PropertyFactory.circleRadius(16.0f),
-                            PropertyFactory.circleColor("#ff0000"),
-                            PropertyFactory.circleStrokeColor("#000000"),
-                            PropertyFactory.circleStrokeWidth(4.0f),
-                        )
-                )
-                style.addLayer(
-                    SymbolLayer("pointsSymbolLayer", "pointsFeatureCollection")
-                        .withProperties(
-                            PropertyFactory.textField(Expression.get("number")),
-                            PropertyFactory.textColor("#ffffff"),
-                            PropertyFactory.textSize(18.0f),
-                            PropertyFactory.textIgnorePlacement(true),
-                        )
-                )
+    }
 
-                style.addSource(locationSource)
-                style.addLayer(
-                    CircleLayer("locationCircleLayer", "locationFeatureCollection")
-                        .withProperties(
-                            PropertyFactory.circleRadius(12.0f),
-                            PropertyFactory.circleColor("#2196f3"),
-                            PropertyFactory.circleStrokeColor("#ffffff"),
-                            PropertyFactory.circleStrokeWidth(3.0f),
-                        )
-                )
+    private fun handleMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        when (call.method) {
+            "updateLocation" -> {
+                locationSource.setGeoJson(call.arguments as String)
+                result.success(null)
             }
         }
     }

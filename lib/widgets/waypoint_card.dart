@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -42,8 +44,8 @@ class WaypointCard extends StatelessWidget {
                         topLeft: borderRadius,
                         bottomLeft: borderRadius,
                       ),
-                      child: Image.asset(
-                        waypoint.gallery.first.fullPath,
+                      child: Image.file(
+                        File(waypoint.gallery.first.fullPath),
                         fit: BoxFit.cover,
                       ),
                     ),

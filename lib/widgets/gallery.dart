@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
@@ -41,7 +43,7 @@ class _GalleryState extends State<Gallery> {
             elevation: 3,
             borderRadius: const BorderRadius.all(Radius.circular(20)),
             clipBehavior: Clip.antiAlias,
-            child: Image.asset(widget.images[index].fullPath),
+            child: Image.file(File(widget.images[index].fullPath)),
           ),
         );
       },
@@ -80,7 +82,7 @@ class _GalleryPageState extends State<GalleryPage> {
             pageOptions: [
               for (var image in widget.images)
                 PhotoViewGalleryPageOptions(
-                  imageProvider: AssetImage(image.fullPath),
+                  imageProvider: FileImage(File(image.fullPath)),
                 ),
             ],
           ),
