@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.mapboxsdk.style.sources.VectorSource
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -40,7 +41,8 @@ class MapLibrePlatformView(
 
         channel.setMethodCallHandler { call, result -> handleMethodCall(call, result) }
 
-        val styleText = creationParams["style"] as String
+        val tilesUrl = creationParams["tilesUrl"] as String
+        val stylePath = creationParams["stylePath"] as String
         val pathGeoJson = creationParams["pathGeoJson"] as String
         val pointsGeoJson = creationParams["pointsGeoJson"] as String
 
@@ -51,7 +53,8 @@ class MapLibrePlatformView(
         mapView.getMapAsync { map ->
             handleMapLoaded(
                 map = map,
-                styleText = styleText,
+                tilesUrl = tilesUrl,
+                stylePath = stylePath,
                 pathGeoJson = pathGeoJson,
                 pointsGeoJson = pointsGeoJson,
             )
@@ -60,7 +63,8 @@ class MapLibrePlatformView(
 
     private fun handleMapLoaded(
         map: MapboxMap,
-        styleText: String,
+        tilesUrl: String,
+        stylePath: String,
         pathGeoJson: String,
         pointsGeoJson: String
     ) {
@@ -74,7 +78,8 @@ class MapLibrePlatformView(
 
         locationSource = GeoJsonSource("current_location")
         map.setStyle(Style.Builder()
-            .fromJson(styleText)
+            .fromUri("file://$stylePath")
+            .withSource(VectorSource("openmaptiles", tilesUrl))
             .withSource(locationSource)
             .withSource(GeoJsonSource("tour_path",
                 FeatureCollection.fromJson(pathGeoJson)))
