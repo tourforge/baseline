@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 import '/models.dart';
 
@@ -25,7 +28,7 @@ class MapLibreMap extends StatefulWidget {
 class MapLibreMapState extends State<MapLibreMap> {
   static const _channel = MethodChannel("evresi.org/app/map");
 
-  late Future<String> style;
+  late Future<String> buildStyle;
 
   void updateLocation(LatLng location) {
     _channel.invokeMethod<void>(
@@ -49,20 +52,7 @@ class MapLibreMapState extends State<MapLibreMap> {
   void initState() {
     super.initState();
 
-    style = (() async {
-      var assetBundle = DefaultAssetBundle.of(context);
-      var styleText = await assetBundle.loadString('assets/style.json');
-      var key = await assetBundle.loadString('assets/maptiler.txt');
-
-      var styleJson = jsonDecode(styleText);
-
-      styleJson["sources"]["openmaptiles"]["url"] =
-          "mbtiles://${widget.tour.tilesPath}";
-      styleJson["glyphs"] =
-          "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=$key";
-
-      return jsonEncode(styleJson);
-    })();
+    buildStyle = _createStyleIfNotExists();
 
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
@@ -78,17 +68,43 @@ class MapLibreMapState extends State<MapLibreMap> {
     });
   }
 
+  Future<String> _createStyleIfNotExists() async {
+    final stylePath =
+        p.join((await getTemporaryDirectory()).path, "style.json");
+
+    if (await File(stylePath).exists()) {
+      return stylePath;
+    }
+
+    if (!mounted) return stylePath;
+    var assetBundle = DefaultAssetBundle.of(context);
+    var styleText = await assetBundle.loadString('assets/style.json');
+    var key = await assetBundle.loadString('assets/maptiler.txt');
+
+    var baseStyle = jsonDecode(styleText);
+
+    baseStyle["glyphs"] =
+        "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=$key";
+
+    var style = jsonEncode(baseStyle);
+
+    await File(stylePath).writeAsString(style);
+
+    return stylePath;
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String>(
-      future: style,
+      future: buildStyle,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasData && !snapshot.hasError) {
           // This is used in the platform side to register the view.
           const String viewType = 'org.evresi.app.MapLibrePlatformView';
           // Pass parameters to the platform side.
           final Map<String, dynamic> creationParams = <String, dynamic>{
-            "style": snapshot.data,
+            "stylePath": snapshot.data,
+            "tilesUrl": "mbtiles://${widget.tour.tilesPath}",
             "pathGeoJson": _pathToGeoJson(widget.tour.path),
             "pointsGeoJson": _waypointsToGeoJson(widget.tour.waypoints),
           };
@@ -96,12 +112,20 @@ class MapLibreMapState extends State<MapLibreMap> {
           return Stack(
             fit: StackFit.passthrough,
             children: [
-              AndroidView(
-                viewType: viewType,
-                layoutDirection: TextDirection.ltr,
-                creationParams: creationParams,
-                creationParamsCodec: const StandardMessageCodec(),
-              ),
+              if (Platform.isAndroid)
+                AndroidView(
+                  viewType: viewType,
+                  layoutDirection: TextDirection.ltr,
+                  creationParams: creationParams,
+                  creationParamsCodec: const StandardMessageCodec(),
+                ),
+              if (Platform.isIOS)
+                UiKitView(
+                  viewType: viewType,
+                  layoutDirection: TextDirection.ltr,
+                  creationParams: creationParams,
+                  creationParamsCodec: const StandardMessageCodec(),
+                ),
               widget.fakeGpsOverlay,
             ],
           );

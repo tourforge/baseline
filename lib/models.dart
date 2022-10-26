@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
@@ -90,23 +91,35 @@ class TourModel {
 
     await Directory(p.join(base, "$id.part", "assets")).create(recursive: true);
 
-    await (_downloadToFile(Uri.parse("$_hostUri/$id/tiles.mbtiles"),
-        outPath: p.join(base, "$id.part", "tiles.mbtiles")));
-    var tourJsonStr =
-        await _downloadToMemory(Uri.parse("$_hostUri/$id/tour.json"));
-    await (_writeToFile(tourJsonStr,
-        outPath: p.join(base, "$id.part", "tour.json")));
-    var tour = _parse(id, jsonDecode(tourJsonStr));
-    // now recursively download assets
-    var assets = tour.gallery.followedBy(tour.waypoints
-        .map((e) => [...e.gallery, if (e.narration != null) e.narration!])
-        .reduce((a, b) => a + b));
-    for (var asset in assets) {
-      await (_downloadToFile(Uri.parse("$_hostUri/$id/assets/${asset.name}"),
-          outPath: p.join(base, "$id.part", "assets", asset.name)));
-    }
+    try {
+      var futures = <Future>[];
 
-    await Directory(p.join(base, "$id.part")).rename(p.join(base, id));
+      _printDebug("Starting tour download...");
+      futures.add(_downloadToFile(Uri.parse("$_hostUri/$id/tiles.mbtiles"),
+          outPath: p.join(base, "$id.part", "tiles.mbtiles")));
+      _printDebug("Downloading tour.json...");
+      var tourJsonStr =
+          await _downloadToMemory(Uri.parse("$_hostUri/$id/tour.json"));
+      _printDebug("tour.json downloaded.");
+      futures.add(_writeToFile(tourJsonStr,
+          outPath: p.join(base, "$id.part", "tour.json")));
+      var tour = _parse(id, jsonDecode(tourJsonStr));
+      // now recursively download assets
+      var assets = tour.gallery.followedBy(tour.waypoints
+          .map((e) => [...e.gallery, if (e.narration != null) e.narration!])
+          .reduce((a, b) => a + b));
+      for (var asset in assets) {
+        futures.add(_downloadToFile(
+            Uri.parse("$_hostUri/$id/assets/${asset.name}"),
+            outPath: p.join(base, "$id.part", "assets", asset.name)));
+      }
+
+      await Future.wait(futures);
+
+      await Directory(p.join(base, "$id.part")).rename(p.join(base, id));
+    } catch (e) {
+      _printDebug("Error occurred while downloading: $e");
+    }
   }
 
   static TourModel _parse(String tourId, dynamic json) => TourModel._(
@@ -214,18 +227,18 @@ Future<void> _downloadToFile(Uri uri, {required String outPath}) async {
     await outFile.delete();
   }
 
+  _printDebug("Downloading $uri to $outPath...");
   var outSink = outFile.openWrite();
   var client = HttpClient();
   var req = await client.getUrl(uri);
   var resp = await req.close();
-  await outSink.addStream(resp).then((_) async {
-    await outSink.flush();
-    await outSink.close();
+  await outSink.addStream(resp);
+  await outSink.flush();
+  await outSink.close();
+  _printDebug("$uri downloaded to $outPath.");
 
-    await outFile.rename(outPath);
-  });
-
-  return;
+  await outFile.rename(outPath);
+  _printDebug("Download of $uri finalized.");
 }
 
 Future<String> _downloadToMemory(Uri uri) async {
@@ -239,4 +252,8 @@ Future<void> _writeToFile(String s, {required String outPath}) async {
   }
   await outFile.writeAsString(s);
   await outFile.rename(outPath);
+}
+
+void _printDebug(String s) {
+  if (kDebugMode) print(s);
 }

@@ -9,12 +9,6 @@
     "openmaptiles:mapbox:owner": "openmaptiles",
     "openmaptiles:mapbox:source:url": "mapbox://openmaptiles.4qljc88t"
   },
-  "sources": {
-    "openmaptiles": {
-      "type": "vector",
-      "url": "PLACEHOLDER"
-    }
-  },
   "glyphs": "PLACEHOLDER",
   "layers": [
     {

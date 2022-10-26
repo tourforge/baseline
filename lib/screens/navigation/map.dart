@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -45,62 +43,19 @@ class _NavigationMapState extends State<NavigationMap> {
 
   @override
   Widget build(BuildContext context) {
-    if (Platform.isAndroid) {
-      return MapLibreMap(
-        key: _mapKey,
-        tour: widget.tour,
-        onCameraUpdate: (center, zoom) {
-          _fakeGpsKey.currentState?.updateCameraPosition(center, zoom);
-        },
-        fakeGpsOverlay: kDebugMode
-            ? _FakeGpsOverlay(
-                key: _fakeGpsKey,
-                fakeGpsEnabled: widget.fakeGpsEnabled,
-              )
-            : const SizedBox(),
-      );
-    } else {
-      return FlutterMap(
-        options: MapOptions(
-          center: LatLng(34.000556, -81.034722),
-          interactiveFlags: InteractiveFlag.pinchZoom |
-              InteractiveFlag.pinchMove |
-              InteractiveFlag.doubleTapZoom |
-              InteractiveFlag.drag,
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-            userAgentPackageName: "org.evresi.app",
-          ),
-          PolylineLayer(
-            polylines: [
-              Polyline(
-                points: widget.tour.path,
-                strokeWidth: 4,
-                color: Colors.red,
-              ),
-            ],
-          ),
-          MarkerLayer(
-            markers: [
-              for (var waypoint in widget.tour.waypoints.asMap().entries)
-                Marker(
-                  point: LatLng(waypoint.value.lat, waypoint.value.lng),
-                  builder: (context) => _MarkerIcon(waypoint.key + 1),
-                ),
-            ],
-          ),
-          const _CurrentLocationMarkerLayer(),
-          if (kDebugMode && widget.fakeGpsEnabled)
-            _FakeGpsPosition(
-              onPositionChanged: (ll) {
-                context.read<CurrentLocationModel>().value = ll;
-              },
-            ),
-        ],
-      );
-    }
+    return MapLibreMap(
+      key: _mapKey,
+      tour: widget.tour,
+      onCameraUpdate: (center, zoom) {
+        _fakeGpsKey.currentState?.updateCameraPosition(center, zoom);
+      },
+      fakeGpsOverlay: kDebugMode
+          ? _FakeGpsOverlay(
+              key: _fakeGpsKey,
+              fakeGpsEnabled: widget.fakeGpsEnabled,
+            )
+          : const SizedBox(),
+    );
   }
 }
 
@@ -135,36 +90,6 @@ class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
             onPositionChanged: (ll) {
               context.read<CurrentLocationModel>().value = ll;
             },
-          ),
-      ],
-    );
-  }
-}
-
-class _CurrentLocationMarkerLayer extends StatelessWidget {
-  const _CurrentLocationMarkerLayer({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    var currentLocation = context.watch<CurrentLocationModel>();
-
-    return MarkerLayer(
-      markers: [
-        if (currentLocation.value != null)
-          Marker(
-            point: currentLocation.value!,
-            width: 25,
-            height: 25,
-            builder: (context) => const DecoratedBox(
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.blue,
-                  border: Border.fromBorderSide(
-                      BorderSide(color: Colors.white, width: 3)),
-                  boxShadow: [BoxShadow(blurRadius: 3, color: Colors.black38)]),
-            ),
           ),
       ],
     );
@@ -220,31 +145,6 @@ class _FakeGpsPositionState extends State<_FakeGpsPosition> {
           },
         ),
       ],
-    );
-  }
-}
-
-class _MarkerIcon extends StatelessWidget {
-  const _MarkerIcon(this.number, {super.key});
-
-  final int number;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 30,
-      height: 30,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.red,
-        border: Border.all(width: 3),
-      ),
-      child: Center(
-          child: Text(
-        "$number",
-        style:
-            Theme.of(context).textTheme.button!.copyWith(color: Colors.white),
-      )),
     );
   }
 }
