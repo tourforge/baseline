@@ -25,8 +25,7 @@ class WaypointCard extends StatelessWidget {
       borderRadius: const BorderRadius.all(borderRadius),
       child: InkWell(
         onTap: () {
-          Navigator.of(context).push(DialogRoute(
-              context: context,
+          Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => WaypointDetails(waypoint)));
         },
         borderRadius: const BorderRadius.all(borderRadius),
@@ -44,9 +43,12 @@ class WaypointCard extends StatelessWidget {
                         topLeft: borderRadius,
                         bottomLeft: borderRadius,
                       ),
-                      child: Image.file(
-                        File(waypoint.gallery.first.fullPath),
-                        fit: BoxFit.cover,
+                      child: Hero(
+                        tag: "waypointThumbnail ${waypoint.name}",
+                        child: Image.file(
+                          File(waypoint.gallery.first.fullPath),
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     Center(

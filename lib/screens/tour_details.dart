@@ -41,12 +41,13 @@ class _TourDetailsState extends State<TourDetails>
         slivers: [
           SliverAppBar(
             pinned: true,
-            expandedHeight: 250.0,
+            toolbarHeight: kToolbarHeight + 5,
+            expandedHeight: 200.0,
             leading: _InitialFadeIn(
               child: IconButton(
                 onPressed: () => Navigator.of(context).pop(),
                 tooltip: "Back",
-                icon: const Icon(Icons.arrow_back),
+                icon: Icon(Icons.adaptive.arrow_back),
               ),
             ),
             actions: [
@@ -67,7 +68,7 @@ class _TourDetailsState extends State<TourDetails>
                       imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                       child: Image.file(
                         File(widget.summary.thumbnail!.fullPath),
-                        fit: BoxFit.fitWidth,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   Stack(
@@ -78,7 +79,7 @@ class _TourDetailsState extends State<TourDetails>
                           tag: "tourThumbnail",
                           child: Image.file(
                             File(widget.summary.thumbnail!.fullPath),
-                            fit: BoxFit.fitWidth,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       Positioned.fill(
@@ -92,15 +93,27 @@ class _TourDetailsState extends State<TourDetails>
                 ],
               ),
               centerTitle: true,
-              title: _InitialFadeIn(
-                child: Text(
-                  widget.summary.name,
-                  style: GoogleFonts.montserrat(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
+              expandedTitleScale: 1.0,
+              title: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: LayoutBuilder(builder: (context, constraints) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 48.0),
+                    child: _InitialFadeIn(
+                      child: Text(
+                        widget.summary.name,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: constraints.maxHeight > 84 ? 3 : 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  );
+                }),
               ),
-              expandedTitleScale: 2,
             ),
           ),
           SliverPersistentHeader(
