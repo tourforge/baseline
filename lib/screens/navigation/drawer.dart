@@ -38,104 +38,89 @@ class NavigationDrawerState extends State<NavigationDrawer>
     const handleHeight = 8.0;
     const handleWidth = 50.0;
 
-    return ConstraintsTransformBox(
-      constraintsTransform: (c) => BoxConstraints(
-        minWidth: c.minWidth,
-        maxWidth: c.maxWidth,
-        minHeight: 0,
-        maxHeight: c.maxHeight,
-      ),
-      alignment: Alignment.bottomCenter,
-      child: LayoutBuilder(builder: (context, constraints) {
-        _expandedSize = constraints.maxHeight * 0.5;
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Material(
-              child: GestureDetector(
-                onTap: _onTap,
-                onVerticalDragStart: onVerticalDragStart,
-                onVerticalDragEnd: onVerticalDragEnd,
-                onVerticalDragUpdate: onVerticalDragUpdate,
-                child: const DecoratedBox(
-                  decoration: BoxDecoration(color: Colors.transparent),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: UnconstrainedBox(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                        ),
-                        child:
-                            SizedBox(height: handleHeight, width: handleWidth),
+    return LayoutBuilder(builder: (context, constraints) {
+      _expandedSize = constraints.maxHeight * 0.5;
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Material(
+            child: GestureDetector(
+              onTap: _onTap,
+              onVerticalDragStart: onVerticalDragStart,
+              onVerticalDragEnd: onVerticalDragEnd,
+              onVerticalDragUpdate: onVerticalDragUpdate,
+              child: const DecoratedBox(
+                decoration: BoxDecoration(color: Colors.transparent),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: UnconstrainedBox(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
                       ),
+                      child: SizedBox(height: handleHeight, width: handleWidth),
                     ),
                   ),
                 ),
               ),
             ),
-            SizeTransition(
-              sizeFactor: _animation,
-              child: ClipRect(
-                child: SizedBox(
-                  height: _innerSize,
-                  child: OverflowBox(
-                    alignment: Alignment.topCenter,
-                    maxHeight: _expandedSize,
-                    child: Material(
-                      color: const Color.fromARGB(255, 244, 244, 244),
-                      child: Column(
-                        children: [
-                          const Divider(height: 2, thickness: 2),
-                          Expanded(
-                            child: NotificationListener<OverscrollNotification>(
-                              onNotification: (notification) {
-                                if (notification.velocity == 0 &&
-                                    notification.overscroll < -2) {
-                                  setState(() {
-                                    var factor = _animation.value *
-                                        _innerSize /
-                                        _expandedSize;
-                                    _controller.reverse(
-                                        from: _invCurve.transform(factor));
-                                  });
-                                }
+          ),
+          SizeTransition(
+            sizeFactor: _animation,
+            child: SizedBox(
+              height: _innerSize,
+              child: Material(
+                color: const Color.fromARGB(255, 244, 244, 244),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Divider(height: 2, thickness: 2),
+                    Expanded(
+                      child: NotificationListener<OverscrollNotification>(
+                        onNotification: (notification) {
+                          if (notification.velocity == 0 &&
+                              notification.overscroll < -2) {
+                            setState(() {
+                              var factor =
+                                  _animation.value * _innerSize / _expandedSize;
+                              _controller.reverse(
+                                  from: _invCurve.transform(factor));
+                            });
+                          }
 
-                                return false;
-                              },
-                              child: ListView(
-                                children: [
-                                  const SizedBox(height: 3),
-                                  for (var x
-                                      in widget.tour.waypoints.asMap().entries)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6.0,
-                                        vertical: 3.0,
-                                      ),
-                                      child: WaypointCard(
-                                        waypoint: x.value,
-                                        index: x.key,
-                                      ),
-                                    ),
-                                  const SizedBox(height: 3),
-                                ],
+                          return false;
+                        },
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: [
+                            const SizedBox(height: 3),
+                            for (var x in widget.tour.waypoints.asMap().entries)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6.0,
+                                  vertical: 3.0,
+                                ),
+                                child: WaypointCard(
+                                  waypoint: x.value,
+                                  index: x.key,
+                                ),
                               ),
-                            ),
-                          ),
-                        ],
+                            const SizedBox(height: 3),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
-          ],
-        );
-      }),
-    );
+          ),
+        ],
+      );
+    });
   }
 
   void _onTap() {
