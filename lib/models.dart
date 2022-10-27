@@ -17,7 +17,7 @@ Future<String> get _toursBasePath async {
       .then((value) => _toursBasePathCurrent = value);
 }
 
-const _hostUri = "https://evresi.netlify.app";
+const _hostUri = "https://fsrv.fly.dev";
 
 class TourSummary {
   TourSummary._({
