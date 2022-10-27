@@ -5,8 +5,13 @@ import '/models.dart';
 import '/widgets/waypoint_card.dart';
 
 class NavigationDrawer extends StatefulWidget {
-  const NavigationDrawer({super.key, required this.tour});
+  const NavigationDrawer({
+    super.key,
+    required this.handleHeight,
+    required this.tour,
+  });
 
+  final double handleHeight;
   final TourModel tour;
 
   @override
@@ -51,11 +56,11 @@ class NavigationDrawerState extends State<NavigationDrawer>
               onVerticalDragStart: onVerticalDragStart,
               onVerticalDragEnd: onVerticalDragEnd,
               onVerticalDragUpdate: onVerticalDragUpdate,
-              child: const DecoratedBox(
-                decoration: BoxDecoration(color: Colors.transparent),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: UnconstrainedBox(
+              child: DecoratedBox(
+                decoration: const BoxDecoration(color: Colors.transparent),
+                child: SizedBox(
+                  height: widget.handleHeight,
+                  child: const UnconstrainedBox(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         color: Colors.grey,
@@ -74,46 +79,50 @@ class NavigationDrawerState extends State<NavigationDrawer>
               height: _innerSize,
               child: Material(
                 color: const Color.fromARGB(255, 244, 244, 244),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const Divider(height: 2, thickness: 2),
-                    Expanded(
-                      child: NotificationListener<OverscrollNotification>(
-                        onNotification: (notification) {
-                          if (notification.velocity == 0 &&
-                              notification.overscroll < -2) {
-                            setState(() {
-                              var factor =
-                                  _animation.value * _innerSize / _expandedSize;
-                              _controller.reverse(
-                                  from: _invCurve.transform(factor));
-                            });
-                          }
+                child: OverflowBox(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const Divider(height: 2, thickness: 2),
+                      Expanded(
+                        child: NotificationListener<OverscrollNotification>(
+                          onNotification: (notification) {
+                            if (notification.velocity == 0 &&
+                                notification.overscroll < -2) {
+                              setState(() {
+                                var factor = _animation.value *
+                                    _innerSize /
+                                    _expandedSize;
+                                _controller.reverse(
+                                    from: _invCurve.transform(factor));
+                              });
+                            }
 
-                          return false;
-                        },
-                        child: ListView(
-                          padding: EdgeInsets.zero,
-                          children: [
-                            const SizedBox(height: 3),
-                            for (var x in widget.tour.waypoints.asMap().entries)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6.0,
-                                  vertical: 3.0,
+                            return false;
+                          },
+                          child: ListView(
+                            padding: EdgeInsets.zero,
+                            children: [
+                              const SizedBox(height: 3),
+                              for (var x
+                                  in widget.tour.waypoints.asMap().entries)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6.0,
+                                    vertical: 3.0,
+                                  ),
+                                  child: WaypointCard(
+                                    waypoint: x.value,
+                                    index: x.key,
+                                  ),
                                 ),
-                                child: WaypointCard(
-                                  waypoint: x.value,
-                                  index: x.key,
-                                ),
-                              ),
-                            const SizedBox(height: 3),
-                          ],
+                              const SizedBox(height: 3),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

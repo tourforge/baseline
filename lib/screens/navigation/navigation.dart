@@ -90,6 +90,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   @override
   Widget build(BuildContext context) {
     const bottomHeight = 88.0;
+    const drawerHandleHeight = 28.0;
 
     return ChangeNotifierProvider<CurrentLocationModel>.value(
       value: _currentLocation,
@@ -101,7 +102,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 top: 0.0,
                 left: 0.0,
                 right: 0.0,
-                bottom: bottomHeight,
+                bottom: bottomHeight + drawerHandleHeight,
                 child: NavigationMap(
                   tour: widget.tour,
                   fakeGpsEnabled: _fakeGpsEnabled,
@@ -209,7 +210,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 left: 0.0,
                 right: 0.0,
                 bottom: bottomHeight,
-                child: NavigationDrawer(key: _drawerKey, tour: widget.tour),
+                child: NavigationDrawer(
+                  key: _drawerKey,
+                  handleHeight: drawerHandleHeight,
+                  tour: widget.tour,
+                ),
               ),
               Positioned(
                 left: 0.0,

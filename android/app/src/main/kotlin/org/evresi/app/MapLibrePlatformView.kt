@@ -70,7 +70,6 @@ class MapLibrePlatformView(
     ) {
         this.map = map
 
-        map.uiSettings.setAttributionMargins(15, 0, 0, 15)
         map.cameraPosition = CameraPosition.Builder()
             .target(LatLng(34.0, -80.0))
             .zoom(10.0)
