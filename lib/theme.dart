@@ -10,6 +10,7 @@ const colorScheme = ColorScheme.light(
 );
 
 ThemeData get themeData => ThemeData.light(useMaterial3: true).copyWith(
+      scaffoldBackgroundColor: const Color(0xfff8f8f8),
       cardTheme: const CardTheme(
         color: Color(0xFFFFFFFF),
       ),
