@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '/models.dart';
 import '/widgets/gallery.dart';
@@ -48,6 +47,7 @@ class _TourDetailsState extends State<TourDetails>
                 onPressed: () => Navigator.of(context).pop(),
                 tooltip: "Back",
                 icon: Icon(Icons.adaptive.arrow_back),
+                color: Colors.white,
               ),
             ),
             actions: [
@@ -56,6 +56,7 @@ class _TourDetailsState extends State<TourDetails>
                   onPressed: () {},
                   tooltip: "Preview",
                   icon: const Icon(Icons.map),
+                  color: Colors.white,
                 ),
               )
             ],
@@ -85,7 +86,7 @@ class _TourDetailsState extends State<TourDetails>
                       Positioned.fill(
                         child: _InitialFadeIn(
                           child: Container(
-                              color: const Color.fromARGB(64, 0, 0, 0)),
+                              color: const Color.fromARGB(128, 255, 255, 255)),
                         ),
                       ),
                     ],
@@ -102,10 +103,9 @@ class _TourDetailsState extends State<TourDetails>
                     child: _InitialFadeIn(
                       child: Text(
                         widget.summary.name,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                              color: Colors.white,
+                            ),
                         textAlign: TextAlign.center,
                         maxLines: constraints.maxHeight > 84 ? 3 : 1,
                         overflow: TextOverflow.ellipsis,
@@ -132,6 +132,7 @@ class _TourDetailsState extends State<TourDetails>
               child: Material(
                 elevation: 3,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
+                type: MaterialType.card,
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
@@ -139,14 +140,17 @@ class _TourDetailsState extends State<TourDetails>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      Text(
                         "Description",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium!
+                            .copyWith(color: Colors.grey),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Text(
                         tour?.desc ?? "",
-                        style: GoogleFonts.poppins(fontSize: 15),
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
                   ),
@@ -166,6 +170,7 @@ class _TourDetailsState extends State<TourDetails>
             ),
           ),
           _WaypointList(tour: tour),
+          const SliverToBoxAdapter(child: SizedBox(height: 6)),
         ],
       ),
     );
@@ -194,6 +199,7 @@ class _DetailsHeader extends StatelessWidget {
           child: Material(
             borderRadius: const BorderRadius.all(Radius.circular(12)),
             elevation: 3,
+            type: MaterialType.card,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 32.0,
@@ -201,11 +207,11 @@ class _DetailsHeader extends StatelessWidget {
               ),
               child: Text(
                 title,
-                style: GoogleFonts.roboto(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: const Color.fromARGB(255, 77, 77, 77),
-                ),
+                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      color: const Color.fromARGB(255, 77, 77, 77),
+                    ),
               ),
             ),
           ),

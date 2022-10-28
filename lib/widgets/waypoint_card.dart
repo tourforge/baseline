@@ -23,6 +23,7 @@ class WaypointCard extends StatelessWidget {
     return Material(
       elevation: 3,
       borderRadius: const BorderRadius.all(borderRadius),
+      type: MaterialType.card,
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
@@ -78,13 +79,14 @@ class WaypointCard extends StatelessWidget {
                   children: [
                     Text(
                       waypoint.name,
-                      style: GoogleFonts.montserrat(
-                          fontSize: 14, fontWeight: FontWeight.w500),
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                     Text(
                       "${waypoint.desc}\n\n",
-                      style:
-                          GoogleFonts.poppins(fontSize: 13, color: Colors.grey),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: Colors.grey),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),

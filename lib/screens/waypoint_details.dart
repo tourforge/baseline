@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '/models.dart';
 import '/widgets/gallery.dart';
@@ -32,6 +31,7 @@ class _WaypointDetailsState extends State<WaypointDetails>
                 onPressed: () => Navigator.of(context).pop(),
                 tooltip: "Back",
                 icon: Icon(Icons.adaptive.arrow_back),
+                color: Colors.white,
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
@@ -77,10 +77,9 @@ class _WaypointDetailsState extends State<WaypointDetails>
                     child: _InitialFadeIn(
                       child: Text(
                         widget.waypoint.name,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                              color: Colors.white,
+                            ),
                         textAlign: TextAlign.center,
                         maxLines: constraints.maxHeight > 84 ? 3 : 1,
                         overflow: TextOverflow.ellipsis,
@@ -91,12 +90,14 @@ class _WaypointDetailsState extends State<WaypointDetails>
               ),
             ),
           ),
+          const SliverToBoxAdapter(child: SizedBox(height: 6)),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Material(
                 elevation: 3,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
+                type: MaterialType.card,
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
@@ -104,14 +105,17 @@ class _WaypointDetailsState extends State<WaypointDetails>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      Text(
                         "Description",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium!
+                            .copyWith(color: Colors.grey),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Text(
                         widget.waypoint.desc,
-                        style: GoogleFonts.poppins(fontSize: 15),
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
                   ),
@@ -125,6 +129,7 @@ class _WaypointDetailsState extends State<WaypointDetails>
               child: Gallery(images: widget.waypoint.gallery),
             ),
           ),
+          const SliverToBoxAdapter(child: SizedBox(height: 6)),
         ],
       ),
     );

@@ -35,6 +35,7 @@ class _TourGalleryState extends State<TourGallery> {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('TODO: Show help page'))); // TODO
             },
+            color: Colors.white,
           ),
         ],
       ),
@@ -145,7 +146,7 @@ class TourListItem extends StatelessWidget {
                         child: Center(
                           child: Text(
                             title,
-                            style: Theme.of(context).textTheme.subtitle1,
+                            style: Theme.of(context).textTheme.titleSmall,
                             maxLines: 2,
                             textAlign: TextAlign.center,
                           ),
