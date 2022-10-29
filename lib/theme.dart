@@ -5,8 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 const colorScheme = ColorScheme.light(
   primary: Color.fromARGB(255, 29, 79, 145),
   secondary: Color.fromARGB(255, 20, 173, 122),
-  onBackground: Colors.black,
-  onSurface: Colors.black,
+  onPrimary: Color.fromARGB(255, 211, 233, 255),
+  onSecondary: Colors.white,
 );
 
 ThemeData get themeData => ThemeData.light(useMaterial3: true).copyWith(
@@ -80,11 +80,6 @@ ThemeData get themeData => ThemeData.light(useMaterial3: true).copyWith(
           color: Colors.black,
           fontSize: 12.0,
         ),
-        /*button: GoogleFonts.roboto(
-          letterSpacing: 1.25,
-          fontSize: 14.0,
-          fontWeight: FontWeight.w500,
-        ),*/
       ),
       colorScheme: colorScheme,
       sliderTheme: const SliderThemeData(

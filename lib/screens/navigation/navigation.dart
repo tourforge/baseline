@@ -132,11 +132,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
                                   "Navigating",
                                   style: Theme.of(context)
                                       .textTheme
-                                      .headline5!
+                                      .headlineSmall!
                                       .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onPrimary),
+                                        fontSize: 22,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onPrimary,
+                                      ),
                                 ),
                               ),
                             ],

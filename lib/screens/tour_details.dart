@@ -318,34 +318,52 @@ class _StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
       child: Padding(
         padding: const EdgeInsets.only(
             top: 12.0, left: 12.0, right: 12.0, bottom: 6.0),
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ButtonStyle(
-            backgroundColor: MaterialStatePropertyAll(
-                Theme.of(context).colorScheme.secondary),
-            shape: MaterialStateProperty.all(
-              const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-              ),
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            gradient: LinearGradient(
+              begin: Alignment(-1.0, 0.5),
+              colors: [
+                Color.fromARGB(255, 80, 226, 194),
+                Color.fromARGB(255, 38, 211, 136),
+              ],
             ),
-            padding: const MaterialStatePropertyAll(
-                EdgeInsets.symmetric(horizontal: 16)),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.explore),
-              const SizedBox(width: 12),
-              Text(
-                "Start Tour",
-                style: Theme.of(context)
-                    .textTheme
-                    .button!
-                    .copyWith(fontSize: 16, color: Colors.white),
+          child: ElevatedButton(
+            onPressed: onPressed,
+            style: ButtonStyle(
+              backgroundColor:
+                  const MaterialStatePropertyAll(Colors.transparent),
+              foregroundColor: MaterialStatePropertyAll(
+                  Theme.of(context).colorScheme.onSecondary),
+              shape: MaterialStateProperty.all(
+                const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
               ),
-            ],
+              shadowColor: const MaterialStatePropertyAll(Colors.transparent),
+              padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.explore),
+                const SizedBox(width: 12),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 2.0),
+                    child: Text(
+                      "Start Tour",
+                      style: Theme.of(context).textTheme.button!.copyWith(
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.onSecondary,
+                          ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
