@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 
 import '/models.dart';
 import '/widgets/gallery.dart';
@@ -36,142 +37,164 @@ class _TourDetailsState extends State<TourDetails>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            toolbarHeight: kToolbarHeight + 5,
-            expandedHeight: 200.0,
-            leading: _InitialFadeIn(
-              child: IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                tooltip: "Back",
-                icon: Icon(Icons.adaptive.arrow_back),
-                color: Colors.white,
-              ),
-            ),
-            actions: [
-              _InitialFadeIn(
-                child: IconButton(
-                  onPressed: () {},
-                  tooltip: "Preview",
-                  icon: const Icon(Icons.map),
-                  color: Colors.white,
-                ),
-              )
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.passthrough,
-                children: [
-                  if (widget.summary.thumbnail != null)
-                    ImageFiltered(
-                      imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                      child: Image.file(
-                        File(widget.summary.thumbnail!.fullPath),
-                        fit: BoxFit.cover,
-                      ),
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverOverlapAbsorber(
+            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
+            sliver: MultiSliver(
+              pushPinnedChildren: false,
+              children: [
+                SliverAppBar(
+                  pinned: true,
+                  toolbarHeight: kToolbarHeight + 5,
+                  expandedHeight: 200.0,
+                  leading: _InitialFadeIn(
+                    child: IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      tooltip: "Back",
+                      icon: Icon(Icons.adaptive.arrow_back),
+                      color: Colors.white,
                     ),
-                  Stack(
-                    fit: StackFit.passthrough,
-                    children: [
-                      if (widget.summary.thumbnail != null)
-                        Hero(
-                          tag: "tourThumbnail",
-                          child: Image.file(
-                            File(widget.summary.thumbnail!.fullPath),
-                            fit: BoxFit.cover,
+                  ),
+                  actions: [
+                    _InitialFadeIn(
+                      child: IconButton(
+                        onPressed: () {},
+                        tooltip: "Preview",
+                        icon: const Icon(Icons.map),
+                        color: Colors.white,
+                      ),
+                    )
+                  ],
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Stack(
+                      fit: StackFit.passthrough,
+                      children: [
+                        if (widget.summary.thumbnail != null)
+                          ImageFiltered(
+                            imageFilter:
+                                ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                            child: Image.file(
+                              File(widget.summary.thumbnail!.fullPath),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        Stack(
+                          fit: StackFit.passthrough,
+                          children: [
+                            if (widget.summary.thumbnail != null)
+                              Hero(
+                                tag: "tourThumbnail",
+                                child: Image.file(
+                                  File(widget.summary.thumbnail!.fullPath),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            Positioned.fill(
+                              child: _InitialFadeIn(
+                                child: Container(
+                                    color: const Color.fromARGB(
+                                        128, 255, 255, 255)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    centerTitle: true,
+                    expandedTitleScale: 1.0,
+                    title: LayoutBuilder(builder: (context, constraints) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 56.0),
+                        child: _InitialFadeIn(
+                          child: Text(
+                            widget.summary.name,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(
+                                  color: Colors.white,
+                                ),
+                            textAlign: TextAlign.center,
+                            maxLines: constraints.maxHeight > 84 ? 3 : 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      Positioned.fill(
-                        child: _InitialFadeIn(
-                          child: Container(
-                              color: const Color.fromARGB(128, 255, 255, 255)),
-                        ),
-                      ),
-                    ],
+                      );
+                    }),
                   ),
-                ],
+                  forceElevated: innerBoxIsScrolled,
+                ),
+                SliverPersistentHeader(
+                  pinned: true,
+                  delegate: _StartTourButtonDelegate(
+                    tickerProvider: this,
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => NavigationScreen(tour!)));
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        body: Builder(builder: (context) {
+          return CustomScrollView(
+            slivers: [
+              SliverOverlapInjector(
+                handle:
+                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
               ),
-              centerTitle: true,
-              expandedTitleScale: 1.0,
-              title: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: LayoutBuilder(builder: (context, constraints) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 48.0),
-                    child: _InitialFadeIn(
-                      child: Text(
-                        widget.summary.name,
-                        style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                              color: Colors.white,
-                            ),
-                        textAlign: TextAlign.center,
-                        maxLines: constraints.maxHeight > 84 ? 3 : 1,
-                        overflow: TextOverflow.ellipsis,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: Material(
+                    elevation: 3,
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    type: MaterialType.card,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Description",
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .copyWith(color: Colors.grey),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            tour?.desc ?? "",
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                }),
-              ),
-            ),
-          ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _StartTourButtonDelegate(
-              tickerProvider: this,
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => NavigationScreen(tour!)));
-              },
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              child: Material(
-                elevation: 3,
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                type: MaterialType.card,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Description",
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelMedium!
-                            .copyWith(color: Colors.grey),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        tour?.desc ?? "",
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
                   ),
                 ),
               ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 250,
-              child: Gallery(images: tour?.gallery ?? []),
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: _DetailsHeader(
-              title: "Tour Stops",
-            ),
-          ),
-          _WaypointList(tour: tour),
-          const SliverToBoxAdapter(child: SizedBox(height: 6)),
-        ],
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 250,
+                  child: Gallery(images: tour?.gallery ?? []),
+                ),
+              ),
+              const SliverToBoxAdapter(
+                child: _DetailsHeader(
+                  title: "Tour Stops",
+                ),
+              ),
+              _WaypointList(tour: tour),
+              const SliverToBoxAdapter(child: SizedBox(height: 6)),
+            ],
+          );
+        }),
       ),
     );
   }
