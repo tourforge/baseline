@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
@@ -41,8 +40,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     _navController = NavigationController(
       path: widget.tour.path,
-      waypoints:
-          widget.tour.waypoints.map((e) => LatLng(e.lat, e.lng)).toList(),
+      waypoints: widget.tour.waypoints
+          .map((e) => NavigationWaypoint(
+                position: LatLng(e.lat, e.lng),
+                triggerRadius: e.triggerRadius,
+              ))
+          .toList(),
     );
 
     _currentLocation.addListener(_onCurrentLocationChanged);

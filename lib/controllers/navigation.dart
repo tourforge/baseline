@@ -6,10 +6,19 @@ import 'package:latlong2/latlong.dart';
 
 const _distance = Distance();
 const _pathClosenessThresholdMeters = 50;
-const _waypointClosenessThresholdMeters = 50;
 const _pathExtraClosenessThresholdMeters = 10;
 const _dotThreshold = 0;
 const _distanceOnPathThresholdMeters = 200;
+
+class NavigationWaypoint {
+  const NavigationWaypoint({
+    required this.position,
+    required this.triggerRadius,
+  });
+
+  final LatLng position;
+  final double triggerRadius;
+}
 
 class NavigationController {
   NavigationController({
@@ -18,9 +27,9 @@ class NavigationController {
   }) {
     for (var waypoint in waypoints) {
       var closest = 0;
-      var closestDistance = _distance(waypoint, path[0]);
+      var closestDistance = _distance(waypoint.position, path[0]);
       for (var i = 1; i < path.length; i++) {
-        var distance = _distance(waypoint, path[i]);
+        var distance = _distance(waypoint.position, path[i]);
         if (distance < closestDistance) {
           closest = i;
           closestDistance = distance;
@@ -32,7 +41,7 @@ class NavigationController {
 
   final List<LatLng> path;
   final List<int> waypointIndexToPathIndex = [];
-  final List<LatLng> waypoints;
+  final List<NavigationWaypoint> waypoints;
 
   int? _prevWaypoint;
   LatLng? _location;
@@ -54,10 +63,11 @@ class NavigationController {
         .entries
         .map((e) => _WaypointWithIndexAndDistance(
               index: e.key,
-              position: e.value,
-              distance: _distance(location, e.value),
+              position: e.value.position,
+              triggerRadius: e.value.triggerRadius,
+              distance: _distance(location, e.value.position),
             ))
-        .where((e) => e.distance < _waypointClosenessThresholdMeters)
+        .where((e) => e.distance < e.triggerRadius)
         .toList();
 
     if (nearbyWaypoints.isEmpty) return _prevWaypoint = null;
@@ -72,6 +82,7 @@ class NavigationController {
           .map((e) => _WaypointWithIndexAndDistance(
                 index: e.index,
                 position: e.position,
+                triggerRadius: e.triggerRadius,
                 distance: (waypointIndexToPathIndex[e.index] < segment
                             ? path.skip(waypointIndexToPathIndex[e.index]).take(
                                 segment - waypointIndexToPathIndex[e.index])
@@ -255,11 +266,13 @@ class _WaypointWithIndexAndDistance {
   const _WaypointWithIndexAndDistance({
     required this.index,
     required this.position,
+    required this.triggerRadius,
     required this.distance,
   });
 
   final int index;
   final LatLng position;
+  final double triggerRadius;
   final double distance;
 }
 
