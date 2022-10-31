@@ -116,7 +116,7 @@ class _TourDetailsState extends State<TourDetails>
                                   color: Colors.white,
                                 ),
                             textAlign: TextAlign.center,
-                            maxLines: constraints.maxHeight > 84 ? 3 : 1,
+                            maxLines: constraints.maxHeight > 90 ? 3 : 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),

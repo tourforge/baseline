@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '/controllers/narration_playback.dart';
 import '/models.dart';
@@ -40,20 +39,21 @@ class NavigationPanel extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(
-                        top: 8.0, left: 16.0, bottom: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8.0,
+                      horizontal: 16.0,
+                    ),
                     child: Text(
                       currentWaypoint != null
                           ? "${currentWaypoint! + 1}. ${tour.waypoints[currentWaypoint!].name}"
                           : "No Waypoints Nearby",
-                      style: Theme.of(context).textTheme.subtitle1!.copyWith(
-                          fontWeight:
-                              currentWaypoint != null ? FontWeight.bold : null,
-                          fontSize: 17,
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
                           color: currentWaypoint == null ? Colors.grey : null,
                           fontStyle: currentWaypoint == null
                               ? FontStyle.italic
                               : null),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   _AudioPositionSlider(playbackController: playbackController),
@@ -111,7 +111,10 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
         const SizedBox(width: 16),
         Text(
           widget.playbackController.positionToString(position) ?? "00:00",
-          style: GoogleFonts.robotoCondensed(color: Colors.grey, fontSize: 16),
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Colors.grey),
         ),
         Expanded(
           child: Slider(
@@ -135,7 +138,10 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
         ),
         Text(
           widget.playbackController.positionToString(1.0) ?? "00:00",
-          style: GoogleFonts.robotoCondensed(color: Colors.grey, fontSize: 16),
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: Colors.grey),
         ),
         const SizedBox(width: 16),
       ],

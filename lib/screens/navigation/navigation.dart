@@ -117,7 +117,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 right: 0.0,
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Material(
                         color: Theme.of(context).colorScheme.primary,
@@ -157,7 +157,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 left: 0.0,
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Material(
                       borderRadius: const BorderRadius.all(Radius.circular(30)),
                       color: Theme.of(context).colorScheme.primary,
@@ -183,7 +183,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 right: 0.0,
                 child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Material(
                       borderRadius: const BorderRadius.all(Radius.circular(30)),
                       color: Theme.of(context).colorScheme.primary,

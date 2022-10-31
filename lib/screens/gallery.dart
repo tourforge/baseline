@@ -123,11 +123,11 @@ class TourListItem extends StatelessWidget {
         onTap: onTap,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         child: SizedBox(
-          height: 125,
+          height: 130,
           child: Row(
             children: <Widget>[
               SizedBox(
-                width: 125,
+                width: 130,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(10),
@@ -149,16 +149,19 @@ class TourListItem extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleSmall,
                             maxLines: 2,
                             textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ),
                       const Expanded(child: SizedBox()),
                       Text(
-                        "Duration: about $eta minute${eta == 1 ? "" : "s"}",
+                        "about $eta minute${eta == 1 ? "" : "s"} long",
                         style: Theme.of(context)
                             .textTheme
                             .bodyMedium!
                             .copyWith(color: Colors.grey),
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),

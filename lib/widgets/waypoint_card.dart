@@ -79,7 +79,12 @@ class WaypointCard extends StatelessWidget {
                   children: [
                     Text(
                       waypoint.name,
-                      style: Theme.of(context).textTheme.titleSmall,
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall!
+                          .copyWith(fontSize: 14.5),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       "${waypoint.desc}\n\n",
