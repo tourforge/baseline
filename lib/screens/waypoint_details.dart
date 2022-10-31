@@ -37,7 +37,7 @@ class _WaypointDetailsState extends State<WaypointDetails>
                       onPressed: () => Navigator.of(context).pop(),
                       tooltip: "Back",
                       icon: Icon(Icons.adaptive.arrow_back),
-                      color: Colors.white,
+                      color: Theme.of(context).appBarTheme.foregroundColor,
                     ),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
@@ -87,7 +87,9 @@ class _WaypointDetailsState extends State<WaypointDetails>
                                 .textTheme
                                 .titleLarge!
                                 .copyWith(
-                                  color: Colors.white,
+                                  color: Theme.of(context)
+                                      .appBarTheme
+                                      .foregroundColor,
                                 ),
                             textAlign: TextAlign.center,
                             maxLines: constraints.maxHeight > 90 ? 3 : 1,

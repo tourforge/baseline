@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '/models.dart';
+import '/models/current_waypoint.dart';
 import '/widgets/waypoint_card.dart';
 
 class NavigationDrawer extends StatefulWidget {
@@ -43,6 +45,8 @@ class NavigationDrawerState extends State<NavigationDrawer>
     const handleHeight = 8.0;
     const handleWidth = 50.0;
 
+    var currentWaypoint = context.watch<CurrentWaypointModel>().index;
+
     return LayoutBuilder(builder: (context, constraints) {
       _expandedSize = constraints.maxHeight * 0.5;
       return Column(
@@ -78,7 +82,7 @@ class NavigationDrawerState extends State<NavigationDrawer>
             child: SizedBox(
               height: _innerSize,
               child: Material(
-                color: const Color.fromARGB(255, 244, 244, 244),
+                color: Theme.of(context).scaffoldBackgroundColor,
                 child: OverflowBox(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -114,6 +118,7 @@ class NavigationDrawerState extends State<NavigationDrawer>
                                   child: WaypointCard(
                                     waypoint: x.value,
                                     index: x.key,
+                                    currentlyPlaying: x.key == currentWaypoint,
                                   ),
                                 ),
                               const SizedBox(height: 3),

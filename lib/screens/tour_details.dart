@@ -53,7 +53,7 @@ class _TourDetailsState extends State<TourDetails>
                       onPressed: () => Navigator.of(context).pop(),
                       tooltip: "Back",
                       icon: Icon(Icons.adaptive.arrow_back),
-                      color: Colors.white,
+                      color: Theme.of(context).appBarTheme.foregroundColor,
                     ),
                   ),
                   actions: [
@@ -62,7 +62,7 @@ class _TourDetailsState extends State<TourDetails>
                         onPressed: () {},
                         tooltip: "Preview",
                         icon: const Icon(Icons.map),
-                        color: Colors.white,
+                        color: Theme.of(context).appBarTheme.foregroundColor,
                       ),
                     )
                   ],
@@ -113,7 +113,9 @@ class _TourDetailsState extends State<TourDetails>
                                 .textTheme
                                 .titleLarge!
                                 .copyWith(
-                                  color: Colors.white,
+                                  color: Theme.of(context)
+                                      .appBarTheme
+                                      .foregroundColor,
                                 ),
                             textAlign: TextAlign.center,
                             maxLines: constraints.maxHeight > 90 ? 3 : 1,
@@ -334,8 +336,7 @@ class _StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
             style: ButtonStyle(
               backgroundColor:
                   const MaterialStatePropertyAll(Colors.transparent),
-              foregroundColor: MaterialStatePropertyAll(
-                  Theme.of(context).colorScheme.onSecondary),
+              foregroundColor: const MaterialStatePropertyAll(Colors.white),
               shape: MaterialStateProperty.all(
                 const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -355,10 +356,10 @@ class _StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
                     padding: const EdgeInsets.only(bottom: 2.0),
                     child: Text(
                       "Start Tour",
-                      style: Theme.of(context).textTheme.button!.copyWith(
-                            fontSize: 16,
-                            color: Theme.of(context).colorScheme.onSecondary,
-                          ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .button!
+                          .copyWith(fontSize: 16, color: Colors.white),
                     ),
                   ),
                 ),

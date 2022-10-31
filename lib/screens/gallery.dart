@@ -35,7 +35,7 @@ class _TourGalleryState extends State<TourGallery> {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text('TODO: Show help page'))); // TODO
             },
-            color: Colors.white,
+            color: Theme.of(context).appBarTheme.foregroundColor,
           ),
         ],
       ),

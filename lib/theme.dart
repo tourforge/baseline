@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const colorScheme = ColorScheme.light(
   primary: Color.fromARGB(255, 29, 79, 145),
-  secondary: Color.fromARGB(255, 20, 173, 122),
+  secondary: Color.fromARGB(255, 32, 32, 48),
   onPrimary: Color.fromARGB(255, 211, 233, 255),
-  onSecondary: Colors.white,
+  onSecondary: Color.fromARGB(255, 236, 233, 255),
 );
 
 ThemeData get themeData => ThemeData.light(useMaterial3: true).copyWith(
@@ -86,11 +85,9 @@ ThemeData get themeData => ThemeData.light(useMaterial3: true).copyWith(
         overlayShape: RoundSliderOverlayShape(overlayRadius: 16.0),
         thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8.0),
       ),
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         foregroundColor: Colors.white,
-        backgroundColor: Color.fromARGB(255, 32, 32, 48),
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarBrightness: Brightness.dark,
-        ),
+        backgroundColor: colorScheme.secondary,
+        iconTheme: IconThemeData(color: colorScheme.onSecondary),
       ),
     );

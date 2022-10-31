@@ -48,10 +48,12 @@ class NavigationPanel extends StatelessWidget {
                           ? "${currentWaypoint! + 1}. ${tour.waypoints[currentWaypoint!].name}"
                           : "No Waypoints Nearby",
                       style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                          color: currentWaypoint == null ? Colors.grey : null,
-                          fontStyle: currentWaypoint == null
-                              ? FontStyle.italic
-                              : null),
+                            fontSize: 14.5,
+                            color: currentWaypoint == null ? Colors.grey : null,
+                            fontStyle: currentWaypoint == null
+                                ? FontStyle.italic
+                                : null,
+                          ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

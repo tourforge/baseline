@@ -9,6 +9,7 @@ import '/controllers/navigation.dart';
 import '/location.dart';
 import '/models.dart';
 import '/models/current_location.dart';
+import '/models/current_waypoint.dart';
 import '/screens/navigation/drawer.dart';
 import '/screens/navigation/map.dart';
 import '/screens/navigation/panel.dart';
@@ -23,7 +24,6 @@ class NavigationScreen extends StatefulWidget {
 }
 
 class _NavigationScreenState extends State<NavigationScreen> {
-  int? _currentWaypoint;
   late NavigationController _navController;
   late NarrationPlaybackController _playbackController;
   bool _fakeGpsEnabled = false;
@@ -31,6 +31,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       const Stream<LatLng>.empty().listen((_) {});
 
   final CurrentLocationModel _currentLocation = CurrentLocationModel();
+  final CurrentWaypointModel _currentWaypoint = CurrentWaypointModel();
 
   final GlobalKey<NavigationDrawerState> _drawerKey = GlobalKey();
 
@@ -83,9 +84,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   void _onCurrentLocationChanged() {
     _navController.tick(context, _currentLocation.value).then((waypoint) {
-      if (_currentWaypoint != waypoint && waypoint != null) {
+      if (_currentWaypoint.index != waypoint && waypoint != null) {
         _playbackController.arrivedAtWaypoint(waypoint);
-        setState(() => _currentWaypoint = waypoint);
+        setState(() => _currentWaypoint.index = waypoint);
       }
     });
   }
@@ -95,8 +96,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
     const bottomHeight = 88.0;
     const drawerHandleHeight = 28.0;
 
-    return ChangeNotifierProvider<CurrentLocationModel>.value(
-      value: _currentLocation,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<CurrentLocationModel>.value(
+            value: _currentLocation),
+        ChangeNotifierProvider.value(value: _currentWaypoint)
+      ],
       builder: (context, child) {
         return Scaffold(
           body: Stack(
@@ -230,7 +235,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   child: GestureDetector(
                     child: NavigationPanel(
                       playbackController: _playbackController,
-                      currentWaypoint: _currentWaypoint,
+                      currentWaypoint: _currentWaypoint.index,
                       tour: widget.tour,
                     ),
                     onVerticalDragStart: (details) =>
