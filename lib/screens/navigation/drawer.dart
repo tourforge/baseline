@@ -92,7 +92,7 @@ class NavigationDrawerState extends State<NavigationDrawer>
                         child: NotificationListener<OverscrollNotification>(
                           onNotification: (notification) {
                             if (notification.velocity == 0 &&
-                                notification.overscroll < -2) {
+                                notification.overscroll < -8) {
                               setState(() {
                                 var factor = _animation.value *
                                     _innerSize /

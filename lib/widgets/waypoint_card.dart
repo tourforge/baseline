@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '/models.dart';
 import '/screens/waypoint_details.dart';
 
-class WaypointCard extends StatelessWidget {
+class WaypointCard extends StatefulWidget {
   const WaypointCard({
     Key? key,
     required this.waypoint,
@@ -19,6 +19,13 @@ class WaypointCard extends StatelessWidget {
   final bool currentlyPlaying;
 
   @override
+  State<WaypointCard> createState() => _WaypointCardState();
+}
+
+class _WaypointCardState extends State<WaypointCard> {
+  bool _transcriptShown = false;
+
+  @override
   Widget build(BuildContext context) {
     const borderRadius = Radius.circular(20);
 
@@ -26,7 +33,7 @@ class WaypointCard extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(borderRadius),
         boxShadow: [
-          if (currentlyPlaying)
+          if (widget.currentlyPlaying)
             BoxShadow(
               blurRadius: 5,
               color: const Color.fromARGB(255, 0, 0, 128).withAlpha(32),
@@ -38,8 +45,14 @@ class WaypointCard extends StatelessWidget {
         borderRadius: BorderRadius.only(
           topLeft: borderRadius,
           topRight: borderRadius,
-          bottomLeft: currentlyPlaying ? Radius.zero : borderRadius,
-          bottomRight: currentlyPlaying ? Radius.zero : borderRadius,
+          bottomLeft:
+              widget.currentlyPlaying && widget.waypoint.transcript != null
+                  ? Radius.zero
+                  : borderRadius,
+          bottomRight:
+              widget.currentlyPlaying && widget.waypoint.transcript != null
+                  ? Radius.zero
+                  : borderRadius,
         ),
         type: MaterialType.card,
         child: Column(
@@ -49,17 +62,23 @@ class WaypointCard extends StatelessWidget {
             InkWell(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => WaypointDetails(waypoint)));
+                    builder: (context) => WaypointDetails(widget.waypoint)));
               },
               borderRadius: BorderRadius.only(
                 topLeft: borderRadius,
                 topRight: borderRadius,
-                bottomLeft: currentlyPlaying ? Radius.zero : borderRadius,
-                bottomRight: currentlyPlaying ? Radius.zero : borderRadius,
+                bottomLeft: widget.currentlyPlaying &&
+                        widget.waypoint.transcript != null
+                    ? Radius.zero
+                    : borderRadius,
+                bottomRight: widget.currentlyPlaying &&
+                        widget.waypoint.transcript != null
+                    ? Radius.zero
+                    : borderRadius,
               ),
               child: Row(
                 children: [
-                  if (waypoint.gallery.isNotEmpty)
+                  if (widget.waypoint.gallery.isNotEmpty)
                     SizedBox(
                       width: 90,
                       height: 90,
@@ -69,20 +88,22 @@ class WaypointCard extends StatelessWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.only(
                               topLeft: borderRadius,
-                              bottomLeft:
-                                  currentlyPlaying ? Radius.zero : borderRadius,
+                              bottomLeft: widget.currentlyPlaying &&
+                                      widget.waypoint.transcript != null
+                                  ? Radius.zero
+                                  : borderRadius,
                             ),
                             child: Hero(
-                              tag: "waypointThumbnail ${waypoint.name}",
+                              tag: "waypointThumbnail ${widget.waypoint.name}",
                               child: Image.file(
-                                File(waypoint.gallery.first.fullPath),
+                                File(widget.waypoint.gallery.first.fullPath),
                                 fit: BoxFit.cover,
                               ),
                             ),
                           ),
                           Center(
                             child: Text(
-                              "${index + 1}",
+                              "${widget.index + 1}",
                               style: GoogleFonts.robotoMono(
                                 color: Colors.white,
                                 fontSize: 32,
@@ -106,7 +127,7 @@ class WaypointCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            waypoint.name,
+                            widget.waypoint.name,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleSmall!
@@ -115,7 +136,7 @@ class WaypointCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            "${waypoint.desc}\n\n",
+                            "${widget.waypoint.desc}\n\n",
                             style: Theme.of(context)
                                 .textTheme
                                 .bodySmall!
@@ -130,12 +151,39 @@ class WaypointCard extends StatelessWidget {
                 ],
               ),
             ),
-            if (currentlyPlaying)
+            if (_transcriptShown && widget.currentlyPlaying)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Transcript",
+                      style: Theme.of(context)
+                          .textTheme
+                          .labelMedium!
+                          .copyWith(color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(widget.waypoint.transcript ??
+                        "No transcript available."),
+                  ],
+                ),
+              ),
+            if (widget.currentlyPlaying && widget.waypoint.transcript != null)
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    _transcriptShown = !_transcriptShown;
+                  });
+                },
                 style: ButtonStyle(
                   padding: const MaterialStatePropertyAll(EdgeInsets.zero),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
                   backgroundColor: MaterialStatePropertyAll(
                       Theme.of(context).colorScheme.secondary),
                   foregroundColor: MaterialStatePropertyAll(
@@ -149,7 +197,9 @@ class WaypointCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                child: const Text("View Transcript"),
+                child: _transcriptShown
+                    ? const Text("Hide Transcript")
+                    : const Text("View Transcript"),
               ),
           ],
         ),

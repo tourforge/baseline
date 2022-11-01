@@ -157,6 +157,7 @@ class WaypointModel {
     required this.lng,
     required this.triggerRadius,
     required this.narration,
+    required this.transcript,
     required this.gallery,
   });
 
@@ -167,6 +168,7 @@ class WaypointModel {
         lng: json["lng"]! as double,
         triggerRadius: json["trigger_radius"]! as double,
         narration: AssetModel._parse(tourName, json["narration"]),
+        transcript: json["transcript"] as String?,
         gallery: List<AssetModel>.unmodifiable(
             (json["gallery"]! as List<dynamic>)
                 .map((e) => AssetModel._parse(tourName, e))),
@@ -178,6 +180,7 @@ class WaypointModel {
   final double lng;
   final double triggerRadius;
   final AssetModel? narration;
+  final String? transcript;
   final List<AssetModel> gallery;
 }
 
