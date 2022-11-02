@@ -10,6 +10,7 @@ import '/location.dart';
 import '/models.dart';
 import '/models/current_location.dart';
 import '/models/current_waypoint.dart';
+import '/screens/navigation/disclaimer.dart';
 import '/screens/navigation/drawer.dart';
 import '/screens/navigation/map.dart';
 import '/screens/navigation/panel.dart';
@@ -29,6 +30,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   bool _fakeGpsEnabled = false;
   StreamSubscription<LatLng> _locationStream =
       const Stream<LatLng>.empty().listen((_) {});
+  bool _disclaimerShown = false;
 
   final CurrentLocationModel _currentLocation = CurrentLocationModel();
   final CurrentWaypointModel _currentWaypoint = CurrentWaypointModel();
@@ -95,6 +97,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
   Widget build(BuildContext context) {
     const bottomHeight = 88.0;
     const drawerHandleHeight = 28.0;
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (!_disclaimerShown) {
+        _disclaimerShown = true;
+        showDisclaimer(context);
+      }
+    });
 
     return MultiProvider(
       providers: [
