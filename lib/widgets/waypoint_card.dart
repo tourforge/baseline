@@ -34,26 +34,16 @@ class _WaypointCardState extends State<WaypointCard> {
         borderRadius: const BorderRadius.all(borderRadius),
         boxShadow: [
           if (widget.currentlyPlaying)
-            BoxShadow(
+            const BoxShadow(
               blurRadius: 5,
-              color: const Color.fromARGB(255, 0, 0, 128).withAlpha(32),
+              spreadRadius: -2,
+              color: Color.fromARGB(192, 72, 96, 192),
             ),
         ],
       ),
       child: Material(
         elevation: 3,
-        borderRadius: BorderRadius.only(
-          topLeft: borderRadius,
-          topRight: borderRadius,
-          bottomLeft:
-              widget.currentlyPlaying && widget.waypoint.transcript != null
-                  ? Radius.zero
-                  : borderRadius,
-          bottomRight:
-              widget.currentlyPlaying && widget.waypoint.transcript != null
-                  ? Radius.zero
-                  : borderRadius,
-        ),
+        borderRadius: const BorderRadius.all(borderRadius),
         type: MaterialType.card,
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -184,10 +174,11 @@ class _WaypointCardState extends State<WaypointCard> {
                   padding: const MaterialStatePropertyAll(EdgeInsets.zero),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
-                  backgroundColor: MaterialStatePropertyAll(
-                      Theme.of(context).colorScheme.secondary),
+                  backgroundColor: const MaterialStatePropertyAll(Colors.white),
+                  overlayColor: MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.onPrimary.withAlpha(64)),
                   foregroundColor: MaterialStatePropertyAll(
-                      Theme.of(context).colorScheme.onSecondary),
+                      Theme.of(context).colorScheme.primary),
                   shape: const MaterialStatePropertyAll(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
@@ -199,7 +190,7 @@ class _WaypointCardState extends State<WaypointCard> {
                 ),
                 child: _transcriptShown
                     ? const Text("Hide Transcript")
-                    : const Text("View Transcript"),
+                    : const Text("Show Transcript"),
               ),
           ],
         ),

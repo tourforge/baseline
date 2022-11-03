@@ -125,6 +125,7 @@ class TourListItem extends StatelessWidget {
         child: SizedBox(
           height: 130,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               SizedBox(
                 width: 130,

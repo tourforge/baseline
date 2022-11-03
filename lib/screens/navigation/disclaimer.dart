@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 Future<void> showDisclaimer(BuildContext context) async {
@@ -21,15 +19,16 @@ class Disclaimer extends StatelessWidget {
         child: ListBody(
           children: const <Widget>[
             Text(
-                'Remember to obey local laws and pay attention to your surroundings while driving.'),
+                'Remember to obey the law and pay attention to your surroundings while driving.'),
           ],
         ),
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('Exit app'),
+          child: const Text('Exit tour'),
           onPressed: () {
-            exit(0);
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
           },
         ),
         TextButton(

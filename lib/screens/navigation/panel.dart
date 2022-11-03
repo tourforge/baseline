@@ -46,9 +46,8 @@ class NavigationPanel extends StatelessWidget {
                     child: Text(
                       currentWaypoint != null
                           ? "${currentWaypoint! + 1}. ${tour.waypoints[currentWaypoint!].name}"
-                          : "No Waypoints Nearby",
-                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                            fontSize: 14.5,
+                          : "No Narration Playing",
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                             color: currentWaypoint == null ? Colors.grey : null,
                             fontStyle: currentWaypoint == null
                                 ? FontStyle.italic
@@ -169,8 +168,14 @@ class _AudioControlButtonState extends State<_AudioControlButton> {
     super.initState();
 
     widget.playbackController.onStateChanged = () {
-      setState(() {});
+      if (mounted) setState(() {});
     };
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.playbackController.onStateChanged = () {};
   }
 
   @override

@@ -18,7 +18,6 @@ class NarrationPlaybackController {
     _player.onPlayerStateChanged.listen((event) {
       onStateChanged();
     });
-    ;
   }
 
   final List<AssetModel?> narrations;
@@ -92,6 +91,7 @@ class NarrationPlaybackController {
   String? positionToString(double position) {
     var fullDuration = _currentDuration;
     if (fullDuration == null) return null;
+    if (position.isNaN || !position.isFinite) return null;
 
     var duration = Duration(
       milliseconds: (fullDuration.inMilliseconds.toDouble() * position).toInt(),

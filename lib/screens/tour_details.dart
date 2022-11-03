@@ -93,8 +93,7 @@ class _TourDetailsState extends State<TourDetails>
                             Positioned.fill(
                               child: _InitialFadeIn(
                                 child: Container(
-                                    color: const Color.fromARGB(
-                                        128, 255, 255, 255)),
+                                    color: const Color.fromARGB(64, 0, 0, 0)),
                               ),
                             ),
                           ],

@@ -37,6 +37,7 @@ class TourSummary {
 
     var json = jsonDecode(res.body);
 
+    await _toursBasePath;
     return TourSummary._parse(json);
   }
 
