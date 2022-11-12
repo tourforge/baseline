@@ -9,13 +9,13 @@ import Flutter
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
       
-    weak var registrar = self.registrar(forPlugin: "evresi")!
+    weak var registrar = self.registrar(forPlugin: "opentourbuilder_guide")!
       
       let factory = MapLibreNativeViewFactory(messenger: registrar!.messenger())
       
     registrar!.register(
       factory,
-      withId: "org.evresi.app.MapLibrePlatformView")
+      withId: "org.opentourbuilder.guide.MapLibrePlatformView")
       
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

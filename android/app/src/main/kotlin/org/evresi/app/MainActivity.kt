@@ -1,4 +1,4 @@
-package org.evresi.app
+package org.opentourbuilder.guide
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -11,7 +11,7 @@ class MainActivity : FlutterActivity() {
         flutterEngine
             .platformViewsController
             .registry
-            .registerViewFactory("org.evresi.app.MapLibrePlatformView",
+            .registerViewFactory("org.opentourbuilder.guide.MapLibrePlatformView",
                 MapLibrePlatformViewFactory(flutterEngine.dartExecutor.binaryMessenger))
     }
 }

@@ -1,4 +1,4 @@
-package org.evresi.app
+package org.opentourbuilder.guide
 
 import android.content.Context
 import android.view.View
@@ -24,7 +24,7 @@ class MapLibrePlatformView(
     messenger: BinaryMessenger
 ) : PlatformView {
     private val mapView: MapView
-    private val channel = MethodChannel(messenger, "evresi.org/app/map")
+    private val channel = MethodChannel(messenger, "opentourbuilder.org/guide/map")
     private lateinit var locationSource: GeoJsonSource
     private var map: MapboxMap? = null
 

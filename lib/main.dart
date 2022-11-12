@@ -7,16 +7,16 @@ import 'theme.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterDisplayMode.setHighRefreshRate();
-  runApp(const EvresiApp());
+  runApp(const OtbGuideApp());
 }
 
-class EvresiApp extends StatelessWidget {
-  const EvresiApp({Key? key}) : super(key: key);
+class OtbGuideApp extends StatelessWidget {
+  const OtbGuideApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Evresi',
+      title: 'OpenTourBuilder Guide',
       theme: themeData,
       home: const TourGallery(),
     );

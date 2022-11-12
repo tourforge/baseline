@@ -26,7 +26,7 @@ class MapLibreMap extends StatefulWidget {
 }
 
 class MapLibreMapState extends State<MapLibreMap> {
-  static const _channel = MethodChannel("evresi.org/app/map");
+  static const _channel = MethodChannel("opentourbuilder.org/guide/map");
 
   late Future<String> buildStyle;
 
@@ -100,7 +100,8 @@ class MapLibreMapState extends State<MapLibreMap> {
       builder: (context, snapshot) {
         if (snapshot.hasData && !snapshot.hasError) {
           // This is used in the platform side to register the view.
-          const String viewType = 'org.evresi.app.MapLibrePlatformView';
+          const String viewType =
+              'org.opentourbuilder.guide.MapLibrePlatformView';
           // Pass parameters to the platform side.
           final Map<String, dynamic> creationParams = <String, dynamic>{
             "stylePath": snapshot.data,

@@ -26,7 +26,7 @@ class _TourGalleryState extends State<TourGallery> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Evresi"),
+        title: const Text("OpenTourBuilder Guide"),
         actions: [
           IconButton(
             icon: const Icon(Icons.help),

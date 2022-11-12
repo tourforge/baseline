@@ -1,4 +1,4 @@
-package org.evresi.app
+package org.opentourbuilder.guide
 
 import android.content.Context
 import io.flutter.plugin.common.BinaryMessenger

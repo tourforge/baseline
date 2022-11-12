@@ -44,7 +44,7 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
         binaryMessenger messenger: FlutterBinaryMessenger
     ) {
         _view = UIView()
-        _channel = FlutterMethodChannel(name: "evresi.org/app/map", binaryMessenger: messenger)
+        _channel = FlutterMethodChannel(name: "opentourbuilder.org/guide/map", binaryMessenger: messenger)
         _tilesUrl = (args as! Dictionary<String, Any>)["tilesUrl"] as! String
         _pathGeoJson = (args as! Dictionary<String, Any>)["pathGeoJson"] as! String
         _pointsGeoJson = (args as! Dictionary<String, Any>)["pointsGeoJson"] as! String
