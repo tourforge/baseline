@@ -28,7 +28,19 @@ class MapLibreMap extends StatefulWidget {
 class MapLibreMapState extends State<MapLibreMap> {
   static const _channel = MethodChannel("opentourbuilder.org/guide/map");
 
+  late final String stylePath;
+  late final String satStylePath;
   late Future<String> buildStyle;
+
+  bool _satelliteEnabled = false;
+
+  bool get satelliteEnabled => _satelliteEnabled;
+  set satelliteEnabled(bool value) {
+    _satelliteEnabled = value;
+
+    _channel.invokeMethod<void>(
+        "setStyle", _satelliteEnabled ? satStylePath : stylePath);
+  }
 
   void updateLocation(LatLng location) {
     _channel.invokeMethod<void>(
@@ -52,7 +64,7 @@ class MapLibreMapState extends State<MapLibreMap> {
   void initState() {
     super.initState();
 
-    buildStyle = _createStyleIfNotExists();
+    buildStyle = _createStyle();
 
     _channel.setMethodCallHandler((call) async {
       switch (call.method) {
@@ -68,27 +80,61 @@ class MapLibreMapState extends State<MapLibreMap> {
     });
   }
 
-  Future<String> _createStyleIfNotExists() async {
-    final stylePath =
-        p.join((await getTemporaryDirectory()).path, "style.json");
+  Future<String> _createStyle() async {
+    final spritePath = p.join((await getTemporaryDirectory()).path, "sprite");
+    final spriteSatPath =
+        p.join((await getTemporaryDirectory()).path, "sprite-satellite");
+    stylePath = p.join((await getTemporaryDirectory()).path, "style.json");
+    satStylePath =
+        p.join((await getTemporaryDirectory()).path, "style-satellite.json");
 
-    if (await File(stylePath).exists()) {
-      return stylePath;
-    }
-
-    if (!mounted) return stylePath;
+    if (!mounted) return satStylePath;
     var assetBundle = DefaultAssetBundle.of(context);
     var styleText = await assetBundle.loadString('assets/style.json');
+    var satStyleText =
+        await assetBundle.loadString('assets/style-satellite.json');
     var key = await assetBundle.loadString('assets/maptiler.txt');
+    var tomtomKey = await assetBundle.loadString('assets/tomtom.txt');
+    var spritePng = await assetBundle.load('assets/sprite.png');
+    var spriteJson = await assetBundle.loadString('assets/sprite.json');
+    var sprite2xPng = await assetBundle.load('assets/sprite@2x.png');
+    var sprite2xJson = await assetBundle.loadString('assets/sprite@2x.json');
+    var spriteSatPng = await assetBundle.load('assets/sprite-satellite.png');
+    var spriteSatJson =
+        await assetBundle.loadString('assets/sprite-satellite.json');
+    var spriteSat2xPng =
+        await assetBundle.load('assets/sprite-satellite@2x.png');
+    var spriteSat2xJson =
+        await assetBundle.loadString('assets/sprite-satellite@2x.json');
 
-    var baseStyle = jsonDecode(styleText);
+    var style = jsonDecode(styleText);
+    var satStyle = jsonDecode(satStyleText);
 
-    baseStyle["glyphs"] =
+    satStyle["glyphs"] = style["glyphs"] =
         "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=$key";
+    satStyle["sprite"] = "file://$spriteSatPath";
+    style["sprite"] = "file://$spritePath";
+    satStyle["sources"]["openmaptiles"]["url"] = style["sources"]
+        ["openmaptiles"]["url"] = "mbtiles://${widget.tour.tilesPath}";
+    satStyle["sources"]["satellite"]["tiles"][0] =
+        "https://api.tomtom.com/map/1/tile/sat/main/{z}/{x}/{y}.jpg?key=$tomtomKey";
 
-    var style = jsonEncode(baseStyle);
+    styleText = jsonEncode(style);
+    satStyleText = jsonEncode(satStyle);
 
-    await File(stylePath).writeAsString(style);
+    await File("$spritePath.png").writeAsBytes(spritePng.buffer.asUint8List());
+    await File("$spritePath.json").writeAsString(spriteJson);
+    await File("$spritePath@2x.png")
+        .writeAsBytes(sprite2xPng.buffer.asUint8List());
+    await File("$spritePath@2x.json").writeAsString(sprite2xJson);
+    await File("$spriteSatPath.png")
+        .writeAsBytes(spriteSatPng.buffer.asUint8List());
+    await File("$spriteSatPath.json").writeAsString(spriteSatJson);
+    await File("$spriteSatPath@2x.png")
+        .writeAsBytes(spriteSat2xPng.buffer.asUint8List());
+    await File("$spriteSatPath@2x.json").writeAsString(spriteSat2xJson);
+    await File(stylePath).writeAsString(styleText);
+    await File(satStylePath).writeAsString(satStyleText);
 
     return stylePath;
   }

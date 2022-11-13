@@ -92,9 +92,11 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
 
     _positionSubscription =
         widget.playbackController.onPositionChanged.listen((position) {
-      setState(() {
-        if (!isDragging) this.position = position;
-      });
+      if (!isDragging && position >= 0.0 && position <= 1.0) {
+        setState(() {
+          this.position = position;
+        });
+      }
     });
   }
 

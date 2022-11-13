@@ -48,3 +48,6 @@ app.*.map.json
 
 # Using MapTiler in development, the key is stored here
 /assets/maptiler.txt
+
+# TomTom key
+/assets/tomtom.txt

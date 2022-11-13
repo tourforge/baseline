@@ -20,12 +20,17 @@ class NavigationMap extends StatefulWidget {
   final bool fakeGpsEnabled;
 
   @override
-  State<NavigationMap> createState() => _NavigationMapState();
+  State<NavigationMap> createState() => NavigationMapState();
 }
 
-class _NavigationMapState extends State<NavigationMap> {
+class NavigationMapState extends State<NavigationMap> {
   final GlobalKey<MapLibreMapState> _mapKey = GlobalKey();
   final GlobalKey<_FakeGpsOverlayState> _fakeGpsKey = GlobalKey();
+
+  bool get satelliteEnabled => _mapKey.currentState!.satelliteEnabled;
+  set satelliteEnabled(bool value) {
+    _mapKey.currentState!.satelliteEnabled = value;
+  }
 
   @override
   void initState() {
