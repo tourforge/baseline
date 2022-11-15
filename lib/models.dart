@@ -46,8 +46,7 @@ class TourSummary {
         (eJson) => TourSummary._(
           id: eJson["id"]! as String,
           name: eJson["name"]! as String,
-          thumbnail:
-              AssetModel._parse(eJson["id"]! as String, eJson["thumbnail"]),
+          thumbnail: AssetModel._parse(eJson["thumbnail"], {}),
         ),
       ));
 
@@ -76,7 +75,11 @@ class TourModel {
         await File(p.join(await _toursBasePath, id, "tour.json"))
             .readAsString();
 
-    return TourModel._parse(id, jsonDecode(tourJsonContent));
+    var assetsJsonContent = AssetMeta._parse(jsonDecode(
+        await File(p.join(await _toursBasePath, id, "assets.json"))
+            .readAsString()));
+
+    return TourModel._parse(id, jsonDecode(tourJsonContent), assetsJsonContent);
   }
 
   static Future<bool> isDownloaded(String id) async {
@@ -90,51 +93,49 @@ class TourModel {
 
     var base = await _toursBasePath;
 
-    await Directory(p.join(base, "$id.part", "assets")).create(recursive: true);
+    await Directory(p.join(base, "assets")).create(recursive: true);
+    await Directory(p.join(base, "$id.part")).create(recursive: true);
 
     try {
-      var futures = <Future>[];
+      var futures = <Future<void>>[];
 
       _printDebug("Starting tour download...");
       futures.add(_downloadToFile(Uri.parse("$_hostUri/$id/tiles.mbtiles"),
           outPath: p.join(base, "$id.part", "tiles.mbtiles")));
-      _printDebug("Downloading tour.json...");
-      var tourJsonStr =
-          await _downloadToMemory(Uri.parse("$_hostUri/$id/tour.json"));
-      _printDebug("tour.json downloaded.");
-      futures.add(_writeToFile(tourJsonStr,
+      futures.add(_downloadToFile(Uri.parse("$_hostUri/$id/tour.json"),
           outPath: p.join(base, "$id.part", "tour.json")));
-      var tour = _parse(id, jsonDecode(tourJsonStr));
-      // now recursively download assets
-      var assets = tour.gallery.followedBy(tour.waypoints
-          .map((e) => [...e.gallery, if (e.narration != null) e.narration!])
-          .reduce((a, b) => a + b));
-      for (var asset in assets) {
-        futures.add(_downloadToFile(
-            Uri.parse("$_hostUri/$id/assets/${asset.name}"),
-            outPath: p.join(base, "$id.part", "assets", asset.name)));
+      var assetsFile = await _downloadToFile(
+          Uri.parse("$_hostUri/$id/assets.json"),
+          outPath: p.join(base, "$id.part", "assets.json"));
+      var assets =
+          AssetMeta._parse(jsonDecode(await assetsFile.readAsString()));
+      for (var entry in assets.entries) {
+        futures.add(_downloadToFile(Uri.parse("$_hostUri/assets/${entry.key}"),
+            outPath: p.join(base, "assets", entry.key)));
       }
-
       await Future.wait(futures);
-
       await Directory(p.join(base, "$id.part")).rename(p.join(base, id));
+      _printDebug("Finished tour download.");
     } catch (e) {
       _printDebug("Error occurred while downloading: $e");
+      rethrow;
     }
   }
 
-  static TourModel _parse(String tourId, dynamic json) => TourModel._(
+  static TourModel _parse(
+          String tourId, dynamic json, Map<String, AssetMeta> assets) =>
+      TourModel._(
         id: tourId,
         name: json["name"]! as String,
         desc: json["desc"]! as String,
         waypoints: List<WaypointModel>.unmodifiable(
             (json["waypoints"]! as List<dynamic>)
-                .map((e) => WaypointModel._parse(tourId, e))),
+                .map((e) => WaypointModel._parse(e, assets))),
         gallery: List<AssetModel>.unmodifiable(
             (json["gallery"]! as List<dynamic>)
-                .map((e) => AssetModel._parse(tourId, e))),
+                .map((e) => AssetModel._parse(e, assets))),
         pois: List<PoiModel>.unmodifiable((json["pois"]! as List<dynamic>)
-            .map((e) => PoiModel._parse(tourId, e))),
+            .map((e) => PoiModel._parse(tourId, e, assets))),
         path: List.unmodifiable(mtk.PolygonUtil.decode(json["path"]! as String)
             .map((e) => LatLng(e.latitude, e.longitude))),
       );
@@ -150,6 +151,24 @@ class TourModel {
   String get tilesPath => p.join(_toursBasePathCurrent!, id, "tiles.mbtiles");
 }
 
+class AssetMeta {
+  AssetMeta._({
+    required this.alt,
+    required this.attribution,
+  });
+
+  static Map<String, AssetMeta> _parse(Map<String, dynamic> json) =>
+      (json["assets"]! as Map<String, dynamic>)
+          .map((key, value) => MapEntry(key, _parseItem(value)));
+  static AssetMeta _parseItem(Map<String, dynamic> json) => AssetMeta._(
+        alt: json["alt"],
+        attribution: json["attribution"],
+      );
+
+  final String? alt;
+  final String? attribution;
+}
+
 class WaypointModel {
   WaypointModel._({
     required this.name,
@@ -162,17 +181,18 @@ class WaypointModel {
     required this.gallery,
   });
 
-  static WaypointModel _parse(String tourName, dynamic json) => WaypointModel._(
+  static WaypointModel _parse(dynamic json, Map<String, AssetMeta> assets) =>
+      WaypointModel._(
         name: json["name"]! as String,
         desc: json["desc"]! as String,
         lat: json["lat"]! as double,
         lng: json["lng"]! as double,
         triggerRadius: json["trigger_radius"]! as double,
-        narration: AssetModel._parse(tourName, json["narration"]),
+        narration: AssetModel._parse(json["narration"], assets),
         transcript: json["transcript"] as String?,
         gallery: List<AssetModel>.unmodifiable(
             (json["gallery"]! as List<dynamic>)
-                .map((e) => AssetModel._parse(tourName, e))),
+                .map((e) => AssetModel._parse(e, assets))),
       );
 
   final String name;
@@ -194,14 +214,16 @@ class PoiModel {
     required this.gallery,
   });
 
-  static PoiModel _parse(String tourName, dynamic json) => PoiModel._(
+  static PoiModel _parse(
+          String tourName, dynamic json, Map<String, AssetMeta> assets) =>
+      PoiModel._(
         name: json["name"]! as String,
         desc: json["desc"]! as String,
         lat: json["lat"]! as double,
         lng: json["lng"]! as double,
         gallery: List<AssetModel>.unmodifiable(
             (json["gallery"]! as List<dynamic>)
-                .map((e) => AssetModel._parse(tourName, e))),
+                .map((e) => AssetModel._parse(e, assets))),
       );
 
   final String name;
@@ -212,21 +234,22 @@ class PoiModel {
 }
 
 class AssetModel {
-  AssetModel._(this._tourId, this.name);
+  AssetModel._(this.name, [this.meta]);
 
-  static AssetModel? _parse(String tourName, dynamic name) =>
-      name != null ? AssetModel._(tourName, name as String) : null;
+  static AssetModel? _parse(dynamic name, Map<String, AssetMeta> assets) =>
+      name != null ? AssetModel._(name as String, assets[name]) : null;
 
-  final String _tourId;
   final String name;
+  final AssetMeta? meta;
 
-  String get fullPath =>
-      p.join(_toursBasePathCurrent!, _tourId, "assets", name);
+  String get fullPath => p.join(_toursBasePathCurrent!, "assets", name);
 }
 
-Future<void> _downloadToFile(Uri uri, {required String outPath}) async {
-  if (await File(outPath).exists()) {
-    return;
+Future<File> _downloadToFile(Uri uri, {required String outPath}) async {
+  var file = File(outPath);
+
+  if (await file.exists()) {
+    return file;
   }
 
   var outFile = File("$outPath.part");
@@ -234,7 +257,7 @@ Future<void> _downloadToFile(Uri uri, {required String outPath}) async {
     await outFile.delete();
   }
 
-  _printDebug("Downloading $uri to $outPath...");
+  _printDebug("Downloading $uri...");
   var outSink = outFile.openWrite();
   var client = HttpClient();
   var req = await client.getUrl(uri);
@@ -242,23 +265,16 @@ Future<void> _downloadToFile(Uri uri, {required String outPath}) async {
   await outSink.addStream(resp);
   await outSink.flush();
   await outSink.close();
-  _printDebug("$uri downloaded to $outPath.");
 
   await outFile.rename(outPath);
-  _printDebug("Download of $uri finalized.");
-}
+  _printDebug("Finished downloading $uri.");
 
-Future<String> _downloadToMemory(Uri uri) async {
-  return (await get(uri)).body;
-}
-
-Future<void> _writeToFile(String s, {required String outPath}) async {
-  var outFile = File("$outPath.part");
-  if (await outFile.exists()) {
-    outFile.delete();
+  if (!await file.exists()) {
+    throw Exception(
+        "Download of $uri has completed but file wasn't saved to disk?!");
   }
-  await outFile.writeAsString(s);
-  await outFile.rename(outPath);
+
+  return file;
 }
 
 void _printDebug(String s) {

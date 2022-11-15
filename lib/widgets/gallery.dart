@@ -71,6 +71,31 @@ class GalleryPage extends StatefulWidget {
 class _GalleryPageState extends State<GalleryPage> {
   late final PageController controller =
       PageController(initialPage: widget.initialImage);
+  late int currentPage = widget.initialImage;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.addListener(_onPageControllerUpdate);
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(_onPageControllerUpdate);
+
+    super.dispose();
+  }
+
+  void _onPageControllerUpdate() {
+    if (!controller.hasClients) return;
+
+    if (controller.page != null && controller.page!.round() != currentPage) {
+      setState(() {
+        currentPage = controller.page!.round();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +135,26 @@ class _GalleryPageState extends State<GalleryPage> {
                 ),
               ),
             ),
-          )
+          ),
+          if (widget.images[currentPage].meta?.attribution != null)
+            SafeArea(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Material(
+                  color: Colors.black45,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.images[currentPage].meta!.attribution!,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
