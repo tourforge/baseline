@@ -99,6 +99,8 @@ class _GalleryPageState extends State<GalleryPage> {
 
   @override
   Widget build(BuildContext context) {
+    var currentImage = widget.images[currentPage];
+
     return Scaffold(
       body: Stack(
         children: [
@@ -136,7 +138,7 @@ class _GalleryPageState extends State<GalleryPage> {
               ),
             ),
           ),
-          if (widget.images[currentPage].meta?.attribution != null)
+          if (currentImage.meta?.alt != null)
             IgnorePointer(
               ignoring: true,
               child: Align(
@@ -149,12 +151,57 @@ class _GalleryPageState extends State<GalleryPage> {
                       child: SizedBox(
                         width: double.infinity,
                         child: Text(
-                          widget.images[currentPage].meta!.attribution!,
+                          widget.images[currentPage].meta!.alt!,
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium!
                               .copyWith(color: Colors.white),
                           textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          if (currentImage.meta?.alt != null ||
+              currentImage.meta?.attribution != null)
+            IgnorePointer(
+              ignoring: true,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: SafeArea(
+                  child: Material(
+                    color: Colors.black45,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (currentImage.meta?.alt != null)
+                              Text(
+                                currentImage.meta!.alt!,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                            if (currentImage.meta?.alt != null &&
+                                currentImage.meta?.attribution != null)
+                              const SizedBox(height: 8.0),
+                            if (currentImage.meta?.attribution != null)
+                              Text(
+                                currentImage.meta!.attribution!,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                          ],
                         ),
                       ),
                     ),
