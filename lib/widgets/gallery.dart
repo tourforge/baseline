@@ -137,19 +137,26 @@ class _GalleryPageState extends State<GalleryPage> {
             ),
           ),
           if (widget.images[currentPage].meta?.attribution != null)
-            SafeArea(
+            IgnorePointer(
+              ignoring: true,
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Material(
-                  color: Colors.black45,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      widget.images[currentPage].meta!.attribution!,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(color: Colors.white),
+                child: SafeArea(
+                  child: Material(
+                    color: Colors.black45,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          widget.images[currentPage].meta!.attribution!,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
                   ),
                 ),
