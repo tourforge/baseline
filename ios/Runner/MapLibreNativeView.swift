@@ -29,13 +29,13 @@ class MapLibreNativeViewFactory: NSObject, FlutterPlatformViewFactory {
 
 class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
     private var _view: UIView
-    private var _locationSource: MGLShapeSource = MGLShapeSource(identifier: "current_location", shape: MGLShapeCollectionFeature())
+    private var _locationSource: MGLShapeSource
     private var _channel: FlutterMethodChannel
     private var _mapView: MGLMapView?
     
-    private var _tilesUrl: String
     private var _pathGeoJson: String
     private var _pointsGeoJson: String
+    private var _locationGeoJson: String?
 
     init(
         frame: CGRect,
@@ -45,9 +45,9 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
     ) {
         _view = UIView()
         _channel = FlutterMethodChannel(name: "opentourbuilder.org/guide/map", binaryMessenger: messenger)
-        _tilesUrl = (args as! Dictionary<String, Any>)["tilesUrl"] as! String
         _pathGeoJson = (args as! Dictionary<String, Any>)["pathGeoJson"] as! String
         _pointsGeoJson = (args as! Dictionary<String, Any>)["pointsGeoJson"] as! String
+        _locationSource = MGLShapeSource(identifier: "current_location", shape: MGLShapeCollectionFeature())
         super.init()
         _channel.setMethodCallHandler(handleMethodCall)
         let stylePath = (args as! Dictionary<String, Any>)["stylePath"] as! String
@@ -60,7 +60,6 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
 
     func createNativeView(view _view: UIView, stylePath: String) {
         _view.backgroundColor = UIColor.white
-        
         // create the map view
         let mapView = MGLMapView(frame: _view.bounds, styleURL: URL(fileURLWithPath: stylePath))
         
@@ -79,9 +78,6 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
     }
     
     func mapView(_ mapView: MGLMapView, didFinishLoading style: MGLStyle) {
-        let tilesSource = MGLVectorTileSource(identifier: "openmaptiles", tileURLTemplates: [_tilesUrl])
-        style.addSource(tilesSource)
-        
         var pathShape: MGLShape
         do {
             pathShape = try MGLShape(data: _pathGeoJson.data(using: String.Encoding.utf8)!, encoding: String.Encoding.utf8.rawValue)
@@ -116,10 +112,25 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
     func handleMethodCall(call: FlutterMethodCall, result: FlutterResult) {
         if (call.method == "updateLocation") {
             do {
-                self._locationSource.shape = try MGLShape(data: (call.arguments as! String).data(using: String.Encoding.utf8)!, encoding: String.Encoding.utf8.rawValue)
+                _locationGeoJson = (call.arguments as! String)
+                self._locationSource.shape =
+                    try MGLShape(data: _locationGeoJson!.data(using: String.Encoding.utf8)!, encoding: String.Encoding.utf8.rawValue)
             } catch {
                 print("BAD")
             }
+        }
+        if (call.method == "setStyle") {
+            let stylePath = call.arguments as! String
+            _locationSource = MGLShapeSource(identifier: "current_location", shape: MGLShapeCollectionFeature())
+            do {
+                if (_locationGeoJson != nil) {
+                    self._locationSource.shape =
+                        try MGLShape(data: _locationGeoJson!.data(using: String.Encoding.utf8)!, encoding: String.Encoding.utf8.rawValue)
+                }
+            } catch {
+                print("BAD")
+            }
+            self._mapView?.styleURL = URL(fileURLWithPath: stylePath)
         }
     }
 }

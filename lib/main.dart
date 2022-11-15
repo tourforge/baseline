@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
@@ -5,8 +7,10 @@ import 'screens/gallery.dart';
 import 'theme.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  FlutterDisplayMode.setHighRefreshRate();
+  if (Platform.isAndroid) {
+    WidgetsFlutterBinding.ensureInitialized();
+    FlutterDisplayMode.setHighRefreshRate();
+  }
   runApp(const OtbGuideApp());
 }
 

@@ -28,6 +28,11 @@ class MapLibrePlatformView(
     private lateinit var locationSource: GeoJsonSource
     private var map: MapboxMap? = null
 
+    private var stylePath: String
+    private var pathGeoJson: String
+    private var pointsGeoJson: String
+    private var locationGeoJson: String? = null
+
     override fun getView(): View {
         return mapView
     }
@@ -41,32 +46,29 @@ class MapLibrePlatformView(
 
         channel.setMethodCallHandler { call, result -> handleMethodCall(call, result) }
 
-        val tilesUrl = creationParams["tilesUrl"] as String
-        val stylePath = creationParams["stylePath"] as String
-        val pathGeoJson = creationParams["pathGeoJson"] as String
-        val pointsGeoJson = creationParams["pointsGeoJson"] as String
-
         // Initialize MapLibre
         Mapbox.getInstance(context)
+
+        stylePath = creationParams["stylePath"] as String
+        pathGeoJson = creationParams["pathGeoJson"] as String
+        pointsGeoJson = creationParams["pointsGeoJson"] as String
+        GeoJsonSource("tour_path",
+            FeatureCollection.fromJson(pathGeoJson))
+        GeoJsonSource("tour_points",
+            FeatureCollection.fromJson(pointsGeoJson))
 
         mapView = MapView(context)
         mapView.getMapAsync { map ->
             handleMapLoaded(
                 map = map,
-                tilesUrl = tilesUrl,
-                stylePath = stylePath,
-                pathGeoJson = pathGeoJson,
-                pointsGeoJson = pointsGeoJson,
+                stylePath = stylePath
             )
         }
     }
 
     private fun handleMapLoaded(
         map: MapboxMap,
-        tilesUrl: String,
-        stylePath: String,
-        pathGeoJson: String,
-        pointsGeoJson: String
+        stylePath: String
     ) {
         this.map = map
 
@@ -78,7 +80,6 @@ class MapLibrePlatformView(
         locationSource = GeoJsonSource("current_location")
         map.setStyle(Style.Builder()
             .fromUri("file://$stylePath")
-            .withSource(VectorSource("openmaptiles", tilesUrl))
             .withSource(locationSource)
             .withSource(GeoJsonSource("tour_path",
                 FeatureCollection.fromJson(pathGeoJson)))
@@ -101,7 +102,20 @@ class MapLibrePlatformView(
     private fun handleMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "updateLocation" -> {
-                locationSource.setGeoJson(call.arguments as String)
+                locationGeoJson = call.arguments as String
+                locationSource.setGeoJson(locationGeoJson)
+                result.success(null)
+            }
+            "setStyle" -> {
+                stylePath = call.arguments as String
+                locationSource = GeoJsonSource("current_location", locationGeoJson)
+                map!!.setStyle(Style.Builder()
+                    .fromUri("file://$stylePath")
+                    .withSource(locationSource)
+                    .withSource(GeoJsonSource("tour_path",
+                        FeatureCollection.fromJson(pathGeoJson)))
+                    .withSource(GeoJsonSource("tour_points",
+                        FeatureCollection.fromJson(pointsGeoJson))))
                 result.success(null)
             }
         }

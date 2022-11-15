@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
@@ -36,6 +38,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   final CurrentWaypointModel _currentWaypoint = CurrentWaypointModel();
 
   final GlobalKey<NavigationDrawerState> _drawerKey = GlobalKey();
+  final GlobalKey<NavigationMapState> _mapKey = GlobalKey();
 
   @override
   void initState() {
@@ -112,151 +115,193 @@ class _NavigationScreenState extends State<NavigationScreen> {
         ChangeNotifierProvider.value(value: _currentWaypoint)
       ],
       builder: (context, child) {
-        return Scaffold(
-          body: Stack(
-            children: [
-              Positioned(
-                top: 0.0,
-                left: 0.0,
-                right: 0.0,
-                bottom: bottomHeight + drawerHandleHeight,
-                child: NavigationMap(
-                  tour: widget.tour,
-                  fakeGpsEnabled: _fakeGpsEnabled,
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: _mapKey.currentState != null &&
+                  _mapKey.currentState!.satelliteEnabled
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark,
+          child: Scaffold(
+            body: Stack(
+              children: [
+                Positioned(
+                  top: 0.0,
+                  left: 0.0,
+                  right: 0.0,
+                  bottom: bottomHeight + drawerHandleHeight,
+                  child: NavigationMap(
+                    key: _mapKey,
+                    tour: widget.tour,
+                    fakeGpsEnabled: _fakeGpsEnabled,
+                  ),
                 ),
-              ),
-              Positioned(
-                top: 5.0,
-                left: 0.0,
-                right: 0.0,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
-                      child: Material(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(25)),
-                        child: SizedBox(
-                          height: 50,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0),
-                                child: Text(
-                                  "Navigating",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineSmall!
-                                      .copyWith(
-                                        fontSize: 22,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
-                                      ),
+                Positioned(
+                  top: 5.0,
+                  left: 0.0,
+                  right: 0.0,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Material(
+                          color: Theme.of(context).colorScheme.primary,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(25)),
+                          child: SizedBox(
+                            height: 50,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0),
+                                  child: Text(
+                                    "Navigating",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall!
+                                        .copyWith(
+                                          fontSize: 22,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary,
+                                        ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                top: 0.0,
-                left: 0.0,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Material(
-                      borderRadius: const BorderRadius.all(Radius.circular(30)),
-                      color: Theme.of(context).colorScheme.primary,
-                      child: SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          iconSize: 32,
-                          splashRadius: 30,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          icon: Icon(Icons.adaptive.arrow_back),
+                Positioned(
+                  top: 0.0,
+                  left: 0.0,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Material(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(30)),
+                        color: Theme.of(context).colorScheme.primary,
+                        child: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            iconSize: 32,
+                            splashRadius: 30,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            icon: Icon(Icons.adaptive.arrow_back),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                top: 0.0,
-                right: 0.0,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Material(
-                      borderRadius: const BorderRadius.all(Radius.circular(30)),
-                      color: Theme.of(context).colorScheme.primary,
-                      child: SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: IconButton(
-                          onPressed: () {
-                            if (!_fakeGpsEnabled) {
-                              setState(() => _fakeGpsEnabled = true);
-                              _stopGpsListening();
-                            } else {
-                              setState(() => _fakeGpsEnabled = false);
-                              _startGpsListening();
-                            }
-                          },
-                          iconSize: 32,
-                          splashRadius: 30,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          icon: const Icon(Icons.bug_report),
+                Positioned(
+                  top: 0.0,
+                  right: 0.0,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Material(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(30)),
+                        color: Theme.of(context).colorScheme.primary,
+                        child: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: IconButton(
+                            onPressed: () {
+                              _mapKey.currentState!.satelliteEnabled =
+                                  !_mapKey.currentState!.satelliteEnabled;
+                              setState(() {});
+                            },
+                            iconSize: 32,
+                            splashRadius: 30,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            icon: _mapKey.currentState != null &&
+                                    _mapKey.currentState!.satelliteEnabled
+                                ? const Icon(Icons.layers_clear)
+                                : const Icon(Icons.layers),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                top: 0.0,
-                left: 0.0,
-                right: 0.0,
-                bottom: bottomHeight,
-                child: NavigationDrawer(
-                  key: _drawerKey,
-                  handleHeight: drawerHandleHeight,
-                  tour: widget.tour,
-                ),
-              ),
-              Positioned(
-                left: 0.0,
-                right: 0.0,
-                bottom: 0.0,
-                child: SizedBox(
-                  height: bottomHeight,
-                  child: GestureDetector(
-                    child: NavigationPanel(
-                      playbackController: _playbackController,
-                      currentWaypoint: _currentWaypoint.index,
-                      tour: widget.tour,
+                if (kDebugMode)
+                  Positioned(
+                    bottom: bottomHeight + drawerHandleHeight,
+                    right: 0.0,
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Material(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(30)),
+                          color: Colors.red.withAlpha(128),
+                          child: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: IconButton(
+                              onPressed: () {
+                                if (!_fakeGpsEnabled) {
+                                  setState(() => _fakeGpsEnabled = true);
+                                  _stopGpsListening();
+                                } else {
+                                  setState(() => _fakeGpsEnabled = false);
+                                  _startGpsListening();
+                                }
+                              },
+                              iconSize: 32,
+                              splashRadius: 30,
+                              color: Colors.black,
+                              icon: const Icon(Icons.bug_report),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    onVerticalDragStart: (details) =>
-                        _drawerKey.currentState?.onVerticalDragStart(details),
-                    onVerticalDragEnd: (details) =>
-                        _drawerKey.currentState?.onVerticalDragEnd(details),
-                    onVerticalDragUpdate: (details) =>
-                        _drawerKey.currentState?.onVerticalDragUpdate(details),
+                  ),
+                Positioned(
+                  top: 0.0,
+                  left: 0.0,
+                  right: 0.0,
+                  bottom: bottomHeight,
+                  child: NavigationDrawer(
+                    key: _drawerKey,
+                    handleHeight: drawerHandleHeight,
+                    tour: widget.tour,
                   ),
                 ),
-              ),
-            ],
+                Positioned(
+                  left: 0.0,
+                  right: 0.0,
+                  bottom: 0.0,
+                  child: SizedBox(
+                    height: bottomHeight,
+                    child: GestureDetector(
+                      child: NavigationPanel(
+                        playbackController: _playbackController,
+                        currentWaypoint: _currentWaypoint.index,
+                        tour: widget.tour,
+                      ),
+                      onVerticalDragStart: (details) =>
+                          _drawerKey.currentState?.onVerticalDragStart(details),
+                      onVerticalDragEnd: (details) =>
+                          _drawerKey.currentState?.onVerticalDragEnd(details),
+                      onVerticalDragUpdate: (details) => _drawerKey.currentState
+                          ?.onVerticalDragUpdate(details),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
