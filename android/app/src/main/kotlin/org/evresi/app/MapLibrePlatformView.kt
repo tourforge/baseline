@@ -52,29 +52,33 @@ class MapLibrePlatformView(
         stylePath = creationParams["stylePath"] as String
         pathGeoJson = creationParams["pathGeoJson"] as String
         pointsGeoJson = creationParams["pointsGeoJson"] as String
-        GeoJsonSource("tour_path",
-            FeatureCollection.fromJson(pathGeoJson))
-        GeoJsonSource("tour_points",
-            FeatureCollection.fromJson(pointsGeoJson))
+
+        var centerMap = creationParams["center"] as Map<*, *>
 
         mapView = MapView(context)
         mapView.getMapAsync { map ->
             handleMapLoaded(
                 map = map,
-                stylePath = stylePath
+                stylePath = stylePath,
+                lat = centerMap["lat"] as Double,
+                lng = centerMap["lng"] as Double,
+                zoom = creationParams["zoom"] as Double
             )
         }
     }
 
     private fun handleMapLoaded(
         map: MapboxMap,
-        stylePath: String
+        stylePath: String,
+        lat: Double,
+        lng: Double,
+        zoom: Double
     ) {
         this.map = map
 
         map.cameraPosition = CameraPosition.Builder()
-            .target(LatLng(34.0, -80.0))
-            .zoom(10.0)
+            .target(LatLng(lat, lng))
+            .zoom(zoom - 1)
             .build()
 
         locationSource = GeoJsonSource("current_location")

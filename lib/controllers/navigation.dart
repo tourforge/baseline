@@ -1,8 +1,9 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
+
+import '/math/math.dart';
 
 const _distance = Distance();
 const _pathClosenessThresholdMeters = 50;
@@ -119,7 +120,7 @@ class NavigationController {
     // let's get a list of all segments of the tour path that the user is nearby
     var segments = <_Segment>[];
     for (int i = 0; i < path.length - 1; i++) {
-      var distance = distanceToSegment(path[i], path[i + 1], location);
+      var distance = pointDistanceToGeoSegment(path[i], path[i + 1], location);
       if (distance < _pathClosenessThresholdMeters) {
         segments.add(_Segment(i, distance));
       }
@@ -180,32 +181,6 @@ class NavigationController {
         ? segments.reduce((a, b) => a.startIdx < b.startIdx ? a : b).startIdx
         : null;
   }
-}
-
-double distanceToSegment(LatLng l1, LatLng l2, LatLng p) {
-  // easy case: segment is a single point
-  if (_distance(l1, l2) == 0) {
-    return _distance(l1, p);
-  }
-
-  // convert all the points to vectors so we can do some linear algebra on them.
-  // technically, this is invalid since the Earth is curved, but it should be
-  // close enough considering the small scales this will be working on.
-  var vl1 = l1.toVector(), vl2 = l2.toVector(), vp = p.toVector();
-
-  // we take the dot product of the vector from the initial point of the line to
-  // the test point and the vector from the initial point of the line to the
-  // second point of the line. this gives us a number representing how far along
-  // the line the closest point on the line to the test point is. we clamp from
-  // 0 to 1 because it's a line segment, not an infinite line
-  var t = clampDouble((vp - vl1).dot(vl2 - vl1), 0, 1);
-
-  // finally, get the actual projected point and convert it back to a LatLng
-  var projected = (vl1 + (vl2 - vl1).scaleBy(t)).toLatLng();
-
-  // return the distance from the test point to the closest point to the test
-  // point that lies on the line segment
-  return _distance(p, projected);
 }
 
 class _Vector {

@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
+import '/math/math.dart';
 import '/models.dart';
 
 class MapLibreMap extends StatefulWidget {
@@ -32,6 +34,8 @@ class MapLibreMapState extends State<MapLibreMap> {
   late final String stylePath;
   late final String satStylePath;
   late Future<String> buildStyle;
+  late final LatLng center;
+  late final double zoom;
 
   bool _satelliteEnabled = false;
 
@@ -79,6 +83,10 @@ class MapLibreMapState extends State<MapLibreMap> {
 
       return null;
     });
+
+    center =
+        averagePoint(widget.tour.waypoints.map((w) => LatLng(w.lat, w.lng)));
+    zoom = _calculateTourZoom(widget.tour);
   }
 
   Future<String> _createStyle() async {
@@ -161,6 +169,8 @@ class MapLibreMapState extends State<MapLibreMap> {
             "stylePath": snapshot.data,
             "pathGeoJson": _pathToGeoJson(widget.tour.path),
             "pointsGeoJson": _waypointsToGeoJson(widget.tour.waypoints),
+            "center": {"lat": center.latitude, "lng": center.longitude},
+            "zoom": zoom,
           };
 
           return Stack(
@@ -223,4 +233,13 @@ String _waypointsToGeoJson(List<WaypointModel> waypoints) {
         },
     ],
   });
+}
+
+double _calculateTourZoom(TourModel tour) {
+  var distance = const Distance();
+  var center = averagePoint(tour.waypoints.map((w) => LatLng(w.lat, w.lng)));
+  var minRadius = tour.waypoints
+      .map((w) => distance(LatLng(w.lat, w.lng), center))
+      .reduce(max);
+  return max(-log(minRadius) / ln2 + 25.25 - 1.5, 1);
 }
