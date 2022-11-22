@@ -20,7 +20,7 @@ class OtbGuideApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'OpenTourBuilder Guide',
+      title: 'OpenTourGuide',
       theme: themeData,
       home: const TourGallery(),
     );
