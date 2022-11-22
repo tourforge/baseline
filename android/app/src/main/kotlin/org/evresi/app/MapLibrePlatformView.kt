@@ -9,6 +9,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.style.sources.VectorSource
@@ -37,7 +38,9 @@ class MapLibrePlatformView(
         return mapView
     }
 
-    override fun dispose() {}
+    override fun dispose() {
+        mapView.onDestroy()
+    }
 
     init {
         if (creationParams == null) {
@@ -55,7 +58,8 @@ class MapLibrePlatformView(
 
         var centerMap = creationParams["center"] as Map<*, *>
 
-        mapView = MapView(context)
+        val options = MapboxMapOptions.createFromAttributes(context).textureMode(true)
+        mapView = MapView(context, options)
         mapView.getMapAsync { map ->
             handleMapLoaded(
                 map = map,
