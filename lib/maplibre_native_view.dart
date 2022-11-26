@@ -10,7 +10,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '/math/math.dart';
-import '/models.dart';
+import 'models/data.dart';
 
 class MapLibreMap extends StatefulWidget {
   const MapLibreMap({

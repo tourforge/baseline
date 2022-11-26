@@ -1,14 +1,14 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-import '/models.dart';
+import '/models/data.dart';
+import '/screens/navigation/navigation.dart';
+import '/widgets/asset_image_builder.dart';
 import '/widgets/gallery.dart';
 import '/widgets/waypoint_card.dart';
-import '/screens/navigation/navigation.dart';
 
 // TODO: investigate performance of this page, it's pretty heavy
 
@@ -74,9 +74,14 @@ class _TourDetailsState extends State<TourDetails>
                           ImageFiltered(
                             imageFilter:
                                 ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                            child: Image.file(
-                              File(widget.summary.thumbnail!.fullPath),
-                              fit: BoxFit.cover,
+                            child: AssetImageBuilder(
+                              widget.summary.thumbnail!,
+                              builder: (image) {
+                                return Image(
+                                  image: image,
+                                  fit: BoxFit.cover,
+                                );
+                              },
                             ),
                           ),
                         Stack(
@@ -85,9 +90,14 @@ class _TourDetailsState extends State<TourDetails>
                             if (widget.summary.thumbnail != null)
                               Hero(
                                 tag: "tourThumbnail",
-                                child: Image.file(
-                                  File(widget.summary.thumbnail!.fullPath),
-                                  fit: BoxFit.cover,
+                                child: AssetImageBuilder(
+                                  widget.summary.thumbnail!,
+                                  builder: (image) {
+                                    return Image(
+                                      image: image,
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
                                 ),
                               ),
                             Positioned.fill(

@@ -116,7 +116,12 @@ class MapLibrePlatformView(
             }
             "setStyle" -> {
                 stylePath = call.arguments as String
-                locationSource = GeoJsonSource("current_location", locationGeoJson)
+                // locationSource MUST be reassigned to prevent a segfault. I love MapLibre!
+                if (locationGeoJson != null) {
+                    locationSource = GeoJsonSource("current_location", locationGeoJson)
+                } else {
+                    locationSource = GeoJsonSource("current_location")
+                }
                 map!!.setStyle(Style.Builder()
                     .fromUri("file://$stylePath")
                     .withSource(locationSource)

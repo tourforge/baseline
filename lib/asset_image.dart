@@ -1,0 +1,50 @@
+import 'package:flutter/painting.dart';
+
+import '/download_manager.dart';
+import 'models/data.dart';
+
+class AssetImage extends ImageProvider<FileImage> {
+  AssetImage(this._asset, {this.scale = 1.0})
+      : _fileImage = FileImage(_asset.downloadedFile, scale: scale);
+
+  final AssetModel _asset;
+  final double scale;
+  final FileImage _fileImage;
+
+  @override
+  Future<FileImage> obtainKey(ImageConfiguration configuration) {
+    if (DownloadManager.instance.isDownloaded(_asset.localPath)) {
+      return _fileImage.obtainKey(configuration);
+    } else {
+      return (() async {
+        await (await DownloadManager.instance.download(_asset.localPath)).file;
+
+        return _fileImage.obtainKey(configuration);
+      })();
+    }
+  }
+
+  @override
+  // ignore: deprecated_member_use
+  ImageStreamCompleter load(FileImage key, DecoderCallback decode) {
+    return key.load(key, decode);
+  }
+
+  @override
+  ImageStreamCompleter loadBuffer(FileImage key, DecoderBufferCallback decode) {
+    return key.loadBuffer(key, decode);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is AssetImage &&
+        other._asset.name == _asset.name &&
+        other.scale == scale;
+  }
+
+  @override
+  int get hashCode => Object.hash(_asset.name, scale);
+}

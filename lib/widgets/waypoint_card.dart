@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '/models.dart';
+import '/models/data.dart';
 import '/screens/waypoint_details.dart';
+import '/widgets/asset_image_builder.dart';
 
 class WaypointCard extends StatefulWidget {
   const WaypointCard({
@@ -85,9 +84,14 @@ class _WaypointCardState extends State<WaypointCard> {
                             ),
                             child: Hero(
                               tag: "waypointThumbnail ${widget.waypoint.name}",
-                              child: Image.file(
-                                File(widget.waypoint.gallery.first.fullPath),
-                                fit: BoxFit.cover,
+                              child: AssetImageBuilder(
+                                widget.waypoint.gallery.first,
+                                builder: (image) {
+                                  return Image(
+                                    image: image,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
                               ),
                             ),
                           ),

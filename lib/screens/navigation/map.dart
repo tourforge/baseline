@@ -6,8 +6,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import '/maplibre_native_view.dart';
-import '/models.dart';
 import '/models/current_location.dart';
+import '/models/data.dart';
 
 class NavigationMap extends StatefulWidget {
   const NavigationMap({

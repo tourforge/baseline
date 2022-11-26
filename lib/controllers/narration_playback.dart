@@ -1,6 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 
-import '/models.dart';
+import '/models/data.dart';
 
 enum PlaybackState {
   playing,
@@ -55,7 +55,7 @@ class NarrationPlaybackController {
 
     _currentNarration = narration;
     await _player.stop();
-    await _player.play(DeviceFileSource(narration.fullPath));
+    await _player.play(DeviceFileSource(narration.downloadPath));
   }
 
   Future<void> pause() async {
@@ -84,7 +84,7 @@ class NarrationPlaybackController {
     if (narration == null) return;
 
     await _player.stop();
-    await _player.play(DeviceFileSource(narration.fullPath));
+    await _player.play(DeviceFileSource(narration.downloadPath));
     onStateChanged();
   }
 

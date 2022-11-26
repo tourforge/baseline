@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-import '/models.dart';
+import '/models/data.dart';
+import '/widgets/asset_image_builder.dart';
 
 class Gallery extends StatefulWidget {
   const Gallery({
@@ -22,34 +21,41 @@ class Gallery extends StatefulWidget {
 class _GalleryState extends State<Gallery> {
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    return ListView(
       scrollDirection: Axis.horizontal,
       padding: widget.padding,
-      itemCount: widget.images.length,
-      itemBuilder: (context, index) {
-        return InkWell(
-          borderRadius: const BorderRadius.all(Radius.circular(20)),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => GalleryPage(
-                  images: widget.images,
-                  initialImage: index,
+      children: [
+        for (var index in widget.images.asMap().keys)
+          Padding(
+            padding: index != 0
+                ? const EdgeInsets.only(left: 12.0)
+                : EdgeInsets.zero,
+            child: InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => GalleryPage(
+                      images: widget.images,
+                      initialImage: index,
+                    ),
+                  ),
+                );
+              },
+              child: Material(
+                elevation: 3,
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                clipBehavior: Clip.antiAlias,
+                child: AssetImageBuilder(
+                  widget.images[index],
+                  builder: (image) {
+                    return Image(image: image);
+                  },
                 ),
               ),
-            );
-          },
-          child: Material(
-            elevation: 3,
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            clipBehavior: Clip.antiAlias,
-            child: Image.file(File(widget.images[index].fullPath)),
-          ),
-        );
-      },
-      separatorBuilder: (context, index) {
-        return const SizedBox(width: 8);
-      },
+            ),
+          )
+      ],
     );
   }
 }
@@ -109,7 +115,7 @@ class _GalleryPageState extends State<GalleryPage> {
             pageOptions: [
               for (var image in widget.images)
                 PhotoViewGalleryPageOptions(
-                  imageProvider: FileImage(File(image.fullPath)),
+                  imageProvider: image.imageProvider,
                 ),
             ],
           ),
@@ -138,32 +144,6 @@ class _GalleryPageState extends State<GalleryPage> {
               ),
             ),
           ),
-          if (currentImage.meta?.alt != null)
-            IgnorePointer(
-              ignoring: true,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: SafeArea(
-                  child: Material(
-                    color: Colors.black45,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          widget.images[currentPage].meta!.alt!,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(color: Colors.white),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
           if (currentImage.meta?.alt != null ||
               currentImage.meta?.attribution != null)
             IgnorePointer(

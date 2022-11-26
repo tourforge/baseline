@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-import '/models.dart';
+import '/models/data.dart';
+import '/widgets/asset_image_builder.dart';
 import '/widgets/gallery.dart';
 
 class WaypointDetails extends StatefulWidget {
@@ -48,9 +48,14 @@ class _WaypointDetailsState extends State<WaypointDetails>
                           ImageFiltered(
                             imageFilter:
                                 ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                            child: Image.file(
-                              File(widget.waypoint.gallery.first.fullPath),
-                              fit: BoxFit.cover,
+                            child: AssetImageBuilder(
+                              widget.waypoint.gallery.first,
+                              builder: (image) {
+                                return Image(
+                                  image: image,
+                                  fit: BoxFit.cover,
+                                );
+                              },
                             ),
                           ),
                         Stack(
@@ -60,9 +65,14 @@ class _WaypointDetailsState extends State<WaypointDetails>
                               Hero(
                                 tag:
                                     "waypointThumbnail ${widget.waypoint.name}",
-                                child: Image.file(
-                                  File(widget.waypoint.gallery.first.fullPath),
-                                  fit: BoxFit.cover,
+                                child: AssetImageBuilder(
+                                  widget.waypoint.gallery.first,
+                                  builder: (image) {
+                                    return Image(
+                                      image: image,
+                                      fit: BoxFit.cover,
+                                    );
+                                  },
                                 ),
                               ),
                             Positioned.fill(

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '/controllers/narration_playback.dart';
-import '/models.dart';
+import '/models/data.dart';
 
 class NavigationPanel extends StatelessWidget {
   const NavigationPanel({
