@@ -58,7 +58,12 @@ class MapLibrePlatformView(
 
         var centerMap = creationParams["center"] as Map<*, *>
 
-        val options = MapboxMapOptions.createFromAttributes(context).textureMode(true)
+        val options = MapboxMapOptions
+            .createFromAttributes(context)
+            .textureMode(true)
+            .attributionEnabled(false)
+            .logoEnabled(false)
+            .compassEnabled(false)
         mapView = MapView(context, options)
         mapView.getMapAsync { map ->
             handleMapLoaded(

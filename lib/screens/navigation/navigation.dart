@@ -16,6 +16,7 @@ import '/screens/navigation/disclaimer.dart';
 import '/screens/navigation/drawer.dart';
 import '/screens/navigation/map.dart';
 import '/screens/navigation/panel.dart';
+import 'attribution.dart';
 
 class NavigationScreen extends StatefulWidget {
   const NavigationScreen(this.tour, {super.key});
@@ -231,6 +232,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
                         ),
                       ),
                     ),
+                  ),
+                ),
+                const Positioned(
+                  bottom: bottomHeight + drawerHandleHeight,
+                  left: 0.0,
+                  child: SafeArea(
+                    child: AttributionInfo(),
                   ),
                 ),
                 if (kDebugMode)
