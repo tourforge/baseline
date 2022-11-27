@@ -7,6 +7,7 @@ import 'package:sliver_tools/sliver_tools.dart';
 import '/models/data.dart';
 import '/screens/navigation/navigation.dart';
 import '/widgets/asset_image_builder.dart';
+import '/widgets/details_header.dart';
 import '/widgets/gallery.dart';
 import '/widgets/waypoint_card.dart';
 
@@ -197,7 +198,7 @@ class _TourDetailsState extends State<TourDetails>
                 ),
               ),
               const SliverToBoxAdapter(
-                child: _DetailsHeader(
+                child: DetailsHeader(
                   title: "Tour Stops",
                 ),
               ),
@@ -207,50 +208,6 @@ class _TourDetailsState extends State<TourDetails>
           );
         }),
       ),
-    );
-  }
-}
-
-class _DetailsHeader extends StatelessWidget {
-  const _DetailsHeader({
-    Key? key,
-    required this.title,
-  }) : super(key: key);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 20.0,
-            bottom: 4.0,
-          ),
-          child: Material(
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-            elevation: 3,
-            type: MaterialType.card,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32.0,
-                vertical: 12.0,
-              ),
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: const Color.fromARGB(255, 77, 77, 77),
-                    ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -271,7 +228,7 @@ class _WaypointList extends StatelessWidget {
         (context, index) {
           return Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
             child: WaypointCard(
               waypoint: tour!.waypoints[index],
               index: index,

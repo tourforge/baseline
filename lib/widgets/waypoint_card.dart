@@ -10,11 +10,13 @@ class WaypointCard extends StatefulWidget {
     Key? key,
     required this.waypoint,
     required this.index,
+    this.onPlayed,
     this.currentlyPlaying = false,
   }) : super(key: key);
 
   final WaypointModel waypoint;
   final int index;
+  final void Function()? onPlayed;
   final bool currentlyPlaying;
 
   @override
@@ -22,8 +24,6 @@ class WaypointCard extends StatefulWidget {
 }
 
 class _WaypointCardState extends State<WaypointCard> {
-  bool _transcriptShown = false;
-
   @override
   Widget build(BuildContext context) {
     const borderRadius = Radius.circular(20);
@@ -56,29 +56,24 @@ class _WaypointCardState extends State<WaypointCard> {
               borderRadius: BorderRadius.only(
                 topLeft: borderRadius,
                 topRight: borderRadius,
-                bottomLeft: widget.currentlyPlaying &&
-                        widget.waypoint.transcript != null
-                    ? Radius.zero
-                    : borderRadius,
-                bottomRight: widget.currentlyPlaying &&
-                        widget.waypoint.transcript != null
-                    ? Radius.zero
-                    : borderRadius,
+                bottomLeft:
+                    widget.currentlyPlaying ? Radius.zero : borderRadius,
+                bottomRight:
+                    widget.currentlyPlaying ? Radius.zero : borderRadius,
               ),
               child: Row(
                 children: [
                   if (widget.waypoint.gallery.isNotEmpty)
                     SizedBox(
-                      width: 90,
-                      height: 90,
+                      width: 80,
+                      height: 80,
                       child: Stack(
                         fit: StackFit.passthrough,
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.only(
                               topLeft: borderRadius,
-                              bottomLeft: widget.currentlyPlaying &&
-                                      widget.waypoint.transcript != null
+                              bottomLeft: widget.currentlyPlaying
                                   ? Radius.zero
                                   : borderRadius,
                             ),
@@ -115,7 +110,7 @@ class _WaypointCardState extends State<WaypointCard> {
                     ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      padding: const EdgeInsets.only(left: 20.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -126,7 +121,7 @@ class _WaypointCardState extends State<WaypointCard> {
                                 .textTheme
                                 .titleSmall!
                                 .copyWith(fontSize: 14.5),
-                            maxLines: 2,
+                            maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
@@ -142,59 +137,42 @@ class _WaypointCardState extends State<WaypointCard> {
                       ),
                     ),
                   ),
+                  if (widget.onPlayed != null && !widget.currentlyPlaying)
+                    SizedBox(
+                      width: 72,
+                      child: Center(
+                        child: IconButton(
+                          onPressed: widget.onPlayed ?? () {},
+                          iconSize: 28,
+                          padding: const EdgeInsets.all(16),
+                          icon: const Icon(Icons.play_arrow),
+                        ),
+                      ),
+                    ),
+                  if (!(widget.onPlayed != null && !widget.currentlyPlaying))
+                    const SizedBox(width: 20),
                 ],
               ),
             ),
-            if (_transcriptShown && widget.currentlyPlaying)
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
+            if (widget.currentlyPlaying)
+              Material(
+                color: Theme.of(context).colorScheme.onPrimary.withAlpha(96),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: borderRadius,
+                    bottomRight: borderRadius,
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Transcript",
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelMedium!
-                          .copyWith(color: Colors.grey),
-                    ),
-                    const SizedBox(height: 4.0),
-                    Text(widget.waypoint.transcript ??
-                        "No transcript available."),
-                  ],
-                ),
-              ),
-            if (widget.currentlyPlaying && widget.waypoint.transcript != null)
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _transcriptShown = !_transcriptShown;
-                  });
-                },
-                style: ButtonStyle(
-                  padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  visualDensity: VisualDensity.compact,
-                  backgroundColor: const MaterialStatePropertyAll(Colors.white),
-                  overlayColor: MaterialStatePropertyAll(
-                      Theme.of(context).colorScheme.onPrimary.withAlpha(64)),
-                  foregroundColor: MaterialStatePropertyAll(
-                      Theme.of(context).colorScheme.primary),
-                  shape: const MaterialStatePropertyAll(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: borderRadius,
-                        bottomRight: borderRadius,
-                      ),
+                child: SizedBox(
+                  height: 32,
+                  child: Center(
+                    child: Text(
+                      "Currently Playing",
+                      style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: Theme.of(context).colorScheme.primary),
                     ),
                   ),
                 ),
-                child: _transcriptShown
-                    ? const Text("Hide Transcript")
-                    : const Text("Show Transcript"),
               ),
           ],
         ),

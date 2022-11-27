@@ -90,7 +90,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   void _onCurrentLocationChanged() {
     _navController.tick(context, _currentLocation.value).then((waypoint) {
       if (_currentWaypoint.index != waypoint && waypoint != null) {
-        _playbackController.arrivedAtWaypoint(waypoint);
+        _playbackController.play(waypoint);
         setState(() => _currentWaypoint.index = waypoint);
       }
     });
@@ -110,8 +110,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<CurrentLocationModel>.value(
-            value: _currentLocation),
+        ChangeNotifierProvider.value(value: _currentLocation),
         ChangeNotifierProvider.value(value: _currentWaypoint)
       ],
       builder: (context, child) {
@@ -277,6 +276,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     key: _drawerKey,
                     handleHeight: drawerHandleHeight,
                     tour: widget.tour,
+                    playWaypoint: (waypointIdx) {
+                      setState(() => _currentWaypoint.index = waypointIdx);
+                      _playbackController.play(waypointIdx);
+                    },
                   ),
                 ),
                 Positioned(

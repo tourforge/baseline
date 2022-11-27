@@ -11,10 +11,12 @@ class NavigationDrawer extends StatefulWidget {
     super.key,
     required this.handleHeight,
     required this.tour,
+    required this.playWaypoint,
   });
 
   final double handleHeight;
   final TourModel tour;
+  final void Function(int waypointIdx) playWaypoint;
 
   @override
   State<NavigationDrawer> createState() => NavigationDrawerState();
@@ -107,21 +109,25 @@ class NavigationDrawerState extends State<NavigationDrawer>
                           child: ListView(
                             padding: EdgeInsets.zero,
                             children: [
-                              const SizedBox(height: 3),
-                              for (var x
+                              const SizedBox(height: 4),
+                              for (var entry
                                   in widget.tour.waypoints.asMap().entries)
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 6.0,
-                                    vertical: 3.0,
+                                    horizontal: 8.0,
+                                    vertical: 4.0,
                                   ),
                                   child: WaypointCard(
-                                    waypoint: x.value,
-                                    index: x.key,
-                                    currentlyPlaying: x.key == currentWaypoint,
+                                    waypoint: entry.value,
+                                    index: entry.key,
+                                    currentlyPlaying:
+                                        entry.key == currentWaypoint,
+                                    onPlayed: () {
+                                      widget.playWaypoint(entry.key);
+                                    },
                                   ),
                                 ),
-                              const SizedBox(height: 3),
+                              const SizedBox(height: 4),
                             ],
                           ),
                         ),

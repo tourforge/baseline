@@ -47,9 +47,7 @@ class NarrationPlaybackController {
           (duration.inMilliseconds.toDouble()) /
           ((await _player.getDuration())!.inMilliseconds.toDouble()));
 
-  Future<void> arrivedAtWaypoint(int? newWaypoint) async {
-    if (newWaypoint == null) return;
-
+  Future<void> play(int newWaypoint) async {
     var narration = narrations[newWaypoint];
     if (narration == null) return;
 

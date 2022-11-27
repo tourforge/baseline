@@ -5,6 +5,7 @@ import 'package:sliver_tools/sliver_tools.dart';
 
 import '/models/data.dart';
 import '/widgets/asset_image_builder.dart';
+import '/widgets/details_header.dart';
 import '/widgets/gallery.dart';
 
 class WaypointDetails extends StatefulWidget {
@@ -162,6 +163,41 @@ class _WaypointDetailsState extends State<WaypointDetails>
                   child: Gallery(images: widget.waypoint.gallery),
                 ),
               ),
+              if (widget.waypoint.transcript != null)
+                const SliverPadding(
+                  padding: EdgeInsets.only(top: 16.0),
+                  sliver: SliverToBoxAdapter(
+                    child: DetailsHeader(
+                      title: "Transcript",
+                    ),
+                  ),
+                ),
+              if (widget.waypoint.transcript != null)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Material(
+                      elevation: 3,
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      type: MaterialType.card,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.waypoint.transcript ??
+                                  "The transcript for this stop is unavailable.",
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               const SliverToBoxAdapter(child: SizedBox(height: 6)),
             ],
           );
