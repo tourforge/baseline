@@ -12,6 +12,7 @@ import '/location.dart';
 import '/models/current_location.dart';
 import '/models/current_waypoint.dart';
 import '/models/data.dart';
+import '/models/map_controlledness.dart';
 import '/screens/navigation/disclaimer.dart';
 import '/screens/navigation/drawer.dart';
 import '/screens/navigation/map.dart';
@@ -34,9 +35,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
   StreamSubscription<LatLng> _locationStream =
       const Stream<LatLng>.empty().listen((_) {});
   bool _disclaimerShown = false;
+  LatLng _cameraLocation = LatLng(0, 0);
 
   final CurrentLocationModel _currentLocation = CurrentLocationModel();
   final CurrentWaypointModel _currentWaypoint = CurrentWaypointModel();
+  final MapControllednessModel _mapControlledness = MapControllednessModel();
 
   final GlobalKey<NavigationDrawerState> _drawerKey = GlobalKey();
   final GlobalKey<NavigationMapState> _mapKey = GlobalKey();
@@ -56,6 +59,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     );
 
     _currentLocation.addListener(_onCurrentLocationChanged);
+    _mapControlledness.addListener(_onMapControllednessChanged);
 
     _startGpsListening();
 
@@ -68,6 +72,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   @override
   void dispose() {
     _currentLocation.removeListener(_onCurrentLocationChanged);
+    _mapControlledness.removeListener(_onMapControllednessChanged);
     _locationStream.cancel();
     _playbackController.dispose();
     _currentLocation.dispose();
@@ -97,6 +102,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
     });
   }
 
+  void _onMapControllednessChanged() {
+    if (_mapControlledness.value && _currentLocation.value != null) {
+      _mapKey.currentState?.moveCamera(_currentLocation.value!);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const bottomHeight = 88.0;
@@ -112,7 +123,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: _currentLocation),
-        ChangeNotifierProvider.value(value: _currentWaypoint)
+        ChangeNotifierProvider.value(value: _currentWaypoint),
+        ChangeNotifierProvider.value(value: _mapControlledness),
       ],
       builder: (context, child) {
         return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -132,6 +144,29 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     key: _mapKey,
                     tour: widget.tour,
                     fakeGpsEnabled: _fakeGpsEnabled,
+                    onCameraMove: (cameraLocation) {
+                      _cameraLocation = cameraLocation;
+                    },
+                    onMoveUpdate: () {
+                      if (_currentLocation.value == null) return;
+
+                      var a = _mapKey.currentState!
+                          .latLngToScreenPoint(_currentLocation.value!)!;
+                      var b = _mapKey.currentState!
+                          .latLngToScreenPoint(_cameraLocation)!;
+
+                      if (a.distanceTo(b) > 48) {
+                        _mapControlledness.value = false;
+                      }
+                    },
+                    onMoveBegin: () {},
+                    onMoveEnd: () {
+                      if (_mapControlledness.value &&
+                          _currentLocation.value != null) {
+                        _mapKey.currentState
+                            ?.moveCamera(_currentLocation.value!);
+                      }
+                    },
                   ),
                 ),
                 Positioned(
@@ -275,6 +310,16 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       ),
                     ),
                   ),
+                const Positioned(
+                  bottom: bottomHeight + drawerHandleHeight + 100,
+                  right: 0.0,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: _MapControllednessButton(),
+                    ),
+                  ),
+                ),
                 Positioned(
                   top: 0.0,
                   left: 0.0,
@@ -317,5 +362,48 @@ class _NavigationScreenState extends State<NavigationScreen> {
         );
       },
     );
+  }
+}
+
+class _MapControllednessButton extends StatefulWidget {
+  const _MapControllednessButton();
+
+  @override
+  State<_MapControllednessButton> createState() =>
+      _MapControllednessButtonState();
+}
+
+class _MapControllednessButtonState extends State<_MapControllednessButton> {
+  @override
+  Widget build(BuildContext context) {
+    var mapControlledness = context.watch<MapControllednessModel>();
+
+    if (!mapControlledness.value) {
+      return Material(
+        borderRadius: const BorderRadius.all(Radius.circular(30)),
+        color: mapControlledness.value
+            ? Colors.blue.withAlpha(64)
+            : Colors.blue.withAlpha(128),
+        child: SizedBox(
+          width: 60,
+          height: 60,
+          child: IconButton(
+            onPressed: () {
+              mapControlledness.value = true;
+            },
+            iconSize: 32,
+            splashRadius: 30,
+            color: mapControlledness.value
+                ? Colors.black.withAlpha(128)
+                : Colors.black,
+            icon: mapControlledness.value
+                ? const Icon(Icons.gps_fixed)
+                : const Icon(Icons.gps_not_fixed),
+          ),
+        ),
+      );
+    } else {
+      return const SizedBox();
+    }
   }
 }

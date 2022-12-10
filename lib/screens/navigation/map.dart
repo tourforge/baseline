@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '/models/current_location.dart';
 import '/models/data.dart';
+import '/models/map_controlledness.dart';
 import 'maplibre_native_view.dart';
 
 class NavigationMap extends StatefulWidget {
@@ -14,10 +15,18 @@ class NavigationMap extends StatefulWidget {
     super.key,
     required this.tour,
     required this.fakeGpsEnabled,
+    required this.onCameraMove,
+    required this.onMoveUpdate,
+    required this.onMoveBegin,
+    required this.onMoveEnd,
   });
 
   final TourModel tour;
   final bool fakeGpsEnabled;
+  final void Function(LatLng) onCameraMove;
+  final void Function() onMoveUpdate;
+  final void Function() onMoveBegin;
+  final void Function() onMoveEnd;
 
   @override
   State<NavigationMap> createState() => NavigationMapState();
@@ -38,11 +47,22 @@ class NavigationMapState extends State<NavigationMap> {
     context.read<CurrentLocationModel>().addListener(_onLocationChanged);
   }
 
+  void moveCamera(LatLng where) {
+    _mapKey.currentState?.moveCamera(where);
+  }
+
+  CustomPoint<num>? latLngToScreenPoint(LatLng latLng) {
+    return _fakeGpsKey.currentState?.latLngToScreenPoint(latLng);
+  }
+
   void _onLocationChanged() {
     var location = context.read<CurrentLocationModel>().value;
 
     if (location != null) {
       _mapKey.currentState?.updateLocation(location);
+      if (context.read<MapControllednessModel>().value) {
+        _mapKey.currentState?.moveCamera(location);
+      }
     }
   }
 
@@ -51,8 +71,12 @@ class NavigationMapState extends State<NavigationMap> {
     return MapLibreMap(
       key: _mapKey,
       tour: widget.tour,
+      onMoveUpdate: widget.onMoveUpdate,
+      onMoveBegin: widget.onMoveBegin,
+      onMoveEnd: widget.onMoveEnd,
       onCameraUpdate: (center, zoom) {
         _fakeGpsKey.currentState?.updateCameraPosition(center, zoom);
+        widget.onCameraMove(center);
       },
       fakeGpsOverlay: kDebugMode
           ? _FakeGpsOverlay(
@@ -82,6 +106,10 @@ class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
 
   void updateCameraPosition(LatLng center, double zoom) {
     controller.move(center, zoom);
+  }
+
+  CustomPoint<num>? latLngToScreenPoint(LatLng latLng) {
+    return controller.latLngToScreenPoint(latLng);
   }
 
   @override

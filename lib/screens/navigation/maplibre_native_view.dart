@@ -16,11 +16,17 @@ class MapLibreMap extends StatefulWidget {
   const MapLibreMap({
     super.key,
     required this.tour,
+    required this.onMoveUpdate,
+    required this.onMoveBegin,
+    required this.onMoveEnd,
     required this.onCameraUpdate,
     required this.fakeGpsOverlay,
   });
 
   final TourModel tour;
+  final void Function() onMoveUpdate;
+  final void Function() onMoveBegin;
+  final void Function() onMoveEnd;
   final void Function(LatLng center, double zoom) onCameraUpdate;
   final Widget fakeGpsOverlay;
 
@@ -65,6 +71,17 @@ class MapLibreMapState extends State<MapLibreMap> {
     );
   }
 
+  void moveCamera(LatLng where) {
+    _channel.invokeMethod<void>(
+      "moveCamera",
+      {
+        "lat": where.latitude,
+        "lng": where.longitude,
+        "duration": 1500,
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -78,6 +95,15 @@ class MapLibreMapState extends State<MapLibreMap> {
           double lng = call.arguments["lng"];
           double zoom = call.arguments["zoom"];
           widget.onCameraUpdate(LatLng(lat, lng), zoom);
+          break;
+        case "moveUpdate":
+          widget.onMoveUpdate();
+          break;
+        case "moveBegin":
+          widget.onMoveBegin();
+          break;
+        case "moveEnd":
+          widget.onMoveEnd();
           break;
       }
 

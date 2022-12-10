@@ -2,11 +2,16 @@ package org.opentourbuilder.guide
 
 import android.content.Context
 import android.view.View
+import com.mapbox.android.gestures.MoveGestureDetector
+import com.mapbox.android.gestures.RotateGestureDetector
+import com.mapbox.android.gestures.StandardScaleGestureDetector
 import com.mapbox.geojson.FeatureCollection
 import io.flutter.plugin.platform.PlatformView
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraUpdate
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions
@@ -110,6 +115,33 @@ class MapLibrePlatformView(
             )
         }
 
+        map.addOnMoveListener(object : MapboxMap.OnMoveListener {
+            override fun onMove(detector: MoveGestureDetector) {
+                channel.invokeMethod("moveUpdate", null)
+            }
+
+            override fun onMoveBegin(detector: MoveGestureDetector) {
+                channel.invokeMethod("moveBegin", null)
+            }
+            
+            override fun onMoveEnd(detector: MoveGestureDetector) {
+                channel.invokeMethod("moveEnd", null)
+            }
+        })
+
+        map.addOnScaleListener(object : MapboxMap.OnScaleListener {
+            override fun onScale(detector: StandardScaleGestureDetector) {
+                channel.invokeMethod("moveUpdate", null)
+            }
+
+            override fun onScaleBegin(detector: StandardScaleGestureDetector)  {
+                channel.invokeMethod("moveBegin", null)
+            }
+
+            override fun onScaleEnd(detector: StandardScaleGestureDetector)  {
+                channel.invokeMethod("moveEnd", null)
+            }
+        })
     }
 
     private fun handleMethodCall(call: MethodCall, result: MethodChannel.Result) {
@@ -117,6 +149,14 @@ class MapLibrePlatformView(
             "updateLocation" -> {
                 locationGeoJson = call.arguments as String
                 locationSource.setGeoJson(locationGeoJson)
+                result.success(null)
+            }
+            "moveCamera" -> {
+                val args = call.arguments as Map<*, *>
+                val lat = args["lat"] as Double
+                val lng = args["lng"] as Double
+                val duration = args["duration"] as Int
+                map!!.easeCamera(CameraUpdateFactory.newLatLng(LatLng(lat, lng)), duration)
                 result.success(null)
             }
             "setStyle" -> {
