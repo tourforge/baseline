@@ -12,49 +12,19 @@ import 'package:path_provider/path_provider.dart';
 import '/math/math.dart';
 import '/models/data.dart';
 
-class MapLibreMap extends StatefulWidget {
-  const MapLibreMap({
-    super.key,
-    required this.tour,
-    required this.onMoveUpdate,
-    required this.onMoveBegin,
-    required this.onMoveEnd,
-    required this.onCameraUpdate,
-    required this.fakeGpsOverlay,
-  });
+class MapLibreMapController {
+  late final _MapLibreMapState _state;
 
-  final TourModel tour;
-  final void Function() onMoveUpdate;
-  final void Function() onMoveBegin;
-  final void Function() onMoveEnd;
-  final void Function(LatLng center, double zoom) onCameraUpdate;
-  final Widget fakeGpsOverlay;
-
-  @override
-  State<MapLibreMap> createState() => MapLibreMapState();
-}
-
-class MapLibreMapState extends State<MapLibreMap> {
-  static const _channel = MethodChannel("opentourbuilder.org/guide/map");
-
-  late final String stylePath;
-  late final String satStylePath;
-  late Future<String> buildStyle;
-  late final LatLng center;
-  late final double zoom;
-
-  bool _satelliteEnabled = false;
-
-  bool get satelliteEnabled => _satelliteEnabled;
+  bool get satelliteEnabled => _state._satelliteEnabled;
   set satelliteEnabled(bool value) {
-    _satelliteEnabled = value;
+    _state._satelliteEnabled = value;
 
-    _channel.invokeMethod<void>(
-        "setStyle", _satelliteEnabled ? satStylePath : stylePath);
+    _MapLibreMapState._channel.invokeMethod<void>("setStyle",
+        _state._satelliteEnabled ? _state.satStylePath : _state.stylePath);
   }
 
   void updateLocation(LatLng location) {
-    _channel.invokeMethod<void>(
+    _MapLibreMapState._channel.invokeMethod<void>(
       "updateLocation",
       jsonEncode({
         "type": "FeatureCollection",
@@ -72,7 +42,7 @@ class MapLibreMapState extends State<MapLibreMap> {
   }
 
   void moveCamera(LatLng where) {
-    _channel.invokeMethod<void>(
+    _MapLibreMapState._channel.invokeMethod<void>(
       "moveCamera",
       {
         "lat": where.latitude,
@@ -81,10 +51,48 @@ class MapLibreMapState extends State<MapLibreMap> {
       },
     );
   }
+}
+
+class MapLibreMap extends StatefulWidget {
+  const MapLibreMap({
+    super.key,
+    required this.tour,
+    required this.controller,
+    required this.onMoveUpdate,
+    required this.onMoveBegin,
+    required this.onMoveEnd,
+    required this.onCameraUpdate,
+    required this.fakeGpsOverlay,
+  });
+
+  final TourModel tour;
+  final MapLibreMapController controller;
+  final void Function() onMoveUpdate;
+  final void Function() onMoveBegin;
+  final void Function() onMoveEnd;
+  final void Function(LatLng center, double zoom) onCameraUpdate;
+  final Widget fakeGpsOverlay;
+
+  @override
+  State<MapLibreMap> createState() => _MapLibreMapState();
+}
+
+class _MapLibreMapState extends State<MapLibreMap> {
+  static const _channel = MethodChannel("opentourbuilder.org/guide/map");
+
+  late final String stylePath;
+  late final String satStylePath;
+  late Future<String> buildStyle;
+  late final LatLng center;
+  late final double zoom;
+
+  bool _satelliteEnabled = false;
 
   @override
   void initState() {
     super.initState();
+
+    widget.controller._state = this;
 
     buildStyle = _createStyle();
 

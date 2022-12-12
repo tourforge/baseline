@@ -123,7 +123,7 @@ class MapLibrePlatformView(
             override fun onMoveBegin(detector: MoveGestureDetector) {
                 channel.invokeMethod("moveBegin", null)
             }
-            
+
             override fun onMoveEnd(detector: MoveGestureDetector) {
                 channel.invokeMethod("moveEnd", null)
             }

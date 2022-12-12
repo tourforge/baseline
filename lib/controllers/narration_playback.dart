@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 
 import '/models/data.dart';
@@ -16,7 +18,7 @@ class NarrationPlaybackController {
       _currentDuration = duration;
     });
     _player.onPlayerStateChanged.listen((event) {
-      onStateChanged();
+      _onStateChanged.add(null);
     });
   }
 
@@ -24,7 +26,8 @@ class NarrationPlaybackController {
 
   final AudioPlayer _player = AudioPlayer();
 
-  void Function() onStateChanged = () {};
+  final StreamController _onStateChanged = StreamController.broadcast();
+  Stream<void> get onStateChanged => _onStateChanged.stream;
 
   PlaybackState get state {
     switch (_player.state) {
@@ -48,22 +51,27 @@ class NarrationPlaybackController {
           ((await _player.getDuration())!.inMilliseconds.toDouble()));
 
   Future<void> play(int newWaypoint) async {
-    var narration = narrations[newWaypoint];
-    if (narration == null) return;
+    _currentNarration = narrations[newWaypoint];
 
-    _currentNarration = narration;
     await _player.stop();
-    await _player.play(DeviceFileSource(narration.downloadPath));
+
+    if (_currentNarration == null) {
+      _currentDuration = null;
+      _onStateChanged.add(null);
+      return;
+    }
+
+    await _player.play(DeviceFileSource(_currentNarration!.downloadPath));
   }
 
   Future<void> pause() async {
     await _player.pause();
-    onStateChanged();
+    _onStateChanged.add(null);
   }
 
   Future<void> resume() async {
     await _player.resume();
-    onStateChanged();
+    _onStateChanged.add(null);
   }
 
   Future<void> seek(double position) async {
@@ -83,7 +91,7 @@ class NarrationPlaybackController {
 
     await _player.stop();
     await _player.play(DeviceFileSource(narration.downloadPath));
-    onStateChanged();
+    _onStateChanged.add(null);
   }
 
   String? positionToString(double position) {

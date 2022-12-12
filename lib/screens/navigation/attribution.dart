@@ -34,27 +34,41 @@ class _Attribution {
 }
 
 class AttributionInfo extends StatefulWidget {
-  const AttributionInfo({super.key});
+  const AttributionInfo({required this.userInteract, super.key});
+
+  final Stream<void> userInteract;
 
   @override
   State<AttributionInfo> createState() => _AttributionInfoState();
 }
 
 class _AttributionInfoState extends State<AttributionInfo> {
-  late final Timer _autoHideTimer;
-
+  late final StreamSubscription<void> _subscription;
   bool _hidden = false;
-
-  void _autoHide() {
-    if (!mounted) return;
-
-    setState(() => _hidden = true);
-  }
 
   @override
   void initState() {
     super.initState();
-    _autoHideTimer = Timer(const Duration(seconds: 5), _autoHide);
+
+    widget.userInteract.first.then((event) {
+      if (!mounted) return;
+
+      Timer(const Duration(milliseconds: 125), () {
+        if (!mounted) return;
+
+        if (!_hidden) {
+          setState(() {
+            _hidden = true;
+          });
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -66,7 +80,7 @@ class _AttributionInfoState extends State<AttributionInfo> {
           ignoring: _hidden,
           child: AnimatedOpacity(
             opacity: _hidden ? 0.0 : 1.0,
-            duration: const Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 1000),
             curve: Curves.fastLinearToSlowEaseIn,
             child: Material(
               color: Theme.of(context).colorScheme.onPrimary,
@@ -133,12 +147,13 @@ class _AttributionInfoState extends State<AttributionInfo> {
         ),
         IconButton(
           onPressed: () {
-            _autoHideTimer.cancel;
-            setState(() => _hidden = !_hidden);
+            Navigator.of(context).push(DialogRoute(
+                context: context,
+                builder: (context) => const AttributionDialog()));
           },
           iconSize: 32,
           color: const Color.fromARGB(255, 100, 177, 255),
-          icon: const Icon(Icons.info),
+          icon: const Icon(Icons.info_outline),
         ),
       ],
     );

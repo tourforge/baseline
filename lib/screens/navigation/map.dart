@@ -3,18 +3,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_dragmarker/dragmarker.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:opentourbuilder_guide/models/fake_gps.dart';
+import 'package:opentourbuilder_guide/models/satellite_enabled.dart';
 import 'package:provider/provider.dart';
 
 import '/models/current_location.dart';
 import '/models/data.dart';
 import '/models/map_controlledness.dart';
-import 'maplibre_native_view.dart';
+import 'maplibre_map.dart';
+
+class NavigationMapController {
+  NavigationMapState? _state;
+
+  void moveCamera(LatLng where) {
+    _state?._mapController.moveCamera(where);
+  }
+
+  CustomPoint<num>? latLngToScreenPoint(LatLng latLng) {
+    return _state?._fakeGpsKey.currentState?.latLngToScreenPoint(latLng);
+  }
+}
 
 class NavigationMap extends StatefulWidget {
   const NavigationMap({
     super.key,
     required this.tour,
-    required this.fakeGpsEnabled,
+    required this.controller,
     required this.onCameraMove,
     required this.onMoveUpdate,
     required this.onMoveBegin,
@@ -22,7 +36,7 @@ class NavigationMap extends StatefulWidget {
   });
 
   final TourModel tour;
-  final bool fakeGpsEnabled;
+  final NavigationMapController controller;
   final void Function(LatLng) onCameraMove;
   final void Function() onMoveUpdate;
   final void Function() onMoveBegin;
@@ -33,35 +47,45 @@ class NavigationMap extends StatefulWidget {
 }
 
 class NavigationMapState extends State<NavigationMap> {
-  final GlobalKey<MapLibreMapState> _mapKey = GlobalKey();
+  final MapLibreMapController _mapController = MapLibreMapController();
   final GlobalKey<_FakeGpsOverlayState> _fakeGpsKey = GlobalKey();
-
-  bool get satelliteEnabled => _mapKey.currentState!.satelliteEnabled;
-  set satelliteEnabled(bool value) {
-    _mapKey.currentState!.satelliteEnabled = value;
-  }
+  late final void Function() removeListeners;
 
   @override
   void initState() {
     super.initState();
-    context.read<CurrentLocationModel>().addListener(_onLocationChanged);
+    widget.controller._state = this;
+
+    var currentLocation = context.read<CurrentLocationModel>();
+    var satelliteEnabled = context.read<SatelliteEnabledModel>();
+    currentLocation.addListener(_onLocationChanged);
+    satelliteEnabled.addListener(_onSatelliteEnabledChanged);
+    removeListeners = () {
+      currentLocation.removeListener(_onLocationChanged);
+      satelliteEnabled.removeListener(_onSatelliteEnabledChanged);
+    };
   }
 
-  void moveCamera(LatLng where) {
-    _mapKey.currentState?.moveCamera(where);
+  @override
+  void dispose() {
+    removeListeners();
+    super.dispose();
   }
 
-  CustomPoint<num>? latLngToScreenPoint(LatLng latLng) {
-    return _fakeGpsKey.currentState?.latLngToScreenPoint(latLng);
+  void _onSatelliteEnabledChanged() {
+    _mapController.satelliteEnabled =
+        context.read<SatelliteEnabledModel>().value;
   }
 
   void _onLocationChanged() {
+    if (!mounted) return;
+
     var location = context.read<CurrentLocationModel>().value;
 
     if (location != null) {
-      _mapKey.currentState?.updateLocation(location);
+      _mapController.updateLocation(location);
       if (context.read<MapControllednessModel>().value) {
-        _mapKey.currentState?.moveCamera(location);
+        _mapController.moveCamera(location);
       }
     }
   }
@@ -69,8 +93,8 @@ class NavigationMapState extends State<NavigationMap> {
   @override
   Widget build(BuildContext context) {
     return MapLibreMap(
-      key: _mapKey,
       tour: widget.tour,
+      controller: _mapController,
       onMoveUpdate: widget.onMoveUpdate,
       onMoveBegin: widget.onMoveBegin,
       onMoveEnd: widget.onMoveEnd,
@@ -78,24 +102,15 @@ class NavigationMapState extends State<NavigationMap> {
         _fakeGpsKey.currentState?.updateCameraPosition(center, zoom);
         widget.onCameraMove(center);
       },
-      fakeGpsOverlay: kDebugMode
-          ? _FakeGpsOverlay(
-              key: _fakeGpsKey,
-              fakeGpsEnabled: widget.fakeGpsEnabled,
-            )
-          : const SizedBox(),
+      fakeGpsOverlay:
+          kDebugMode ? _FakeGpsOverlay(key: _fakeGpsKey) : const SizedBox(),
     );
   }
 }
 
 // TODO: Implement this overlay *without* FlutterMap
 class _FakeGpsOverlay extends StatefulWidget {
-  const _FakeGpsOverlay({
-    Key? key,
-    required this.fakeGpsEnabled,
-  }) : super(key: key);
-
-  final bool fakeGpsEnabled;
+  const _FakeGpsOverlay({Key? key}) : super(key: key);
 
   @override
   State<_FakeGpsOverlay> createState() => _FakeGpsOverlayState();
@@ -114,11 +129,13 @@ class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    var fakeGpsEnabled = context.watch<FakeGpsModel>();
+
     return FlutterMap(
       mapController: controller,
       options: MapOptions(interactiveFlags: InteractiveFlag.none),
       children: [
-        if (kDebugMode && widget.fakeGpsEnabled)
+        if (kDebugMode && fakeGpsEnabled.value)
           _FakeGpsPosition(
             onPositionChanged: (ll) {
               context.read<CurrentLocationModel>().value = ll;
@@ -130,7 +147,7 @@ class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
 }
 
 class _FakeGpsPosition extends StatefulWidget {
-  const _FakeGpsPosition({super.key, required this.onPositionChanged});
+  const _FakeGpsPosition({required this.onPositionChanged});
 
   final void Function(LatLng) onPositionChanged;
 
@@ -152,15 +169,19 @@ class _FakeGpsPositionState extends State<_FakeGpsPosition> {
     return DragMarkers(
       markers: [
         DragMarker(
-          width: 128,
-          height: 128,
+          width: 64,
+          height: 64,
           point: _point,
           builder: (context) => DecoratedBox(
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(64)),
+              borderRadius: const BorderRadius.all(Radius.circular(32.0)),
+              border: Border.all(
+                color: Colors.orange.withAlpha(128),
+                width: 3.0,
+              ),
               color: _isDragging
-                  ? Colors.blue.withAlpha(96)
-                  : Colors.blueGrey.withAlpha(32),
+                  ? Colors.blue.withAlpha(64)
+                  : Colors.orange.withAlpha(32),
             ),
           ),
           useLongPress: true,

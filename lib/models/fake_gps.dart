@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-class MapControllednessModel extends ChangeNotifier {
+class FakeGpsModel extends ChangeNotifier {
   bool _value = false;
 
   bool get value => _value;

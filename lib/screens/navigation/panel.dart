@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:opentourbuilder_guide/models/current_waypoint.dart';
+import 'package:provider/provider.dart';
 
 import '/controllers/narration_playback.dart';
 import '/models/data.dart';
@@ -9,16 +11,16 @@ class NavigationPanel extends StatelessWidget {
   const NavigationPanel({
     Key? key,
     required this.playbackController,
-    required this.currentWaypoint,
     required this.tour,
   }) : super(key: key);
 
   final NarrationPlaybackController playbackController;
-  final int? currentWaypoint;
   final TourModel tour;
 
   @override
   Widget build(BuildContext context) {
+    var currentWaypoint = context.watch<CurrentWaypointModel>();
+
     return Material(
       child: DecoratedBox(
         decoration: BoxDecoration(
@@ -44,12 +46,14 @@ class NavigationPanel extends StatelessWidget {
                       horizontal: 16.0,
                     ),
                     child: Text(
-                      currentWaypoint != null
-                          ? "${currentWaypoint! + 1}. ${tour.waypoints[currentWaypoint!].name}"
+                      currentWaypoint.index != null
+                          ? "${currentWaypoint.index! + 1}. ${tour.waypoints[currentWaypoint.index!].name}"
                           : "No Narration Playing",
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: currentWaypoint == null ? Colors.grey : null,
-                            fontStyle: currentWaypoint == null
+                            color: currentWaypoint.index == null
+                                ? Colors.grey
+                                : null,
+                            fontStyle: currentWaypoint.index == null
                                 ? FontStyle.italic
                                 : null,
                           ),
@@ -89,6 +93,10 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
   @override
   void initState() {
     super.initState();
+
+    widget.playbackController.onStateChanged.listen((event) {
+      if (mounted) setState(() {});
+    });
 
     _positionSubscription =
         widget.playbackController.onPositionChanged.listen((position) {
@@ -165,19 +173,22 @@ class _AudioControlButton extends StatefulWidget {
 }
 
 class _AudioControlButtonState extends State<_AudioControlButton> {
+  late final StreamSubscription<void> _streamSubscription;
+
   @override
   void initState() {
     super.initState();
 
-    widget.playbackController.onStateChanged = () {
+    _streamSubscription =
+        widget.playbackController.onStateChanged.listen((event) {
       if (mounted) setState(() {});
-    };
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    widget.playbackController.onStateChanged = () {};
+    _streamSubscription.cancel();
   }
 
   @override

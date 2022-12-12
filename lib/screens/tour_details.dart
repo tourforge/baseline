@@ -142,8 +142,7 @@ class _TourDetailsState extends State<TourDetails>
                   delegate: _StartTourButtonDelegate(
                     tickerProvider: this,
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => NavigationScreen(tour!)));
+                      Navigator.of(context).push(NavigationRoute(tour!));
                     },
                   ),
                 ),
