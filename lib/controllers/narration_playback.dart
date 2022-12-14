@@ -1,88 +1,177 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
+import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
+import 'package:image/image.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:opentourbuilder_guide/download_manager.dart';
+import 'package:opentourbuilder_guide/models/data.dart';
+import 'package:path_provider/path_provider.dart';
 
-import '/models/data.dart';
-
-enum PlaybackState {
+enum NarrationPlaybackState {
   playing,
   paused,
   completed,
   stopped,
 }
 
-class NarrationPlaybackController {
-  NarrationPlaybackController({required this.narrations}) {
-    _player.audioCache = AudioCache(prefix: '');
-    _player.onDurationChanged.listen((duration) {
-      _currentDuration = duration;
-    });
-    _player.onPlayerStateChanged.listen((event) {
-      _onStateChanged.add(null);
-    });
+class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
+  static late final NarrationPlaybackController instance;
+
+  static Future<void> init() async {
+    instance = await AudioService.init(
+      builder: () => NarrationPlaybackController(),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'org.opentourbuilder.guide.channel.audio',
+        androidNotificationChannelName: 'Narration playback',
+      ),
+    );
   }
 
-  final List<AssetModel?> narrations;
+  NarrationPlaybackController() {
+    _player.playerStateStream.listen((event) {
+      _onStateChanged.add(null);
+    });
+    AudioSession.instance.then((value) => _session = value);
+  }
 
-  final AudioPlayer _player = AudioPlayer();
+  late TourModel tour;
+
+  late final AudioSession _session;
+  AudioPlayer _player = AudioPlayer();
 
   final StreamController _onStateChanged = StreamController.broadcast();
   Stream<void> get onStateChanged => _onStateChanged.stream;
 
-  PlaybackState get state {
-    switch (_player.state) {
-      case PlayerState.playing:
-        return PlaybackState.playing;
-      case PlayerState.paused:
-        return PlaybackState.paused;
-      case PlayerState.completed:
-        return PlaybackState.completed;
-      case PlayerState.stopped:
-        return PlaybackState.stopped;
+  NarrationPlaybackState get state {
+    switch (_player.processingState) {
+      case ProcessingState.idle:
+      case ProcessingState.loading:
+      case ProcessingState.buffering:
+      case ProcessingState.completed:
+        return NarrationPlaybackState.stopped;
+      case ProcessingState.ready:
+        return _player.playing
+            ? NarrationPlaybackState.playing
+            : NarrationPlaybackState.paused;
     }
   }
 
+  int? _currentIndex;
   AssetModel? _currentNarration;
-  Duration? _currentDuration;
 
   Stream<double> get onPositionChanged =>
-      _player.onPositionChanged.asyncMap<double>((duration) async =>
+      _player.positionStream.asyncMap<double>((duration) async =>
           (duration.inMilliseconds.toDouble()) /
-          ((await _player.getDuration())!.inMilliseconds.toDouble()));
+          (_player.duration?.inMilliseconds.toDouble() ?? 0));
 
-  Future<void> play(int newWaypoint) async {
-    _currentNarration = narrations[newWaypoint];
+  Future<void> reset() async {
+    await stop();
+    _currentIndex = _currentNarration = null;
+    mediaItem.add(null);
+    await _player.dispose();
+    _player = AudioPlayer();
+  }
+
+  Future<void> playWaypoint(int index) async {
+    _currentIndex = index;
+    _currentNarration = tour.waypoints[index].narration;
 
     await _player.stop();
 
-    if (_currentNarration == null) {
-      _currentDuration = null;
-      _onStateChanged.add(null);
+    if (await _session.setActive(true) || _currentNarration == null) {
+      mediaItem.add(await buildMediaItem(tour.waypoints[index]));
+      if (_currentNarration == null) {
+        _onStateChanged.add(null);
+        _updatePlaybackState();
+      } else {
+        await _player.setAudioSource(
+            ProgressiveAudioSource(Uri.file(_currentNarration!.downloadPath)));
+        await play();
+      }
+    } else {
+      // The request was denied and the app should not play audio
+    }
+  }
+
+  Future<MediaItem> buildMediaItem(WaypointModel waypoint) async {
+    Uri? artUri;
+    if (waypoint.gallery.isNotEmpty) {
+      var squarePath =
+          "${(await getTemporaryDirectory()).path}/square-${waypoint.gallery.first.name}";
+      artUri = Uri.file(squarePath);
+
+      if (!await File(squarePath).exists()) {
+        var imgContent = await File(
+                "${DownloadManager.instance.localBase}/${waypoint.gallery.first.localPath}")
+            .readAsBytes();
+
+        var img = decodeImage(imgContent)!;
+
+        var square = copyResizeCropSquare(img, 512);
+
+        await File(squarePath).writeAsBytes(encodeJpg(square));
+      }
+    }
+
+    return MediaItem(
+      id: waypoint.narration?.downloadPath ?? "${tour.name}/${waypoint.name}",
+      title: waypoint.name,
+      album: tour.name,
+      artUri: artUri,
+    );
+  }
+
+  @override
+  Future<void> pause() async {
+    await _session.setActive(false);
+    await _player.pause();
+    _onStateChanged.add(null);
+
+    _updatePlaybackState();
+  }
+
+  @override
+  Future<void> play() async {
+    _player.play();
+    _onStateChanged.add(null);
+
+    _updatePlaybackState();
+  }
+
+  Future<void> seekFractional(double position) async {
+    var duration = Duration(
+      milliseconds:
+          ((_player.duration!.inMilliseconds.toDouble()) * position).toInt(),
+    );
+
+    await seek(duration);
+  }
+
+  @override
+  Future<void> seek(Duration position) async {
+    await _player.seek(position);
+
+    _updatePlaybackState();
+  }
+
+  @override
+  Future<void> skipToNext() async {
+    if (_currentIndex == null || _currentIndex! >= tour.waypoints.length - 1) {
       return;
     }
 
-    await _player.play(DeviceFileSource(_currentNarration!.downloadPath));
+    playWaypoint(_currentIndex! + 1);
   }
 
-  Future<void> pause() async {
-    await _player.pause();
-    _onStateChanged.add(null);
-  }
+  @override
+  Future<void> skipToPrevious() async {
+    if (_currentIndex == null || _currentIndex! == 0) {
+      return;
+    }
 
-  Future<void> resume() async {
-    await _player.resume();
-    _onStateChanged.add(null);
-  }
-
-  Future<void> seek(double position) async {
-    var duration = Duration(
-      milliseconds:
-          (((await _player.getDuration())!.inMilliseconds.toDouble()) *
-                  position)
-              .toInt(),
-    );
-
-    await _player.seek(duration);
+    playWaypoint(_currentIndex! - 1);
   }
 
   Future<void> replay() async {
@@ -90,12 +179,37 @@ class NarrationPlaybackController {
     if (narration == null) return;
 
     await _player.stop();
-    await _player.play(DeviceFileSource(narration.downloadPath));
+    _player.play();
     _onStateChanged.add(null);
+
+    _updatePlaybackState();
+  }
+
+  void _updatePlaybackState() {
+    playbackState.add(PlaybackState(
+      controls: [
+        if (_currentIndex != null) MediaControl.skipToPrevious,
+        if (_currentIndex != null &&
+            _player.processingState == ProcessingState.ready)
+          _player.playing ? MediaControl.pause : MediaControl.play,
+        if (_currentIndex != null) MediaControl.skipToNext,
+      ],
+      systemActions: const {
+        MediaAction.seek,
+        MediaAction.seekForward,
+        MediaAction.seekBackward,
+      },
+      processingState: AudioProcessingState.ready,
+      playing: _player.playing,
+      updatePosition: _player.position,
+      bufferedPosition: _player.bufferedPosition,
+      speed: 1.0,
+      queueIndex: 0,
+    ));
   }
 
   String? positionToString(double position) {
-    var fullDuration = _currentDuration;
+    var fullDuration = _player.duration;
     if (fullDuration == null) return null;
     if (position.isNaN || !position.isFinite) return null;
 

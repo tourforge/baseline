@@ -156,7 +156,7 @@ class _FakeGpsPosition extends StatefulWidget {
 }
 
 class _FakeGpsPositionState extends State<_FakeGpsPosition> {
-  LatLng _point = LatLng(34.000556, -81.034722);
+  LatLng _point = LatLng(34.183889, -79.774167);
   bool _isDragging = false;
 
   @override

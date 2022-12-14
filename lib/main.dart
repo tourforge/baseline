@@ -1,15 +1,17 @@
 import 'dart:io';
 
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '/controllers/narration_playback.dart';
 import '/download_manager.dart';
 import 'screens/tour_list.dart';
 import 'theme.dart';
 
-void main() {
+Future<void> main() async {
   if (Platform.isAndroid) {
     WidgetsFlutterBinding.ensureInitialized();
     FlutterDisplayMode.setHighRefreshRate();
@@ -20,6 +22,11 @@ void main() {
         .then((appSuppDir) => p.join(appSuppDir.path, "tours")),
     Future.value("https://fsrv.fly.dev"),
   );
+
+  final session = await AudioSession.instance;
+  await session.configure(const AudioSessionConfiguration.speech());
+
+  await NarrationPlaybackController.init();
 
   runApp(const OtbGuideApp());
 }

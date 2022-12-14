@@ -124,7 +124,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
   final GlobalKey<NavigationDrawerState> _drawerKey = GlobalKey();
 
   late NavigationController _navController;
-  late NarrationPlaybackController _playbackController;
   StreamSubscription<LatLng> _locationStream =
       const Stream<LatLng>.empty().listen((_) {});
   LatLng _cameraLocation = LatLng(0, 0);
@@ -149,11 +148,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
     _mapControlledness.addListener(_onMapControllednessChanged);
     _satelliteEnabled.addListener(_onSatelliteEnabledChanged);
 
-    _startGpsListening();
+    NarrationPlaybackController.instance.tour = widget.tour;
 
-    _playbackController = NarrationPlaybackController(
-      narrations: widget.tour.waypoints.map((e) => e.narration).toList(),
-    );
+    _startGpsListening();
   }
 
   @override
@@ -164,8 +161,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
     _mapControlledness.removeListener(_onMapControllednessChanged);
     _satelliteEnabled.removeListener(_onSatelliteEnabledChanged);
     _locationStream.cancel();
-    _playbackController.dispose();
     _currentLocation.dispose();
+
+    NarrationPlaybackController.instance.reset();
 
     super.dispose();
   }
@@ -201,7 +199,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   void _onCurrentWaypointChanged() {
     if (_currentWaypoint.index != null) {
-      _playbackController.play(_currentWaypoint.index!);
+      NarrationPlaybackController.instance
+          .playWaypoint(_currentWaypoint.index!);
     }
   }
 
@@ -357,11 +356,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
               ),
               if (kDebugMode)
                 const Positioned(
-                  bottom: bottomHeight + drawerHandleHeight + 100,
+                  bottom: bottomHeight + drawerHandleHeight + 72,
                   right: 0.0,
                   child: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: EdgeInsets.all(12.0),
                       child: _FakeGpsButton(),
                     ),
                   ),
@@ -371,7 +370,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 right: 0.0,
                 child: SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(12.0),
                     child: _MapControllednessButton(),
                   ),
                 ),
@@ -387,7 +386,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   tour: widget.tour,
                   playWaypoint: (waypointIdx) {
                     _currentWaypoint.index = waypointIdx;
-                    _playbackController.play(waypointIdx);
+                    NarrationPlaybackController.instance
+                        .playWaypoint(waypointIdx);
                   },
                 ),
               ),
@@ -398,10 +398,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 child: SizedBox(
                   height: bottomHeight,
                   child: GestureDetector(
-                    child: NavigationPanel(
-                      playbackController: _playbackController,
-                      tour: widget.tour,
-                    ),
+                    child: NavigationPanel(tour: widget.tour),
                     onVerticalDragStart: (details) =>
                         _drawerKey.currentState?.onVerticalDragStart(details),
                     onVerticalDragEnd: (details) =>
@@ -459,7 +456,7 @@ class _FakeGpsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       borderRadius: const BorderRadius.all(Radius.circular(30)),
-      color: Colors.red.withAlpha(128),
+      color: const Color.fromARGB(255, 48, 48, 48),
       child: SizedBox(
         width: 60,
         height: 60,
@@ -471,7 +468,7 @@ class _FakeGpsButton extends StatelessWidget {
           },
           iconSize: 32,
           splashRadius: 30,
-          color: Colors.black,
+          color: Theme.of(context).colorScheme.onPrimary,
           icon: const Icon(Icons.bug_report),
         ),
       ),

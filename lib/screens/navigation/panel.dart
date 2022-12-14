@@ -10,11 +10,9 @@ import '/models/data.dart';
 class NavigationPanel extends StatelessWidget {
   const NavigationPanel({
     Key? key,
-    required this.playbackController,
     required this.tour,
   }) : super(key: key);
 
-  final NarrationPlaybackController playbackController;
   final TourModel tour;
 
   @override
@@ -30,10 +28,9 @@ class NavigationPanel extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 8.0, bottom: 8.0),
-              child:
-                  _AudioControlButton(playbackController: playbackController),
+            const Padding(
+              padding: EdgeInsets.only(top: 8.0, left: 8.0, bottom: 8.0),
+              child: _AudioControlButton(),
             ),
             Expanded(
               child: Column(
@@ -61,7 +58,7 @@ class NavigationPanel extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  _AudioPositionSlider(playbackController: playbackController),
+                  const _AudioPositionSlider(),
                 ],
               ),
             ),
@@ -73,12 +70,7 @@ class NavigationPanel extends StatelessWidget {
 }
 
 class _AudioPositionSlider extends StatefulWidget {
-  const _AudioPositionSlider({
-    Key? key,
-    required this.playbackController,
-  }) : super(key: key);
-
-  final NarrationPlaybackController playbackController;
+  const _AudioPositionSlider();
 
   @override
   State<_AudioPositionSlider> createState() => _AudioPositionSliderState();
@@ -94,12 +86,13 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
   void initState() {
     super.initState();
 
-    widget.playbackController.onStateChanged.listen((event) {
+    NarrationPlaybackController.instance.onStateChanged.listen((event) {
       if (mounted) setState(() {});
     });
 
-    _positionSubscription =
-        widget.playbackController.onPositionChanged.listen((position) {
+    _positionSubscription = NarrationPlaybackController
+        .instance.onPositionChanged
+        .listen((position) {
       if (!isDragging && position >= 0.0 && position <= 1.0) {
         setState(() {
           this.position = position;
@@ -121,7 +114,8 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
       children: [
         const SizedBox(width: 16),
         Text(
-          widget.playbackController.positionToString(position) ?? "00:00",
+          NarrationPlaybackController.instance.positionToString(position) ??
+              "00:00",
           style: Theme.of(context)
               .textTheme
               .bodyMedium!
@@ -130,10 +124,12 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
         Expanded(
           child: Slider(
             value: position,
-            label: widget.playbackController.positionToString(position),
+            label:
+                NarrationPlaybackController.instance.positionToString(position),
             min: 0,
             max: 1,
-            onChanged: widget.playbackController.state != PlaybackState.stopped
+            onChanged: NarrationPlaybackController.instance.state !=
+                    NarrationPlaybackState.stopped
                 ? (value) {
                     setState(() {
                       position = value;
@@ -143,12 +139,12 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
             onChangeStart: (_) => isDragging = true,
             onChangeEnd: (value) {
               isDragging = false;
-              widget.playbackController.seek(value);
+              NarrationPlaybackController.instance.seekFractional(value);
             },
           ),
         ),
         Text(
-          widget.playbackController.positionToString(1.0) ?? "00:00",
+          NarrationPlaybackController.instance.positionToString(1.0) ?? "00:00",
           style: Theme.of(context)
               .textTheme
               .bodyMedium!
@@ -161,12 +157,7 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
 }
 
 class _AudioControlButton extends StatefulWidget {
-  const _AudioControlButton({
-    Key? key,
-    required this.playbackController,
-  }) : super(key: key);
-
-  final NarrationPlaybackController playbackController;
+  const _AudioControlButton();
 
   @override
   State<_AudioControlButton> createState() => _AudioControlButtonState();
@@ -180,7 +171,7 @@ class _AudioControlButtonState extends State<_AudioControlButton> {
     super.initState();
 
     _streamSubscription =
-        widget.playbackController.onStateChanged.listen((event) {
+        NarrationPlaybackController.instance.onStateChanged.listen((event) {
       if (mounted) setState(() {});
     });
   }
@@ -195,7 +186,8 @@ class _AudioControlButtonState extends State<_AudioControlButton> {
   Widget build(BuildContext context) {
     const radius = 36.0;
 
-    var isEnabled = widget.playbackController.state != PlaybackState.stopped;
+    var isEnabled = NarrationPlaybackController.instance.state !=
+        NarrationPlaybackState.stopped;
     return SizedBox(
       width: radius * 2,
       height: radius * 2,
@@ -216,30 +208,30 @@ class _AudioControlButtonState extends State<_AudioControlButton> {
   }
 
   void _onPressed() {
-    switch (widget.playbackController.state) {
-      case PlaybackState.playing:
-        widget.playbackController.pause();
+    switch (NarrationPlaybackController.instance.state) {
+      case NarrationPlaybackState.playing:
+        NarrationPlaybackController.instance.pause();
         break;
-      case PlaybackState.paused:
-        widget.playbackController.resume();
+      case NarrationPlaybackState.paused:
+        NarrationPlaybackController.instance.play();
         break;
-      case PlaybackState.completed:
-        widget.playbackController.replay();
+      case NarrationPlaybackState.completed:
+        NarrationPlaybackController.instance.replay();
         break;
-      case PlaybackState.stopped:
+      case NarrationPlaybackState.stopped:
         break;
     }
   }
 
   IconData _icon() {
-    switch (widget.playbackController.state) {
-      case PlaybackState.playing:
+    switch (NarrationPlaybackController.instance.state) {
+      case NarrationPlaybackState.playing:
         return Icons.pause;
-      case PlaybackState.paused:
+      case NarrationPlaybackState.paused:
         return Icons.play_arrow;
-      case PlaybackState.completed:
+      case NarrationPlaybackState.completed:
         return Icons.replay;
-      case PlaybackState.stopped:
+      case NarrationPlaybackState.stopped:
         return Icons.play_arrow;
     }
   }

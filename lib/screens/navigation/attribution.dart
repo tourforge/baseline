@@ -43,7 +43,6 @@ class AttributionInfo extends StatefulWidget {
 }
 
 class _AttributionInfoState extends State<AttributionInfo> {
-  late final StreamSubscription<void> _subscription;
   bool _hidden = false;
 
   @override
@@ -63,12 +62,6 @@ class _AttributionInfoState extends State<AttributionInfo> {
         }
       });
     });
-  }
-
-  @override
-  void dispose() {
-    _subscription.cancel();
-    super.dispose();
   }
 
   @override
