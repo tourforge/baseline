@@ -12,8 +12,8 @@ import 'screens/tour_list.dart';
 import 'theme.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid) {
-    WidgetsFlutterBinding.ensureInitialized();
     FlutterDisplayMode.setHighRefreshRate();
   }
 

@@ -328,7 +328,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           iconSize: 32,
                           splashRadius: 30,
                           color: Theme.of(context).colorScheme.onPrimary,
-                          icon: Icon(Icons.adaptive.arrow_back),
+                          icon: const Icon(Icons.arrow_back),
                         ),
                       ),
                     ),

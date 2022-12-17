@@ -51,14 +51,17 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
         super.init()
         _channel.setMethodCallHandler(handleMethodCall)
         let stylePath = (args as! Dictionary<String, Any>)["stylePath"] as! String
-        createNativeView(view: _view, stylePath: stylePath)
+        let lat = ((args as! Dictionary<String, Any>)["center"] as! Dictionary<String, Any>)["lat"] as! Double
+        let lng = ((args as! Dictionary<String, Any>)["center"] as! Dictionary<String, Any>)["lng"] as! Double
+        let zoom = (args as! Dictionary<String, Any>)["zoom"] as! Double
+        createNativeView(view: _view, stylePath: stylePath, lat: lat, lng: lng, zoom: zoom)
     }
 
     func view() -> UIView {
         return _view
     }
 
-    func createNativeView(view _view: UIView, stylePath: String) {
+    func createNativeView(view _view: UIView, stylePath: String, lat: Double, lng: Double, zoom: Double) {
         _view.backgroundColor = UIColor.white
         // create the map view
         let mapView = MGLMapView(frame: _view.bounds, styleURL: URL(fileURLWithPath: stylePath))
@@ -68,10 +71,12 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         mapView.delegate = self
         mapView.logoView.isHidden = true
+        mapView.compassView.isHidden = true
+        mapView.attributionButton.isHidden = true
         // Set the map’s center coordinate and zoom level.
         mapView.setCenter(
-            CLLocationCoordinate2D(latitude: 47.127757, longitude: 8.579139),
-            zoomLevel: 10,
+            CLLocationCoordinate2D(latitude: lat, longitude: lng),
+            zoomLevel: zoom,
             animated: false)
         
         _view.addSubview(mapView)
@@ -99,6 +104,11 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
         style.addSource(pointsSource)
         
         style.addSource(_locationSource)
+    }
+    
+    func mapView(_ mapView: MGLMapView, shouldChangeFrom oldCamera: MGLMapCamera, to newCamera: MGLMapCamera) -> Bool {
+        _channel.invokeMethod("moveUpdate", arguments: [])
+        return true
     }
     
     func mapView(_ mapView: MGLMapView, regionIsChangingWith reason: MGLCameraChangeReason) {
@@ -131,6 +141,15 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
                 print("BAD")
             }
             self._mapView?.styleURL = URL(fileURLWithPath: stylePath)
+        }
+        if (call.method == "moveCamera") {
+            let args = call.arguments as! Dictionary<String, Any>
+            let lat = args["lat"] as! Double
+            let lng = args["lng"] as! Double
+            let duration  = args["duration"] as! Double
+            self._mapView!.setCenter(
+                CLLocationCoordinate2D(latitude: lat, longitude: lng),
+                animated: true)
         }
     }
 }

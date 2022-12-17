@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:image/image.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:opentourbuilder_guide/download_manager.dart';
@@ -32,13 +31,21 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
   NarrationPlaybackController() {
     _player.playerStateStream.listen((event) {
       _onStateChanged.add(null);
+      _updatePlaybackState();
     });
-    AudioSession.instance.then((value) => _session = value);
+    _player.durationStream.listen((duration) {
+      if (_currentIndex == null || duration == null) return;
+
+      buildMediaItem(tour.waypoints[_currentIndex!], duration)
+          .then(updateMediaItem);
+    });
+    _player.positionDiscontinuityStream.listen((event) {
+      _updatePlaybackState();
+    });
   }
 
   late TourModel tour;
 
-  late final AudioSession _session;
   AudioPlayer _player = AudioPlayer();
 
   final StreamController _onStateChanged = StreamController.broadcast();
@@ -80,22 +87,19 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
 
     await _player.stop();
 
-    if (await _session.setActive(true) || _currentNarration == null) {
-      mediaItem.add(await buildMediaItem(tour.waypoints[index]));
-      if (_currentNarration == null) {
-        _onStateChanged.add(null);
-        _updatePlaybackState();
-      } else {
-        await _player.setAudioSource(
-            ProgressiveAudioSource(Uri.file(_currentNarration!.downloadPath)));
-        await play();
-      }
+    mediaItem.add(await buildMediaItem(tour.waypoints[index]));
+    if (_currentNarration == null) {
+      _onStateChanged.add(null);
+      _updatePlaybackState();
     } else {
-      // The request was denied and the app should not play audio
+      await _player.setAudioSource(
+          ProgressiveAudioSource(Uri.file(_currentNarration!.downloadPath)));
+      await play();
     }
   }
 
-  Future<MediaItem> buildMediaItem(WaypointModel waypoint) async {
+  Future<MediaItem> buildMediaItem(WaypointModel waypoint,
+      [Duration? duration]) async {
     Uri? artUri;
     if (waypoint.gallery.isNotEmpty) {
       var squarePath =
@@ -120,12 +124,12 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
       title: waypoint.name,
       album: tour.name,
       artUri: artUri,
+      duration: duration,
     );
   }
 
   @override
   Future<void> pause() async {
-    await _session.setActive(false);
     await _player.pause();
     _onStateChanged.add(null);
 
@@ -136,8 +140,6 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
   Future<void> play() async {
     _player.play();
     _onStateChanged.add(null);
-
-    _updatePlaybackState();
   }
 
   Future<void> seekFractional(double position) async {
@@ -152,8 +154,6 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> seek(Duration position) async {
     await _player.seek(position);
-
-    _updatePlaybackState();
   }
 
   @override
