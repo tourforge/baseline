@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:opentourbuilder_guide/models/current_waypoint.dart';
 import 'package:provider/provider.dart';
 
 import '/controllers/narration_playback.dart';
+import '/models/current_waypoint.dart';
 import '/models/data.dart';
 
 class NavigationPanel extends StatelessWidget {

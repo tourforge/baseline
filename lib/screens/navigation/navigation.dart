@@ -71,7 +71,7 @@ class DisclaimerScreen extends StatelessWidget {
         ),
         Container(
           color: const Color.fromARGB(64, 130, 221, 11),
-          child: Image.asset("assets/traffic.png"),
+          child: Image.asset("assets/traffic.png", package: "opentourguide"),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(
