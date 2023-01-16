@@ -29,16 +29,19 @@ jobs:
       with:
         channel: 'stable'
     - run: flutter pub get
+      working-directory: ./example
     - run: echo "${{ secrets.MAPTILER_KEY }}" > assets/maptiler.txt
     - run: flutter build apk
+      working-directory: ./example
     - run: flutter build appbundle
+      working-directory: ./example
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
       with:
         name: apk
-        path: build/app/outputs/flutter-apk/app-release.apk
+        path: example/build/app/outputs/flutter-apk/app-release.apk
     - name: Upload App Bundle artifact
       uses: actions/upload-artifact@v3
       with:
         name: appbundle
-        path: build/app/outputs/bundle/release/app-release.aab
+        path: example/build/app/outputs/bundle/release/app-release.aab
