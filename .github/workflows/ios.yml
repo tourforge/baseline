@@ -25,5 +25,7 @@ jobs:
         channel: 'stable'
         architecture: x64
     - run: flutter pub get
+      working-directory: ./example
     - run: echo "${{ secrets.MAPTILER_KEY }}" > assets/maptiler.txt
     - run: flutter build ios --release --no-codesign
+      working-directory: ./example
