@@ -134,22 +134,30 @@ class _MapLibreMapState extends State<MapLibreMap> {
 
       if (!mounted) return satStylePath;
       var assetBundle = DefaultAssetBundle.of(context);
-      var styleText = await assetBundle.loadString('assets/style.json');
-      var satStyleText =
-          await assetBundle.loadString('assets/style-satellite.json');
-      var key = await assetBundle.loadString('assets/maptiler.txt');
-      var tomtomKey = await assetBundle.loadString('assets/tomtom.txt');
-      var spritePng = await assetBundle.load('assets/sprite.png');
-      var spriteJson = await assetBundle.loadString('assets/sprite.json');
-      var sprite2xPng = await assetBundle.load('assets/sprite@2x.png');
-      var sprite2xJson = await assetBundle.loadString('assets/sprite@2x.json');
-      var spriteSatPng = await assetBundle.load('assets/sprite-satellite.png');
-      var spriteSatJson =
-          await assetBundle.loadString('assets/sprite-satellite.json');
+      var assetPrefix = "packages/opentourguide";
+      var styleText =
+          await assetBundle.loadString('$assetPrefix/assets/style.json');
+      var satStyleText = await assetBundle
+          .loadString('$assetPrefix/assets/style-satellite.json');
+      var key =
+          await assetBundle.loadString('$assetPrefix/assets/maptiler.txt');
+      var tomtomKey =
+          await assetBundle.loadString('$assetPrefix/assets/tomtom.txt');
+      var spritePng = await assetBundle.load('$assetPrefix/assets/sprite.png');
+      var spriteJson =
+          await assetBundle.loadString('$assetPrefix/assets/sprite.json');
+      var sprite2xPng =
+          await assetBundle.load('$assetPrefix/assets/sprite@2x.png');
+      var sprite2xJson =
+          await assetBundle.loadString('$assetPrefix/assets/sprite@2x.json');
+      var spriteSatPng =
+          await assetBundle.load('$assetPrefix/assets/sprite-satellite.png');
+      var spriteSatJson = await assetBundle
+          .loadString('$assetPrefix/assets/sprite-satellite.json');
       var spriteSat2xPng =
-          await assetBundle.load('assets/sprite-satellite@2x.png');
-      var spriteSat2xJson =
-          await assetBundle.loadString('assets/sprite-satellite@2x.json');
+          await assetBundle.load('$assetPrefix/assets/sprite-satellite@2x.png');
+      var spriteSat2xJson = await assetBundle
+          .loadString('$assetPrefix/assets/sprite-satellite@2x.json');
 
       var style = jsonDecode(styleText);
       var satStyle = jsonDecode(satStyleText);

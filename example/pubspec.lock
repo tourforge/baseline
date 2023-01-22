@@ -16,7 +16,7 @@ packages:
     source: hosted
     version: "2.9.0"
   audio_service:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: audio_service
       url: "https://pub.dartlang.org"
@@ -37,7 +37,7 @@ packages:
     source: hosted
     version: "0.1.1"
   audio_session:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: audio_session
       url: "https://pub.dartlang.org"
@@ -126,7 +126,7 @@ packages:
     source: hosted
     version: "3.3.0"
   flutter_displaymode:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_displaymode
       url: "https://pub.dartlang.org"
@@ -140,14 +140,14 @@ packages:
     source: hosted
     version: "2.0.1"
   flutter_map:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_map
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.1.0"
   flutter_map_dragmarker:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: flutter_map_dragmarker
       url: "https://pub.dartlang.org"
@@ -164,7 +164,7 @@ packages:
     source: sdk
     version: "0.0.0"
   geolocator:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: geolocator
       url: "https://pub.dartlang.org"
@@ -206,14 +206,14 @@ packages:
     source: hosted
     version: "0.1.1"
   google_fonts:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: google_fonts
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -227,7 +227,7 @@ packages:
     source: hosted
     version: "4.0.2"
   image:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: image
       url: "https://pub.dartlang.org"
@@ -248,7 +248,7 @@ packages:
     source: hosted
     version: "0.6.4"
   just_audio:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: just_audio
       url: "https://pub.dartlang.org"
@@ -269,7 +269,7 @@ packages:
     source: hosted
     version: "0.4.7"
   latlong2:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: latlong2
       url: "https://pub.dartlang.org"
@@ -290,7 +290,7 @@ packages:
     source: hosted
     version: "1.0.1"
   maps_toolkit:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: maps_toolkit
       url: "https://pub.dartlang.org"
@@ -331,15 +331,22 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  path:
+  opentourguide:
     dependency: "direct main"
+    description:
+      path: ".."
+      relative: true
+    source: path
+    version: "1.0.0+1"
+  path:
+    dependency: transitive
     description:
       name: path
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.2"
   path_provider:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: path_provider
       url: "https://pub.dartlang.org"
@@ -402,7 +409,7 @@ packages:
     source: hosted
     version: "5.1.0"
   photo_view:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: photo_view
       url: "https://pub.dartlang.org"
@@ -458,7 +465,7 @@ packages:
     source: hosted
     version: "2.1.0"
   provider:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: provider
       url: "https://pub.dartlang.org"
@@ -477,7 +484,7 @@ packages:
     source: sdk
     version: "0.0.99"
   sliver_tools:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: sliver_tools
       url: "https://pub.dartlang.org"
@@ -568,7 +575,7 @@ packages:
     source: hosted
     version: "0.3.1"
   url_launcher:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: url_launcher
       url: "https://pub.dartlang.org"

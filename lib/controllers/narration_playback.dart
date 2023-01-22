@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:image/image.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:opentourbuilder_guide/download_manager.dart';
-import 'package:opentourbuilder_guide/models/data.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '/download_manager.dart';
+import '/models/data.dart';
 
 enum NarrationPlaybackState {
   playing,
