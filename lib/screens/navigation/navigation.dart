@@ -18,6 +18,7 @@ import '/models/satellite_enabled.dart';
 import '/screens/navigation/drawer.dart';
 import '/screens/navigation/map.dart';
 import '/screens/navigation/panel.dart';
+import '/screens/waypoint_details.dart';
 import 'attribution.dart';
 
 class NavigationRoute extends PopupRoute {
@@ -265,6 +266,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
                         _currentLocation.value != null) {
                       _mapController.moveCamera(_currentLocation.value!);
                     }
+                  },
+                  onPointClick: (index) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            WaypointDetails(widget.tour.waypoints[index])));
                   },
                 ),
               ),

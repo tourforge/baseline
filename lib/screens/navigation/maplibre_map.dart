@@ -62,6 +62,7 @@ class MapLibreMap extends StatefulWidget {
     required this.onMoveBegin,
     required this.onMoveEnd,
     required this.onCameraUpdate,
+    required this.onPointClick,
     required this.fakeGpsOverlay,
   });
 
@@ -71,6 +72,7 @@ class MapLibreMap extends StatefulWidget {
   final void Function() onMoveBegin;
   final void Function() onMoveEnd;
   final void Function(LatLng center, double zoom) onCameraUpdate;
+  final void Function(int index) onPointClick;
   final Widget fakeGpsOverlay;
 
   @override
@@ -112,6 +114,9 @@ class _MapLibreMapState extends State<MapLibreMap> {
           break;
         case "moveEnd":
           widget.onMoveEnd();
+          break;
+        case "pointClick":
+          widget.onPointClick(call.arguments["index"] as int);
           break;
       }
 

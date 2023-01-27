@@ -33,6 +33,7 @@ class NavigationMap extends StatefulWidget {
     required this.onMoveUpdate,
     required this.onMoveBegin,
     required this.onMoveEnd,
+    required this.onPointClick,
   });
 
   final TourModel tour;
@@ -41,6 +42,7 @@ class NavigationMap extends StatefulWidget {
   final void Function() onMoveUpdate;
   final void Function() onMoveBegin;
   final void Function() onMoveEnd;
+  final void Function(int index) onPointClick;
 
   @override
   State<NavigationMap> createState() => NavigationMapState();
@@ -102,6 +104,7 @@ class NavigationMapState extends State<NavigationMap> {
         _fakeGpsKey.currentState?.updateCameraPosition(center, zoom);
         widget.onCameraMove(center);
       },
+      onPointClick: widget.onPointClick,
       fakeGpsOverlay:
           kDebugMode ? _FakeGpsOverlay(key: _fakeGpsKey) : const SizedBox(),
     );
