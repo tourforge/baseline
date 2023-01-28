@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.style.sources.VectorSource
 import io.flutter.plugin.common.BinaryMessenger
@@ -102,7 +103,20 @@ class MapLibrePlatformView(
             .withSource(GeoJsonSource("tour_path",
                 FeatureCollection.fromJson(pathGeoJson)))
             .withSource(GeoJsonSource("tour_points",
-                FeatureCollection.fromJson(pointsGeoJson))))
+                FeatureCollection.fromJson(pointsGeoJson)))) { style ->
+            val circleManager = CircleManager(mapView, map, style)
+            val fc = FeatureCollection.fromJson(pointsGeoJson)
+            for (feature in fc.features()!!) {
+                feature.addNumberProperty("circle-radius", 32)
+                feature.addNumberProperty("circle-opacity", 0.0)
+            }
+            val ids = circleManager.create(fc).map { it.id }
+            circleManager.addClickListener { circle ->
+                val index = ids.indexOf(circle.id)
+                channel.invokeMethod("pointClick", mapOf("index" to index))
+                return@addClickListener true
+            }
+        }
 
         map.addOnCameraMoveListener {
             val cameraPosition = map.cameraPosition

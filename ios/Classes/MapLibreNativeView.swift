@@ -93,9 +93,9 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
         let pathSource = MGLShapeSource(identifier: "tour_path", shape: pathShape)
         style.addSource(pathSource)
         
-        var pointsShape: MGLShape
+        var pointsShape: MGLShapeCollection
         do {
-            pointsShape = try MGLShape(data: _pointsGeoJson.data(using: String.Encoding.utf8)!, encoding: String.Encoding.utf8.rawValue)
+            pointsShape = try MGLShape(data: _pointsGeoJson.data(using: String.Encoding.utf8)!, encoding: String.Encoding.utf8.rawValue) as! MGLShapeCollection
         } catch {
             print("BAD")
             return
@@ -103,7 +103,21 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
         let pointsSource = MGLShapeSource(identifier: "tour_points", shape: pointsShape)
         style.addSource(pointsSource)
         
+        for shape in pointsShape.shapes {
+            // Add each waypoint as an annotation. These are made transparent in the mapView(..., imageFor annotation) method,
+            // since they are being displayed through pointsSource.
+            mapView.addAnnotation(shape)
+        }
+        
         style.addSource(_locationSource)
+    }
+    
+    func mapView(_ mapView: MGLMapView, imageFor annotation: MGLAnnotation) -> MGLAnnotationImage? {
+        // fully transparent 32x32 PNG from GIMP
+        let data = Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAABImlDQ1BJQ0MgcHJvZmlsZQAAKJGdkLFKw1AUhr9UsSI6VRykQwYdCy52cqkKQbAQYwWjU5qkWExiSFKKb+Cb6MN0EARfwV3B2f9GBwezeOBwPg7n/P+5F1p2Eqbl8h6kWVU43sC/9K/s9hsWXTq02Q3CMh+47imN8fmqacVLz2g1z/0ZK1FchqoLZRbmRQXWgbg/r3LDSjZvR96R+EFsR2kWiZ/EO1EaGTa7XprMwh9Nc816nF2cm76yi8MJQ1xsxsyYklDRU83UOabPvqpDQcA9JaFqQqzeXDMVN6JSSg6HopFI1zT4bdd+rlzG0phKyzjckUrT+GH+93vt46zetLYWeVAEdWtJ2ZpM4P0RNnzoPMPadYPX6u+3Ncz065l/vvEL5NBQY40R6psAAAACYktHRAD/h4/MvwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAAd0SU1FB+cBHBMIG7zmHsAAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAIUlEQVRIx2P8z0AZYGIYNWDUgFEDRg0YNWDUgFEDhpkBACOIAT96to3gAAAAAElFTkSuQmCC")!
+        let img = UIImage(data: data)!
+        
+        return MGLAnnotationImage(image: img, reuseIdentifier: "empty-32x32-png")
     }
     
     func mapView(_ mapView: MGLMapView, shouldChangeFrom oldCamera: MGLMapCamera, to newCamera: MGLMapCamera) -> Bool {
@@ -116,6 +130,12 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
             "lat": _mapView!.camera.centerCoordinate.latitude,
             "lng": _mapView!.camera.centerCoordinate.longitude,
             "zoom": _mapView!.zoomLevel + 1,
+        ])
+    }
+    
+    func mapView(_ mapView: MGLMapView, didSelect annotation: MGLAnnotation) {
+        _channel.invokeMethod("pointClick", arguments: [
+            "index": Int((annotation as! MGLPointFeature).attributes["number"] as! String)! - 1
         ])
     }
     
