@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
 
-import '/math/math.dart';
+import '../math/math.dart';
 
 const _distance = Distance();
 const _pathClosenessThresholdMeters = 50;

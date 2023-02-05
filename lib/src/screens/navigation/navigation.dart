@@ -6,19 +6,19 @@ import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
-import '/controllers/narration_playback.dart';
-import '/controllers/navigation.dart';
-import '/location.dart';
-import '/models/current_location.dart';
-import '/models/current_waypoint.dart';
-import '/models/data.dart';
-import '/models/fake_gps.dart';
-import '/models/map_controlledness.dart';
-import '/models/satellite_enabled.dart';
-import '/screens/navigation/drawer.dart';
-import '/screens/navigation/map.dart';
-import '/screens/navigation/panel.dart';
-import '/screens/waypoint_details.dart';
+import '../../controllers/narration_playback.dart';
+import '../../controllers/navigation.dart';
+import '../../location.dart';
+import '../../models/current_location.dart';
+import '../../models/current_waypoint.dart';
+import '../../models/data.dart';
+import '../../models/fake_gps.dart';
+import '../../models/map_controlledness.dart';
+import '../../models/satellite_enabled.dart';
+import '../../screens/navigation/drawer.dart';
+import '../../screens/navigation/map.dart';
+import '../../screens/navigation/panel.dart';
+import '../../screens/waypoint_details.dart';
 import 'attribution.dart';
 
 class NavigationRoute extends PopupRoute {

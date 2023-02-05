@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '/models/current_waypoint.dart';
-import '/models/data.dart';
-import '/widgets/waypoint_card.dart';
+import '../../models/current_waypoint.dart';
+import '../../models/data.dart';
+import '../../widgets/waypoint_card.dart';
 
 class NavigationDrawer extends StatefulWidget {
   const NavigationDrawer({

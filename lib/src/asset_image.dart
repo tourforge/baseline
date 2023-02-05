@@ -1,6 +1,6 @@
 import 'package:flutter/painting.dart';
 
-import '/download_manager.dart';
+import 'download_manager.dart';
 import 'models/data.dart';
 
 class AssetImage extends ImageProvider<FileImage> {

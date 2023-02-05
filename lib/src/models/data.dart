@@ -8,8 +8,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
 import 'package:path/path.dart' as p;
 
-import '/asset_image.dart';
-import '/download_manager.dart';
+import '../asset_image.dart';
+import '../download_manager.dart';
 
 class TourSummary {
   TourSummary._({

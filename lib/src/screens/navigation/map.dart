@@ -5,11 +5,11 @@ import 'package:flutter_map_dragmarker/dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
-import '/models/current_location.dart';
-import '/models/data.dart';
-import '/models/fake_gps.dart';
-import '/models/map_controlledness.dart';
-import '/models/satellite_enabled.dart';
+import '../../models/current_location.dart';
+import '../../models/data.dart';
+import '../../models/fake_gps.dart';
+import '../../models/map_controlledness.dart';
+import '../../models/satellite_enabled.dart';
 import 'maplibre_map.dart';
 
 class NavigationMapController {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '/models/data.dart';
-import '/screens/waypoint_details.dart';
-import '/widgets/asset_image_builder.dart';
+import '../models/data.dart';
+import '../screens/waypoint_details.dart';
+import '../widgets/asset_image_builder.dart';
 
 class WaypointCard extends StatefulWidget {
   const WaypointCard({

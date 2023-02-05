@@ -1,40 +1,24 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-import '/models/data.dart';
-import '/screens/navigation/navigation.dart';
-import '/widgets/asset_image_builder.dart';
-import '/widgets/details_header.dart';
-import '/widgets/gallery.dart';
-import '/widgets/waypoint_card.dart';
+import '../models/data.dart';
+import '../widgets/asset_image_builder.dart';
+import '../widgets/details_header.dart';
+import '../widgets/gallery.dart';
 
-// TODO: investigate performance of this page, it's pretty heavy
+class WaypointDetails extends StatefulWidget {
+  const WaypointDetails(this.waypoint, {super.key});
 
-class TourDetails extends StatefulWidget {
-  const TourDetails(this.summary, {super.key});
-
-  final TourSummary summary;
+  final WaypointModel waypoint;
 
   @override
-  State<TourDetails> createState() => _TourDetailsState();
+  State<WaypointDetails> createState() => _WaypointDetailsState();
 }
 
-class _TourDetailsState extends State<TourDetails>
+class _WaypointDetailsState extends State<WaypointDetails>
     with SingleTickerProviderStateMixin {
-  late Future<TourModel> tourFuture;
-  TourModel? tour;
-
-  @override
-  void initState() {
-    super.initState();
-
-    tourFuture = TourModel.load(widget.summary.id);
-    tourFuture.then((value) => setState(() => tour = value));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,26 +41,16 @@ class _TourDetailsState extends State<TourDetails>
                       color: Theme.of(context).appBarTheme.foregroundColor,
                     ),
                   ),
-                  actions: [
-                    _InitialFadeIn(
-                      child: IconButton(
-                        onPressed: () {},
-                        tooltip: "Preview",
-                        icon: const Icon(Icons.map),
-                        color: Theme.of(context).appBarTheme.foregroundColor,
-                      ),
-                    )
-                  ],
                   flexibleSpace: FlexibleSpaceBar(
                     background: Stack(
                       fit: StackFit.passthrough,
                       children: [
-                        if (widget.summary.thumbnail != null)
+                        if (widget.waypoint.gallery.isNotEmpty)
                           ImageFiltered(
                             imageFilter:
                                 ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                             child: AssetImageBuilder(
-                              widget.summary.thumbnail!,
+                              widget.waypoint.gallery.first,
                               builder: (image) {
                                 return Image(
                                   image: image,
@@ -88,11 +62,12 @@ class _TourDetailsState extends State<TourDetails>
                         Stack(
                           fit: StackFit.passthrough,
                           children: [
-                            if (widget.summary.thumbnail != null)
+                            if (widget.waypoint.gallery.isNotEmpty)
                               Hero(
-                                tag: "tourThumbnail",
+                                tag:
+                                    "waypointThumbnail ${widget.waypoint.name}",
                                 child: AssetImageBuilder(
-                                  widget.summary.thumbnail!,
+                                  widget.waypoint.gallery.first,
                                   builder: (image) {
                                     return Image(
                                       image: image,
@@ -118,7 +93,7 @@ class _TourDetailsState extends State<TourDetails>
                         padding: const EdgeInsets.symmetric(horizontal: 56.0),
                         child: _InitialFadeIn(
                           child: Text(
-                            widget.summary.name,
+                            widget.waypoint.name,
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge!
@@ -137,15 +112,6 @@ class _TourDetailsState extends State<TourDetails>
                   ),
                   forceElevated: innerBoxIsScrolled,
                 ),
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _StartTourButtonDelegate(
-                    tickerProvider: this,
-                    onPressed: () {
-                      Navigator.of(context).push(NavigationRoute(tour!));
-                    },
-                  ),
-                ),
               ],
             ),
           ),
@@ -157,6 +123,7 @@ class _TourDetailsState extends State<TourDetails>
                 handle:
                     NestedScrollView.sliverOverlapAbsorberHandleFor(context),
               ),
+              const SliverToBoxAdapter(child: SizedBox(height: 6)),
               SliverToBoxAdapter(
                 child: Padding(
                   padding:
@@ -181,7 +148,7 @@ class _TourDetailsState extends State<TourDetails>
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            tour?.desc ?? "",
+                            widget.waypoint.desc,
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
@@ -193,47 +160,48 @@ class _TourDetailsState extends State<TourDetails>
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 250,
-                  child: Gallery(images: tour?.gallery ?? []),
+                  child: Gallery(images: widget.waypoint.gallery),
                 ),
               ),
-              const SliverToBoxAdapter(
-                child: DetailsHeader(
-                  title: "Tour Stops",
+              if (widget.waypoint.transcript != null)
+                const SliverPadding(
+                  padding: EdgeInsets.only(top: 16.0),
+                  sliver: SliverToBoxAdapter(
+                    child: DetailsHeader(
+                      title: "Transcript",
+                    ),
+                  ),
                 ),
-              ),
-              _WaypointList(tour: tour),
+              if (widget.waypoint.transcript != null)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Material(
+                      elevation: 3,
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      type: MaterialType.card,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.waypoint.transcript ??
+                                  "The transcript for this stop is unavailable.",
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               const SliverToBoxAdapter(child: SizedBox(height: 6)),
             ],
           );
         }),
-      ),
-    );
-  }
-}
-
-class _WaypointList extends StatelessWidget {
-  const _WaypointList({
-    Key? key,
-    required this.tour,
-  }) : super(key: key);
-
-  final TourModel? tour;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        childCount: tour?.waypoints.length ?? 0,
-        (context, index) {
-          return Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-            child: WaypointCard(
-              waypoint: tour!.waypoints[index],
-              index: index,
-            ),
-          );
-        },
       ),
     );
   }
@@ -266,94 +234,4 @@ class _InitialFadeInState extends State<_InitialFadeIn>
       child: widget.child,
     );
   }
-}
-
-class _StartTourButtonDelegate extends SliverPersistentHeaderDelegate {
-  const _StartTourButtonDelegate({
-    required this.tickerProvider,
-    required this.onPressed,
-  });
-
-  final TickerProvider tickerProvider;
-  final void Function() onPressed;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return SizedBox(
-      height: 80,
-      child: Padding(
-        padding: const EdgeInsets.only(
-            top: 12.0, left: 12.0, right: 12.0, bottom: 6.0),
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-            gradient: LinearGradient(
-              begin: Alignment(-1.0, 0.5),
-              colors: [
-                Color.fromARGB(255, 80, 226, 194),
-                Color.fromARGB(255, 38, 211, 136),
-              ],
-            ),
-          ),
-          child: ElevatedButton(
-            onPressed: onPressed,
-            style: ButtonStyle(
-              backgroundColor:
-                  const MaterialStatePropertyAll(Colors.transparent),
-              foregroundColor: const MaterialStatePropertyAll(Colors.white),
-              shape: MaterialStateProperty.all(
-                const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-              ),
-              shadowColor: const MaterialStatePropertyAll(Colors.transparent),
-              padding: const MaterialStatePropertyAll(EdgeInsets.zero),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.explore),
-                const SizedBox(width: 12),
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 2.0),
-                    child: Text(
-                      "Start Tour",
-                      style: Theme.of(context)
-                          .textTheme
-                          .button!
-                          .copyWith(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  double get maxExtent => 80;
-
-  @override
-  double get minExtent => 80;
-
-  @override
-  TickerProvider get vsync => tickerProvider;
-
-  @override
-  FloatingHeaderSnapConfiguration get snapConfiguration =>
-      FloatingHeaderSnapConfiguration();
-
-  @override
-  PersistentHeaderShowOnScreenConfiguration get showOnScreenConfiguration =>
-      const PersistentHeaderShowOnScreenConfiguration();
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
-      false;
 }

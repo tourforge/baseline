@@ -6,8 +6,8 @@ import 'package:image/image.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '/download_manager.dart';
-import '/models/data.dart';
+import '../download_manager.dart';
+import '../models/data.dart';
 
 enum NarrationPlaybackState {
   playing,

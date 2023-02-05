@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:opentourguide/opentourguide.dart';
-import 'package:opentourguide/screens/tour_list.dart';
 import 'package:opentourguide/theme.dart';
 
 Future<void> main() async {
-  await otbGuideInit();
+  await otbGuideInit(const OtbGuideAppConfig(
+    appName: "OpenTourGuide",
+    appDesc:
+        '''OpenTourGuide is the example app for the OpenTourBuilder Guide library.''',
+  ));
   runApp(const OtbGuideApp());
 }
 

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '/models/data.dart';
-import '/screens/tour_details.dart';
-import '/widgets/asset_image_builder.dart';
+import '../config.dart';
+import '../models/data.dart';
+import '../screens/about.dart';
+import '../screens/tour_details.dart';
+import '../widgets/asset_image_builder.dart';
 
 class TourList extends StatefulWidget {
   const TourList({super.key});
@@ -25,7 +27,7 @@ class _TourListState extends State<TourList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("OpenTourGuide"),
+        title: Text(appConfig.appName),
         actions: [
           IconButton(
             icon: const Icon(Icons.help),
@@ -35,6 +37,28 @@ class _TourListState extends State<TourList> {
                   content: Text('TODO: Show help page'))); // TODO
             },
             color: Theme.of(context).appBarTheme.foregroundColor,
+          ),
+          PopupMenuButton(
+            icon: Icon(
+              Icons.more_vert,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
+            tooltip: 'More',
+            elevation: 1.0,
+            itemBuilder: (_) => [
+              const PopupMenuItem(
+                value: "About",
+                child: Text("About"),
+              ),
+            ],
+            onSelected: (value) {
+              switch (value) {
+                case "About":
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => const About()));
+                  break;
+              }
+            },
           ),
         ],
       ),
