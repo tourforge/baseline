@@ -165,17 +165,14 @@ class _TourListItemState extends State<_TourListItem> {
                     bottomLeft: Radius.circular(10),
                   ),
                   child: widget.tour.thumbnail != null
-                      ? Hero(
-                          tag: "tourThumbnail",
-                          child: AssetImageBuilder(
-                            widget.tour.thumbnail!,
-                            builder: (image) {
-                              return Image(
-                                image: image,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          ),
+                      ? AssetImageBuilder(
+                          widget.tour.thumbnail!,
+                          builder: (image) {
+                            return Image(
+                              image: image,
+                              fit: BoxFit.cover,
+                            );
+                          },
                         )
                       : const SizedBox(),
                 ),

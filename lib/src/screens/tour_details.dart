@@ -89,17 +89,14 @@ class _TourDetailsState extends State<TourDetails>
                           fit: StackFit.passthrough,
                           children: [
                             if (widget.summary.thumbnail != null)
-                              Hero(
-                                tag: "tourThumbnail",
-                                child: AssetImageBuilder(
-                                  widget.summary.thumbnail!,
-                                  builder: (image) {
-                                    return Image(
-                                      image: image,
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                ),
+                              AssetImageBuilder(
+                                widget.summary.thumbnail!,
+                                builder: (image) {
+                                  return Image(
+                                    image: image,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
                               ),
                             Positioned.fill(
                               child: _InitialFadeIn(

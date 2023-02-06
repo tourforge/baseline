@@ -63,18 +63,14 @@ class _WaypointDetailsState extends State<WaypointDetails>
                           fit: StackFit.passthrough,
                           children: [
                             if (widget.waypoint.gallery.isNotEmpty)
-                              Hero(
-                                tag:
-                                    "waypointThumbnail ${widget.waypoint.name}",
-                                child: AssetImageBuilder(
-                                  widget.waypoint.gallery.first,
-                                  builder: (image) {
-                                    return Image(
-                                      image: image,
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                ),
+                              AssetImageBuilder(
+                                widget.waypoint.gallery.first,
+                                builder: (image) {
+                                  return Image(
+                                    image: image,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
                               ),
                             Positioned.fill(
                               child: _InitialFadeIn(

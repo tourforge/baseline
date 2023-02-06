@@ -63,17 +63,14 @@ class _WaypointCardState extends State<WaypointCard> {
                                 ? Radius.zero
                                 : borderRadius,
                           ),
-                          child: Hero(
-                            tag: "waypointThumbnail ${widget.waypoint.name}",
-                            child: AssetImageBuilder(
-                              widget.waypoint.gallery.first,
-                              builder: (image) {
-                                return Image(
-                                  image: image,
-                                  fit: BoxFit.cover,
-                                );
-                              },
-                            ),
+                          child: AssetImageBuilder(
+                            widget.waypoint.gallery.first,
+                            builder: (image) {
+                              return Image(
+                                image: image,
+                                fit: BoxFit.cover,
+                              );
+                            },
                           ),
                         ),
                         Center(
