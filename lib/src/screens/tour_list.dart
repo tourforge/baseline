@@ -221,17 +221,37 @@ class _TourListItemState extends State<_TourListItem> {
                         children: [
                           Stack(
                             children: [
-                              const Icon(
-                                Icons.download,
-                                size: 40,
-                                color: Color.fromARGB(255, 211, 211, 211),
-                              ),
-                              ClipRect(
-                                clipper: _DownloadIconClipper(downloadProgress),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 4.0,
+                                ),
+                                decoration: const BoxDecoration(
+                                    color: Color.fromARGB(255, 245, 245, 245),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(12.0))),
                                 child: const Icon(
                                   Icons.download,
                                   size: 40,
-                                  color: Color.fromARGB(255, 0, 192, 48),
+                                  color: Color.fromARGB(255, 211, 211, 211),
+                                ),
+                              ),
+                              ClipRect(
+                                clipper: _DownloadIconClipper(downloadProgress),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                    horizontal: 4.0,
+                                  ),
+                                  decoration: const BoxDecoration(
+                                      color: Color.fromARGB(255, 61, 252, 109),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(12.0))),
+                                  child: const Icon(
+                                    Icons.download,
+                                    size: 40,
+                                    color: Color.fromARGB(255, 0, 192, 48),
+                                  ),
                                 ),
                               )
                             ],
@@ -316,8 +336,7 @@ class _DownloadIconClipper extends CustomClipper<Rect> {
 
   @override
   Rect getClip(Size size) {
-    return Rect.fromLTRB(
-        0, 0, size.width, size.height * (currentClip * 0.76 + 0.12));
+    return Rect.fromLTRB(0, 0, size.width, size.height * currentClip);
   }
 
   @override
