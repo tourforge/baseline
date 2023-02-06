@@ -72,39 +72,20 @@ class _TourDetailsState extends State<TourDetails>
                       fit: StackFit.passthrough,
                       children: [
                         if (widget.summary.thumbnail != null)
-                          ImageFiltered(
-                            imageFilter:
-                                ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                            child: AssetImageBuilder(
-                              widget.summary.thumbnail!,
-                              builder: (image) {
-                                return Image(
-                                  image: image,
-                                  fit: BoxFit.cover,
-                                );
-                              },
-                            ),
+                          AssetImageBuilder(
+                            widget.summary.thumbnail!,
+                            builder: (image) {
+                              return Image(
+                                image: image,
+                                fit: BoxFit.cover,
+                              );
+                            },
                           ),
-                        Stack(
-                          fit: StackFit.passthrough,
-                          children: [
-                            if (widget.summary.thumbnail != null)
-                              AssetImageBuilder(
-                                widget.summary.thumbnail!,
-                                builder: (image) {
-                                  return Image(
-                                    image: image,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              ),
-                            Positioned.fill(
-                              child: _InitialFadeIn(
-                                child: Container(
-                                    color: const Color.fromARGB(64, 0, 0, 0)),
-                              ),
-                            ),
-                          ],
+                        Positioned.fill(
+                          child: _InitialFadeIn(
+                            child: Container(
+                                color: const Color.fromARGB(64, 0, 0, 0)),
+                          ),
                         ),
                       ],
                     ),

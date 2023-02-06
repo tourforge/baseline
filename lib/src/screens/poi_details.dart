@@ -45,39 +45,20 @@ class _PoiDetailsState extends State<PoiDetails>
                       fit: StackFit.passthrough,
                       children: [
                         if (widget.poi.gallery.isNotEmpty)
-                          ImageFiltered(
-                            imageFilter:
-                                ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                            child: AssetImageBuilder(
-                              widget.poi.gallery.first,
-                              builder: (image) {
-                                return Image(
-                                  image: image,
-                                  fit: BoxFit.cover,
-                                );
-                              },
-                            ),
+                          AssetImageBuilder(
+                            widget.poi.gallery.first,
+                            builder: (image) {
+                              return Image(
+                                image: image,
+                                fit: BoxFit.cover,
+                              );
+                            },
                           ),
-                        Stack(
-                          fit: StackFit.passthrough,
-                          children: [
-                            if (widget.poi.gallery.isNotEmpty)
-                              AssetImageBuilder(
-                                widget.poi.gallery.first,
-                                builder: (image) {
-                                  return Image(
-                                    image: image,
-                                    fit: BoxFit.cover,
-                                  );
-                                },
-                              ),
-                            Positioned.fill(
-                              child: _InitialFadeIn(
-                                child: Container(
-                                    color: const Color.fromARGB(64, 0, 0, 0)),
-                              ),
-                            ),
-                          ],
+                        Positioned.fill(
+                          child: _InitialFadeIn(
+                            child: Container(
+                                color: const Color.fromARGB(64, 0, 0, 0)),
+                          ),
                         ),
                       ],
                     ),
