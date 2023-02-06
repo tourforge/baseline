@@ -8,7 +8,8 @@ const colorScheme = ColorScheme.light(
   onSecondary: Color.fromARGB(255, 236, 233, 255),
 );
 
-ThemeData get themeData => ThemeData.light(useMaterial3: true).copyWith(
+ThemeData get themeData => ThemeData(
+      useMaterial3: true,
       scaffoldBackgroundColor: const Color(0xfff8f8f8),
       cardTheme: const CardTheme(
         color: Color(0xFFFFFFFF),

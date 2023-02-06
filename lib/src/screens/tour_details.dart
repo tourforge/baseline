@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,8 +10,6 @@ import '../widgets/asset_image_builder.dart';
 import '../widgets/details_header.dart';
 import '../widgets/gallery.dart';
 import '../widgets/waypoint_card.dart';
-
-// TODO: investigate performance of this page, it's pretty heavy
 
 class TourDetails extends StatefulWidget {
   const TourDetails(this.tour, {super.key});
@@ -27,6 +25,7 @@ class _TourDetailsState extends State<TourDetails>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverOverlapAbsorber(
@@ -34,65 +33,12 @@ class _TourDetailsState extends State<TourDetails>
             sliver: MultiSliver(
               pushPinnedChildren: false,
               children: [
-                SliverAppBar(
+                SliverPersistentHeader(
                   pinned: true,
-                  toolbarHeight: kToolbarHeight + 5,
-                  expandedHeight: 200.0,
-                  leading: IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    tooltip: "Back",
-                    icon: Icon(Icons.adaptive.arrow_back),
-                    color: Theme.of(context).appBarTheme.foregroundColor,
+                  delegate: _GalleryDelegate(
+                    tickerProvider: this,
+                    tour: widget.tour,
                   ),
-                  actions: [
-                    IconButton(
-                      onPressed: () {},
-                      tooltip: "Preview",
-                      icon: const Icon(Icons.map),
-                      color: Theme.of(context).appBarTheme.foregroundColor,
-                    )
-                  ],
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Stack(
-                      fit: StackFit.passthrough,
-                      children: [
-                        if (widget.tour.thumbnail != null)
-                          AssetImageBuilder(
-                            widget.tour.thumbnail!,
-                            builder: (image) {
-                              return Image(
-                                image: image,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          ),
-                        Positioned.fill(
-                          child: Container(
-                              color: const Color.fromARGB(64, 0, 0, 0)),
-                        ),
-                      ],
-                    ),
-                    centerTitle: true,
-                    expandedTitleScale: 1.0,
-                    title: LayoutBuilder(builder: (context, constraints) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 56.0),
-                        child: Text(
-                          widget.tour.name,
-                          style:
-                              Theme.of(context).textTheme.titleLarge!.copyWith(
-                                    color: Theme.of(context)
-                                        .appBarTheme
-                                        .foregroundColor,
-                                  ),
-                          textAlign: TextAlign.center,
-                          maxLines: constraints.maxHeight > 90 ? 3 : 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }),
-                  ),
-                  forceElevated: innerBoxIsScrolled,
                 ),
                 SliverPersistentHeader(
                   pinned: true,
@@ -116,42 +62,26 @@ class _TourDetailsState extends State<TourDetails>
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: Material(
-                    elevation: 3,
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    type: MaterialType.card,
-                    shadowColor: Colors.transparent,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "Description",
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .copyWith(color: Colors.grey),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            widget.tour.desc,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
+                  padding: const EdgeInsets.only(
+                      left: 24.0, right: 24.0, top: 12.0, bottom: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Description",
+                        style: Theme.of(context)
+                            .textTheme
+                            .labelMedium!
+                            .copyWith(color: Colors.grey),
                       ),
-                    ),
+                      const SizedBox(height: 6),
+                      Text(
+                        widget.tour.desc,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 250,
-                  child: Gallery(images: widget.tour.gallery),
                 ),
               ),
               const SliverToBoxAdapter(
@@ -194,6 +124,59 @@ class _WaypointList extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _GalleryDelegate extends SliverPersistentHeaderDelegate {
+  const _GalleryDelegate({
+    required this.tickerProvider,
+    required this.tour,
+  });
+
+  final TickerProvider tickerProvider;
+  final TourModel tour;
+
+  @override
+  double get maxExtent => 384;
+
+  @override
+  double get minExtent => MediaQueryData.fromWindow(ui.window).padding.top + 60;
+
+  @override
+  TickerProvider get vsync => tickerProvider;
+
+  @override
+  FloatingHeaderSnapConfiguration get snapConfiguration =>
+      FloatingHeaderSnapConfiguration();
+
+  @override
+  PersistentHeaderShowOnScreenConfiguration get showOnScreenConfiguration =>
+      const PersistentHeaderShowOnScreenConfiguration();
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      false;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final shrinkFactor = shrinkOffset / (maxExtent - minExtent);
+    if (shrinkFactor < 0.99) {
+      return ClipRect(
+        child: OverflowBox(
+          maxHeight: 384,
+          child: Gallery(
+            images: tour.gallery,
+            padding: EdgeInsets.zero,
+          ),
+        ),
+      );
+    } else {
+      return AppBar(
+        title: Text(tour.name),
+        backgroundColor: Colors.black,
+      );
+    }
   }
 }
 
