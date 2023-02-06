@@ -69,7 +69,7 @@ class DisclaimerScreen extends StatelessWidget {
             ),
           ),
           Container(
-            color: const Color.fromARGB(64, 130, 221, 11),
+            color: const Color(0xFFE8F7E1),
             child: LayoutBuilder(builder: (context, constraints) {
               // manual calculation of width and height required to avoid layout
               // shift. :)
