@@ -1363,6 +1363,17 @@
       }
     },
     {
+      "id": "pois_circle_layer",
+      "type": "circle",
+      "source": "tour_pois",
+      "paint": {
+        "circle-radius": 8,
+        "circle-color": "#47d847",
+        "circle-stroke-color": "#1c471c",
+        "circle-stroke-width": 3
+      }
+    },
+    {
       "id": "tour_points_circle_layer",
       "type": "circle",
       "source": "tour_points",

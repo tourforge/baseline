@@ -18,6 +18,7 @@ import '../../models/satellite_enabled.dart';
 import '../../screens/navigation/drawer.dart';
 import '../../screens/navigation/map.dart';
 import '../../screens/navigation/panel.dart';
+import '../../screens/poi_details.dart';
 import '../../screens/waypoint_details.dart';
 import 'attribution.dart';
 
@@ -271,6 +272,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
                             WaypointDetails(widget.tour.waypoints[index])));
+                  },
+                  onPoiClick: (index) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            PoiDetails(widget.tour.pois[index])));
                   },
                 ),
               ),

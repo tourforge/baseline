@@ -63,6 +63,7 @@ class MapLibreMap extends StatefulWidget {
     required this.onMoveEnd,
     required this.onCameraUpdate,
     required this.onPointClick,
+    required this.onPoiClick,
     required this.fakeGpsOverlay,
   });
 
@@ -73,6 +74,7 @@ class MapLibreMap extends StatefulWidget {
   final void Function() onMoveEnd;
   final void Function(LatLng center, double zoom) onCameraUpdate;
   final void Function(int index) onPointClick;
+  final void Function(int index) onPoiClick;
   final Widget fakeGpsOverlay;
 
   @override
@@ -117,6 +119,9 @@ class _MapLibreMapState extends State<MapLibreMap> {
           break;
         case "pointClick":
           widget.onPointClick(call.arguments["index"] as int);
+          break;
+        case "poiClick":
+          widget.onPoiClick(call.arguments["index"] as int);
           break;
       }
 
@@ -216,6 +221,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
             "stylePath": snapshot.data,
             "pathGeoJson": _pathToGeoJson(widget.tour.path),
             "pointsGeoJson": _waypointsToGeoJson(widget.tour.waypoints),
+            "poisGeoJson": _poisToGeoJson(widget.tour.pois),
             "center": {"lat": center.latitude, "lng": center.longitude},
             "zoom": zoom,
           };
@@ -276,6 +282,23 @@ String _waypointsToGeoJson(List<WaypointModel> waypoints) {
           "geometry": {
             "type": "Point",
             "coordinates": [waypoint.value.lng, waypoint.value.lat],
+          },
+        },
+    ],
+  });
+}
+
+String _poisToGeoJson(List<PoiModel> pois) {
+  return jsonEncode({
+    "type": "FeatureCollection",
+    "features": [
+      for (var poi in pois.asMap().entries)
+        {
+          "type": "Feature",
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [poi.value.lng, poi.value.lat],
           },
         },
     ],

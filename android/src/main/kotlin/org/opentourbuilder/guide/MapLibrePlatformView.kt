@@ -3,14 +3,12 @@ package org.opentourbuilder.guide
 import android.content.Context
 import android.view.View
 import com.mapbox.android.gestures.MoveGestureDetector
-import com.mapbox.android.gestures.RotateGestureDetector
 import com.mapbox.android.gestures.StandardScaleGestureDetector
 import com.mapbox.geojson.FeatureCollection
 import io.flutter.plugin.platform.PlatformView
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.camera.CameraUpdate
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -18,7 +16,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.annotation.CircleManager
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.style.sources.VectorSource
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -38,6 +35,7 @@ class MapLibrePlatformView(
     private var stylePath: String
     private var pathGeoJson: String
     private var pointsGeoJson: String
+    private var poisGeoJson: String
     private var locationGeoJson: String? = null
 
     override fun getView(): View {
@@ -61,6 +59,7 @@ class MapLibrePlatformView(
         stylePath = creationParams["stylePath"] as String
         pathGeoJson = creationParams["pathGeoJson"] as String
         pointsGeoJson = creationParams["pointsGeoJson"] as String
+        poisGeoJson = creationParams["poisGeoJson"] as String
 
         var centerMap = creationParams["center"] as Map<*, *>
 
@@ -103,17 +102,31 @@ class MapLibrePlatformView(
             .withSource(GeoJsonSource("tour_path",
                 FeatureCollection.fromJson(pathGeoJson)))
             .withSource(GeoJsonSource("tour_points",
-                FeatureCollection.fromJson(pointsGeoJson)))) { style ->
+                FeatureCollection.fromJson(pointsGeoJson)))
+            .withSource(GeoJsonSource("tour_pois",
+                FeatureCollection.fromJson(poisGeoJson)))) { style ->
             val circleManager = CircleManager(mapView, map, style)
-            val fc = FeatureCollection.fromJson(pointsGeoJson)
-            for (feature in fc.features()!!) {
+            val poisFc = FeatureCollection.fromJson(poisGeoJson)
+            for (feature in poisFc.features()!!) {
                 feature.addNumberProperty("circle-radius", 32)
                 feature.addNumberProperty("circle-opacity", 0.0)
             }
-            val ids = circleManager.create(fc).map { it.id }
+            val pointsFc = FeatureCollection.fromJson(pointsGeoJson)
+            for (feature in pointsFc.features()!!) {
+                feature.addNumberProperty("circle-radius", 32)
+                feature.addNumberProperty("circle-opacity", 0.0)
+            }
+            val pointIds = circleManager.create(pointsFc).map { it.id }
+            val poiIds = circleManager.create(poisFc).map { it.id }
             circleManager.addClickListener { circle ->
-                val index = ids.indexOf(circle.id)
-                channel.invokeMethod("pointClick", mapOf("index" to index))
+                val pointIndex = pointIds.indexOf(circle.id)
+                if (pointIndex != -1) {
+                    channel.invokeMethod("pointClick", mapOf("index" to pointIndex))
+                }
+                val poiIndex = poiIds.indexOf(circle.id)
+                if (poiIndex != -1) {
+                    channel.invokeMethod("poiClick", mapOf("index" to poiIndex))
+                }
                 return@addClickListener true
             }
         }
