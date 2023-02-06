@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^0.13.5
   flutter_map: ^3.0.0
-  google_fonts: ^3.0.1
+  google_fonts: ^4.0.3
   photo_view: ^0.14.0
   latlong2: ^0.8.1
   maps_toolkit: ^2.0.1
