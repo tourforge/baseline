@@ -56,50 +56,60 @@ class DisclaimerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SimpleDialog(
-      title: const Text("Starting Tour"),
-      contentPadding: EdgeInsets.zero,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24.0,
-            vertical: 16.0,
+    return Dialog(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Text(
+              'Remember to obey the law and pay attention to '
+              'your surroundings while driving.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
           ),
-          child: Text(
-            'Remember to obey the law and pay attention to '
-            'your surroundings while driving.',
-            style: Theme.of(context).textTheme.bodyLarge,
+          Container(
+            color: const Color.fromARGB(64, 130, 221, 11),
+            child: LayoutBuilder(builder: (context, constraints) {
+              // manual calculation of width and height required to avoid layout
+              // shift. :)
+              const aspect = 1285.0 / 1985.0;
+              final width = constraints.maxWidth;
+              final height = width * aspect;
+              return Image.asset(
+                "assets/traffic.png",
+                package: "opentourguide",
+                width: width,
+                height: height,
+              );
+            }),
           ),
-        ),
-        Container(
-          color: const Color.fromARGB(64, 130, 221, 11),
-          child: Image.asset("assets/traffic.png", package: "opentourguide"),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 8.0,
-            horizontal: 20.0,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                child: const Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: const Text('I understand'),
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => NavigationScreen(tour)));
-                },
-              ),
-            ],
-          ),
-        )
-      ],
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 20.0,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  child: const Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('I understand'),
+                  onPressed: () {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => NavigationScreen(tour)));
+                  },
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
