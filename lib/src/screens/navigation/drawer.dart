@@ -6,8 +6,8 @@ import '../../models/current_waypoint.dart';
 import '../../models/data.dart';
 import '../../widgets/waypoint_card.dart';
 
-class NavigationDrawer extends StatefulWidget {
-  const NavigationDrawer({
+class TourNavigationDrawer extends StatefulWidget {
+  const TourNavigationDrawer({
     super.key,
     required this.handleHeight,
     required this.tour,
@@ -19,10 +19,10 @@ class NavigationDrawer extends StatefulWidget {
   final void Function(int waypointIdx) playWaypoint;
 
   @override
-  State<NavigationDrawer> createState() => NavigationDrawerState();
+  State<TourNavigationDrawer> createState() => TourNavigationDrawerState();
 }
 
-class NavigationDrawerState extends State<NavigationDrawer>
+class TourNavigationDrawerState extends State<TourNavigationDrawer>
     with SingleTickerProviderStateMixin {
   static const _curve = Cubic(0.65, 0.0, 0.35, 1.0);
   static const _invCurve = Cubic(0.0, 0.65, 1.0, 0.35);

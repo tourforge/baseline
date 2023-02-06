@@ -133,7 +133,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   final MapControllednessModel _mapControlledness = MapControllednessModel();
   final SatelliteEnabledModel _satelliteEnabled = SatelliteEnabledModel();
 
-  final GlobalKey<NavigationDrawerState> _drawerKey = GlobalKey();
+  final GlobalKey<TourNavigationDrawerState> _drawerKey = GlobalKey();
 
   late NavigationController _navController;
   StreamSubscription<LatLng> _locationStream =
@@ -402,7 +402,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 left: 0.0,
                 right: 0.0,
                 bottom: bottomHeight,
-                child: NavigationDrawer(
+                child: TourNavigationDrawer(
                   key: _drawerKey,
                   handleHeight: drawerHandleHeight,
                   tour: widget.tour,
