@@ -32,6 +32,7 @@ class _WaypointCardState extends State<WaypointCard> {
       elevation: 3,
       borderRadius: const BorderRadius.all(borderRadius),
       type: MaterialType.card,
+      shadowColor: Colors.transparent,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

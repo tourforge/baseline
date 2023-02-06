@@ -111,6 +111,7 @@ class _TourListItemState extends State<_TourListItem> {
       type: MaterialType.card,
       borderRadius: const BorderRadius.all(Radius.circular(10)),
       elevation: 3,
+      shadowColor: Colors.transparent,
       child: InkWell(
         onTap: () async {
           var isDownloaded = await _isDownloaded;

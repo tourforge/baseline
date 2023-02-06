@@ -101,6 +101,7 @@ class _WaypointDetailsState extends State<WaypointDetails>
                     elevation: 3,
                     borderRadius: const BorderRadius.all(Radius.circular(20)),
                     type: MaterialType.card,
+                    shadowColor: Colors.transparent,
                     child: Padding(
                       padding: const EdgeInsets.only(
                           left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
@@ -150,6 +151,7 @@ class _WaypointDetailsState extends State<WaypointDetails>
                       elevation: 3,
                       borderRadius: const BorderRadius.all(Radius.circular(20)),
                       type: MaterialType.card,
+                      shadowColor: Colors.transparent,
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(

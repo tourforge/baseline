@@ -23,6 +23,7 @@ class DetailsHeader extends StatelessWidget {
             borderRadius: const BorderRadius.all(Radius.circular(12)),
             elevation: 3,
             type: MaterialType.card,
+            shadowColor: Colors.transparent,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 32.0,

@@ -41,6 +41,7 @@ class About extends StatelessWidget {
                 type: MaterialType.card,
                 surfaceTintColor: Colors.white,
                 borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+                shadowColor: Colors.transparent,
                 child: InkWell(
                   onTap: () => showDialog<String>(
                     context: context,

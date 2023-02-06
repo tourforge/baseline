@@ -46,6 +46,7 @@ class _GalleryState extends State<Gallery> {
                 elevation: 3,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
                 clipBehavior: Clip.antiAlias,
+                shadowColor: Colors.transparent,
                 child: AssetImageBuilder(
                   widget.images[index],
                   builder: (image) {
