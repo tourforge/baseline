@@ -14,9 +14,9 @@ import '../widgets/waypoint_card.dart';
 // TODO: investigate performance of this page, it's pretty heavy
 
 class TourDetails extends StatefulWidget {
-  const TourDetails(this.summary, {super.key});
+  const TourDetails(this.tour, {super.key});
 
-  final TourSummary summary;
+  final TourModel tour;
 
   @override
   State<TourDetails> createState() => _TourDetailsState();
@@ -24,17 +24,6 @@ class TourDetails extends StatefulWidget {
 
 class _TourDetailsState extends State<TourDetails>
     with SingleTickerProviderStateMixin {
-  late Future<TourModel> tourFuture;
-  TourModel? tour;
-
-  @override
-  void initState() {
-    super.initState();
-
-    tourFuture = TourModel.load(widget.summary.id);
-    tourFuture.then((value) => setState(() => tour = value));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,9 +56,9 @@ class _TourDetailsState extends State<TourDetails>
                     background: Stack(
                       fit: StackFit.passthrough,
                       children: [
-                        if (widget.summary.thumbnail != null)
+                        if (widget.tour.thumbnail != null)
                           AssetImageBuilder(
-                            widget.summary.thumbnail!,
+                            widget.tour.thumbnail!,
                             builder: (image) {
                               return Image(
                                 image: image,
@@ -89,7 +78,7 @@ class _TourDetailsState extends State<TourDetails>
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 56.0),
                         child: Text(
-                          widget.summary.name,
+                          widget.tour.name,
                           style:
                               Theme.of(context).textTheme.titleLarge!.copyWith(
                                     color: Theme.of(context)
@@ -110,7 +99,7 @@ class _TourDetailsState extends State<TourDetails>
                   delegate: _StartTourButtonDelegate(
                     tickerProvider: this,
                     onPressed: () {
-                      Navigator.of(context).push(NavigationRoute(tour!));
+                      Navigator.of(context).push(NavigationRoute(widget.tour));
                     },
                   ),
                 ),
@@ -150,7 +139,7 @@ class _TourDetailsState extends State<TourDetails>
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            tour?.desc ?? "",
+                            widget.tour.desc,
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ],
@@ -162,7 +151,7 @@ class _TourDetailsState extends State<TourDetails>
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 250,
-                  child: Gallery(images: tour?.gallery ?? []),
+                  child: Gallery(images: widget.tour.gallery),
                 ),
               ),
               const SliverToBoxAdapter(
@@ -170,7 +159,7 @@ class _TourDetailsState extends State<TourDetails>
                   title: "Tour Stops",
                 ),
               ),
-              _WaypointList(tour: tour),
+              _WaypointList(tour: widget.tour),
               const SliverToBoxAdapter(child: SizedBox(height: 6)),
             ],
           );

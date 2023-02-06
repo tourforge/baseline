@@ -118,8 +118,10 @@ class _TourListItemState extends State<_TourListItem> {
           if (!mounted) return;
 
           if (isDownloaded) {
+            final tourModel = await widget.tour.loadDetails();
+            if (!mounted) return;
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => TourDetails(widget.tour)));
+                builder: (context) => TourDetails(tourModel)));
           } else if (downloadProgress.value == 0) {
             var shouldDownload = await Navigator.of(context).push<bool>(
                 DialogRoute(

@@ -62,6 +62,8 @@ class TourSummary {
   final String id;
   final String name;
   final AssetModel? thumbnail;
+
+  Future<TourModel> loadDetails() => TourModel.load(id);
 }
 
 class TourModel {
@@ -180,6 +182,8 @@ class TourModel {
   final List<AssetModel> gallery;
   final List<PoiModel> pois;
   final List<LatLng> path;
+
+  AssetModel? get thumbnail => gallery[0];
 
   String get tilesPath =>
       p.join(DownloadManager.instance.localBase, id, "tiles.mbtiles");
