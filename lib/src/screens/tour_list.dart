@@ -29,15 +29,6 @@ class _TourListState extends State<TourList> {
       appBar: AppBar(
         title: Text(appConfig.appName),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.help),
-            tooltip: 'Help',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('TODO: Show help page'))); // TODO
-            },
-            color: Theme.of(context).appBarTheme.foregroundColor,
-          ),
           PopupMenuButton(
             icon: Icon(
               Icons.more_vert,
