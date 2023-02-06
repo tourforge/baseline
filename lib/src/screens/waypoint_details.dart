@@ -33,13 +33,11 @@ class _WaypointDetailsState extends State<WaypointDetails>
                   pinned: true,
                   toolbarHeight: kToolbarHeight + 5,
                   expandedHeight: 200.0,
-                  leading: _InitialFadeIn(
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      tooltip: "Back",
-                      icon: Icon(Icons.adaptive.arrow_back),
-                      color: Theme.of(context).appBarTheme.foregroundColor,
-                    ),
+                  leading: IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    tooltip: "Back",
+                    icon: Icon(Icons.adaptive.arrow_back),
+                    color: Theme.of(context).appBarTheme.foregroundColor,
                   ),
                   flexibleSpace: FlexibleSpaceBar(
                     background: Stack(
@@ -56,10 +54,8 @@ class _WaypointDetailsState extends State<WaypointDetails>
                             },
                           ),
                         Positioned.fill(
-                          child: _InitialFadeIn(
-                            child: Container(
-                                color: const Color.fromARGB(64, 0, 0, 0)),
-                          ),
+                          child: Container(
+                              color: const Color.fromARGB(64, 0, 0, 0)),
                         ),
                       ],
                     ),
@@ -68,21 +64,17 @@ class _WaypointDetailsState extends State<WaypointDetails>
                     title: LayoutBuilder(builder: (context, constraints) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 56.0),
-                        child: _InitialFadeIn(
-                          child: Text(
-                            widget.waypoint.name,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(
-                                  color: Theme.of(context)
-                                      .appBarTheme
-                                      .foregroundColor,
-                                ),
-                            textAlign: TextAlign.center,
-                            maxLines: constraints.maxHeight > 90 ? 3 : 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        child: Text(
+                          widget.waypoint.name,
+                          style:
+                              Theme.of(context).textTheme.titleLarge!.copyWith(
+                                    color: Theme.of(context)
+                                        .appBarTheme
+                                        .foregroundColor,
+                                  ),
+                          textAlign: TextAlign.center,
+                          maxLines: constraints.maxHeight > 90 ? 3 : 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       );
                     }),
@@ -180,35 +172,6 @@ class _WaypointDetailsState extends State<WaypointDetails>
           );
         }),
       ),
-    );
-  }
-}
-
-class _InitialFadeIn extends StatefulWidget {
-  const _InitialFadeIn({super.key, required this.child});
-
-  final Widget child;
-
-  @override
-  State<_InitialFadeIn> createState() => _InitialFadeInState();
-}
-
-class _InitialFadeInState extends State<_InitialFadeIn>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 600),
-    vsync: this,
-  )..forward();
-  late final Animation<double> _animation = CurvedAnimation(
-    parent: _controller,
-    curve: Curves.easeInCubic,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _animation,
-      child: widget.child,
     );
   }
 }
