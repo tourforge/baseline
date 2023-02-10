@@ -33,8 +33,7 @@ class DetailsHeader extends StatelessWidget {
                 title,
                 style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                       fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: const Color.fromARGB(255, 77, 77, 77),
+                      fontWeight: FontWeight.w600,
                     ),
               ),
             ),

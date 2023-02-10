@@ -19,17 +19,23 @@ class NavigationPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     var currentWaypoint = context.watch<CurrentWaypointModel>();
 
-    return Material(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(
-              top: BorderSide(color: Theme.of(context).dividerColor, width: 2)),
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 8.0,
+        right: 8.0,
+        bottom: 8.0,
+      ),
+      child: Material(
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(16.0),
+          bottomRight: Radius.circular(16.0),
         ),
+        color: Colors.black.withAlpha(208),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const Padding(
-              padding: EdgeInsets.only(top: 8.0, left: 8.0, bottom: 8.0),
+              padding: EdgeInsets.only(top: 8.0, left: 4.0, bottom: 8.0),
               child: _AudioControlButton(),
             ),
             Expanded(
@@ -39,8 +45,8 @@ class NavigationPanel extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                      vertical: 8.0,
-                      horizontal: 16.0,
+                      vertical: 4.0,
+                      horizontal: 8.0,
                     ),
                     child: Text(
                       currentWaypoint.index != null
@@ -49,7 +55,7 @@ class NavigationPanel extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
                             color: currentWaypoint.index == null
                                 ? Colors.grey
-                                : null,
+                                : Colors.white,
                             fontStyle: currentWaypoint.index == null
                                 ? FontStyle.italic
                                 : null,
@@ -112,7 +118,7 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const SizedBox(width: 16),
+        const SizedBox(width: 8),
         Text(
           NarrationPlaybackController.instance.positionToString(position) ??
               "00:00",
@@ -123,6 +129,9 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
         ),
         Expanded(
           child: Slider(
+            thumbColor: Colors.white,
+            activeColor: Colors.white,
+            inactiveColor: Colors.white.withAlpha(32),
             value: position,
             label:
                 NarrationPlaybackController.instance.positionToString(position),
@@ -184,25 +193,14 @@ class _AudioControlButtonState extends State<_AudioControlButton> {
 
   @override
   Widget build(BuildContext context) {
-    const radius = 36.0;
-
     var isEnabled = NarrationPlaybackController.instance.state !=
         NarrationPlaybackState.stopped;
-    return SizedBox(
-      width: radius * 2,
-      height: radius * 2,
-      child: Material(
-        shape: const CircleBorder(),
-        color: isEnabled ? Theme.of(context).colorScheme.primary : Colors.grey,
-        child: IconButton(
-          splashRadius: radius,
-          onPressed: isEnabled ? _onPressed : null,
-          iconSize: 48,
-          icon: Icon(
-            _icon(),
-            color: Colors.white,
-          ),
-        ),
+    return IconButton(
+      onPressed: isEnabled ? _onPressed : null,
+      iconSize: 48,
+      icon: Icon(
+        _icon(),
+        color: Colors.white,
       ),
     );
   }

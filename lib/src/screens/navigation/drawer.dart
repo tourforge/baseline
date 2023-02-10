@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../theme.dart';
 import '../../models/current_waypoint.dart';
 import '../../models/data.dart';
 import '../../widgets/waypoint_card.dart';
@@ -49,98 +50,108 @@ class TourNavigationDrawerState extends State<TourNavigationDrawer>
 
     var currentWaypoint = context.watch<CurrentWaypointModel>().index;
 
-    return LayoutBuilder(builder: (context, constraints) {
-      _expandedSize = constraints.maxHeight * 0.5;
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Material(
-            child: GestureDetector(
-              onTap: _onTap,
-              onVerticalDragStart: onVerticalDragStart,
-              onVerticalDragEnd: onVerticalDragEnd,
-              onVerticalDragUpdate: onVerticalDragUpdate,
-              child: DecoratedBox(
-                decoration: const BoxDecoration(color: Colors.transparent),
-                child: SizedBox(
-                  height: widget.handleHeight,
-                  child: const UnconstrainedBox(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: LayoutBuilder(builder: (context, constraints) {
+        _expandedSize = constraints.maxHeight * 0.5;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Material(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16.0),
+                topRight: Radius.circular(16.0),
+              ),
+              color: Colors.black.withAlpha(208),
+              child: GestureDetector(
+                onTap: _onTap,
+                onVerticalDragStart: onVerticalDragStart,
+                onVerticalDragEnd: onVerticalDragEnd,
+                onVerticalDragUpdate: onVerticalDragUpdate,
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(color: Colors.transparent),
+                  child: SizedBox(
+                    height: widget.handleHeight,
+                    child: const UnconstrainedBox(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                        ),
+                        child:
+                            SizedBox(height: handleHeight, width: handleWidth),
                       ),
-                      child: SizedBox(height: handleHeight, width: handleWidth),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          SizeTransition(
-            sizeFactor: _animation,
-            child: SizedBox(
-              height: _innerSize,
-              child: Material(
-                color: Theme.of(context).scaffoldBackgroundColor,
-                child: OverflowBox(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Divider(height: 2, thickness: 2),
-                      Expanded(
-                        child: NotificationListener<OverscrollNotification>(
-                          onNotification: (notification) {
-                            if (notification.velocity == 0 &&
-                                notification.overscroll < -8) {
-                              setState(() {
-                                var factor = _animation.value *
-                                    _innerSize /
-                                    _expandedSize;
-                                _controller.reverse(
-                                    from: _invCurve.transform(factor));
-                              });
-                            }
+            SizeTransition(
+              sizeFactor: _animation,
+              child: SizedBox(
+                height: _innerSize,
+                child: Theme(
+                  data: darkThemeData,
+                  child: Material(
+                    child: OverflowBox(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: NotificationListener<OverscrollNotification>(
+                              onNotification: (notification) {
+                                if (notification.velocity == 0 &&
+                                    notification.overscroll < -8) {
+                                  setState(() {
+                                    var factor = _animation.value *
+                                        _innerSize /
+                                        _expandedSize;
+                                    _controller.reverse(
+                                        from: _invCurve.transform(factor));
+                                  });
+                                }
 
-                            return false;
-                          },
-                          child: ListView(
-                            padding: EdgeInsets.zero,
-                            children: [
-                              const SizedBox(height: 4),
-                              for (var entry
-                                  in widget.tour.waypoints.asMap().entries)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                    vertical: 4.0,
-                                  ),
-                                  child: WaypointCard(
-                                    waypoint: entry.value,
-                                    index: entry.key,
-                                    currentlyPlaying:
-                                        entry.key == currentWaypoint,
-                                    onPlayed: () {
-                                      widget.playWaypoint(entry.key);
-                                    },
-                                  ),
-                                ),
-                              const SizedBox(height: 4),
-                            ],
+                                return false;
+                              },
+                              child: ListView(
+                                padding: EdgeInsets.zero,
+                                children: [
+                                  const SizedBox(height: 4),
+                                  for (var entry
+                                      in widget.tour.waypoints.asMap().entries)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0,
+                                        vertical: 4.0,
+                                      ),
+                                      child: WaypointCard(
+                                        waypoint: entry.value,
+                                        index: entry.key,
+                                        currentlyPlaying:
+                                            entry.key == currentWaypoint,
+                                        onPlayed: () {
+                                          widget.playWaypoint(entry.key);
+                                        },
+                                      ),
+                                    ),
+                                  const SizedBox(height: 4),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
-      );
-    });
+          ],
+        );
+      }),
+    );
   }
 
   void _onTap() {
