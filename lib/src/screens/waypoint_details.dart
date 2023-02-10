@@ -1,12 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:sliver_tools/sliver_tools.dart';
 
 import '../models/data.dart';
-import '../widgets/asset_image_builder.dart';
-import '../widgets/details_header.dart';
-import '../widgets/gallery.dart';
+import '../widgets/collapsible_section.dart';
+import '../widgets/details_description.dart';
+import '../widgets/details_screen_header_delegate.dart';
 
 class WaypointDetails extends StatefulWidget {
   const WaypointDetails(this.waypoint, {super.key});
@@ -22,157 +19,55 @@ class _WaypointDetailsState extends State<WaypointDetails>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) => [
-          SliverOverlapAbsorber(
-            handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-            sliver: MultiSliver(
-              pushPinnedChildren: false,
-              children: [
-                SliverAppBar(
-                  pinned: true,
-                  toolbarHeight: kToolbarHeight + 5,
-                  expandedHeight: 200.0,
-                  leading: IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    tooltip: "Back",
-                    icon: Icon(Icons.adaptive.arrow_back),
-                    color: Theme.of(context).appBarTheme.foregroundColor,
-                  ),
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Stack(
-                      fit: StackFit.passthrough,
-                      children: [
-                        if (widget.waypoint.gallery.isNotEmpty)
-                          AssetImageBuilder(
-                            widget.waypoint.gallery.first,
-                            builder: (image) {
-                              return Image(
-                                image: image,
-                                fit: BoxFit.cover,
-                              );
-                            },
-                          ),
-                        Positioned.fill(
-                          child: Container(
-                              color: const Color.fromARGB(64, 0, 0, 0)),
-                        ),
-                      ],
+      body: CustomScrollView(
+        slivers: [
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: DetailsScreenHeaderDelegate(
+              tickerProvider: this,
+              gallery: widget.waypoint.gallery,
+              title: widget.waypoint.name,
+              action: ElevatedButton(
+                onPressed: () {},
+                style: ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll(
+                      Theme.of(context).colorScheme.secondary),
+                  padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                  shape: const MaterialStatePropertyAll(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
                     ),
-                    centerTitle: true,
-                    expandedTitleScale: 1.0,
-                    title: LayoutBuilder(builder: (context, constraints) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 56.0),
-                        child: Text(
-                          widget.waypoint.name,
-                          style:
-                              Theme.of(context).textTheme.titleLarge!.copyWith(
-                                    color: Theme.of(context)
-                                        .appBarTheme
-                                        .foregroundColor,
-                                  ),
-                          textAlign: TextAlign.center,
-                          maxLines: constraints.maxHeight > 90 ? 3 : 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      );
-                    }),
                   ),
-                  forceElevated: innerBoxIsScrolled,
                 ),
-              ],
+                child: Row(
+                  children: const [
+                    SizedBox(width: 12.0),
+                    Icon(Icons.music_note),
+                    SizedBox(width: 8.0),
+                    Text("Listen"),
+                    SizedBox(width: 12.0),
+                  ],
+                ),
+              ),
             ),
           ),
+          SliverToBoxAdapter(
+            child: DetailsDescription(desc: widget.waypoint.desc),
+          ),
+          if (widget.waypoint.transcript != null)
+            SliverPadding(
+              padding: const EdgeInsets.only(top: 16.0),
+              sliver: SliverToBoxAdapter(
+                child: CollapsibleSection(
+                  title: "Transcript",
+                  child: DetailsDescription(
+                    header: null,
+                    desc: widget.waypoint.transcript!,
+                  ),
+                ),
+              ),
+            ),
         ],
-        body: Builder(builder: (context) {
-          return CustomScrollView(
-            slivers: [
-              SliverOverlapInjector(
-                handle:
-                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: 6)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: Material(
-                    elevation: 3,
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    type: MaterialType.card,
-                    shadowColor: Colors.transparent,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16.0, right: 16.0, top: 12.0, bottom: 16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "Description",
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .copyWith(color: Colors.grey),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            widget.waypoint.desc,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 250,
-                  child: Gallery(images: widget.waypoint.gallery),
-                ),
-              ),
-              if (widget.waypoint.transcript != null)
-                const SliverPadding(
-                  padding: EdgeInsets.only(top: 16.0),
-                  sliver: SliverToBoxAdapter(
-                    child: DetailsHeader(
-                      title: "Transcript",
-                    ),
-                  ),
-                ),
-              if (widget.waypoint.transcript != null)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Material(
-                      elevation: 3,
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      type: MaterialType.card,
-                      shadowColor: Colors.transparent,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              widget.waypoint.transcript ??
-                                  "The transcript for this stop is unavailable.",
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              const SliverToBoxAdapter(child: SizedBox(height: 6)),
-            ],
-          );
-        }),
       ),
     );
   }

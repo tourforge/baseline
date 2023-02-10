@@ -246,11 +246,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
         child: Scaffold(
           body: Stack(
             children: [
-              Positioned(
-                top: 0.0,
-                left: 0.0,
-                right: 0.0,
-                bottom: bottomHeight + drawerHandleHeight,
+              Positioned.fill(
                 child: NavigationMap(
                   controller: _mapController,
                   tour: widget.tour,
@@ -299,7 +295,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Material(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.secondary,
                         borderRadius:
                             const BorderRadius.all(Radius.circular(25)),
                         child: SizedBox(
@@ -319,7 +315,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                                         fontSize: 22,
                                         color: Theme.of(context)
                                             .colorScheme
-                                            .onPrimary,
+                                            .onSecondary,
                                       ),
                                 ),
                               ),
@@ -339,7 +335,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Material(
                       borderRadius: const BorderRadius.all(Radius.circular(30)),
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.secondary,
                       child: SizedBox(
                         width: 60,
                         height: 60,
@@ -349,7 +345,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           },
                           iconSize: 32,
                           splashRadius: 30,
-                          color: Theme.of(context).colorScheme.onPrimary,
+                          color: Theme.of(context).colorScheme.onSecondary,
                           icon: const Icon(Icons.arrow_back),
                         ),
                       ),
@@ -382,7 +378,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   right: 0.0,
                   child: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.all(12.0),
+                      padding: EdgeInsets.all(8.0),
                       child: _FakeGpsButton(),
                     ),
                   ),
@@ -392,7 +388,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 right: 0.0,
                 child: SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.all(12.0),
+                    padding: EdgeInsets.all(8.0),
                     child: _MapControllednessButton(),
                   ),
                 ),
@@ -449,7 +445,7 @@ class _SatelliteEnabledButton extends StatelessWidget {
 
     return Material(
       borderRadius: const BorderRadius.all(Radius.circular(30)),
-      color: Theme.of(context).colorScheme.primary,
+      color: Theme.of(context).colorScheme.secondary,
       child: SizedBox(
         width: 60,
         height: 60,
@@ -459,7 +455,7 @@ class _SatelliteEnabledButton extends StatelessWidget {
           },
           iconSize: 32,
           splashRadius: 30,
-          color: Theme.of(context).colorScheme.onPrimary,
+          color: Theme.of(context).colorScheme.onSecondary,
           icon: satelliteEnabled.value
               ? const Icon(Icons.layers_clear)
               : const Icon(Icons.layers),
@@ -490,7 +486,7 @@ class _FakeGpsButton extends StatelessWidget {
           },
           iconSize: 32,
           splashRadius: 30,
-          color: Theme.of(context).colorScheme.onPrimary,
+          color: Theme.of(context).colorScheme.onSecondary,
           icon: const Icon(Icons.bug_report),
         ),
       ),
@@ -523,7 +519,7 @@ class _MapControllednessButtonState extends State<_MapControllednessButton> {
           },
           iconSize: 32,
           splashRadius: 30,
-          color: Theme.of(context).colorScheme.onPrimary,
+          color: Theme.of(context).colorScheme.onSecondary,
           icon: mapControlledness.value
               ? const Icon(Icons.gps_fixed)
               : const Icon(Icons.gps_not_fixed),

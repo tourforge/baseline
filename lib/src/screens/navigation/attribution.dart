@@ -75,78 +75,84 @@ class _AttributionInfoState extends State<AttributionInfo> {
             opacity: _hidden ? 0.0 : 1.0,
             duration: const Duration(milliseconds: 1000),
             curve: Curves.fastLinearToSlowEaseIn,
-            child: Material(
-              color: Theme.of(context).colorScheme.onPrimary,
-              borderRadius:
-                  const BorderRadius.only(topRight: Radius.circular(16.0)),
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context).push(DialogRoute(
-                      context: context,
-                      builder: (context) => const AttributionDialog()));
-                },
-                borderRadius:
-                    const BorderRadius.only(topRight: Radius.circular(16.0)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Maps",
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          ),
-                          const SizedBox(
-                            width: 32,
-                            height: 32,
-                          )
-                        ],
-                      ),
-                      const SizedBox(width: 6.0),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          for (var attrib in _attributions)
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Material(
+                color: Theme.of(context).colorScheme.onSecondary,
+                borderRadius: const BorderRadius.all(Radius.circular(16.0)),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(DialogRoute(
+                        context: context,
+                        builder: (context) => const AttributionDialog()));
+                  },
+                  borderRadius:
+                      const BorderRadius.only(topRight: Radius.circular(16.0)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              attrib.text,
+                              "Maps",
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium!
                                   .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
+                                    fontWeight: FontWeight.w600,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
                             ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(
+                              width: 32,
+                              height: 32,
+                            )
+                          ],
+                        ),
+                        const SizedBox(width: 6.0),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (var attrib in _attributions)
+                              Text(
+                                attrib.text,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-        IconButton(
-          onPressed: () {
-            Navigator.of(context).push(DialogRoute(
-                context: context,
-                builder: (context) => const AttributionDialog()));
-          },
-          iconSize: 32,
-          color: const Color.fromARGB(255, 100, 177, 255),
-          icon: const Icon(Icons.info_outline),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: IconButton(
+            onPressed: () {
+              Navigator.of(context).push(DialogRoute(
+                  context: context,
+                  builder: (context) => const AttributionDialog()));
+            },
+            iconSize: 32,
+            color: const Color.fromARGB(255, 100, 177, 255),
+            icon: const Icon(Icons.info_outline),
+          ),
         ),
       ],
     );

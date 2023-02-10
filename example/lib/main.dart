@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:opentourguide/opentourguide.dart';
 import 'package:opentourguide/theme.dart';
 
@@ -18,8 +19,30 @@ class OtbGuideApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'OpenTourGuide',
-      theme: themeData,
+      theme: SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark
+          ? darkThemeData
+          : lightThemeData,
+      builder: (context, child) {
+        if (child != null) {
+          return ScrollConfiguration(
+            behavior: const BouncingScrollBehavior(),
+            child: child,
+          );
+        } else {
+          return const SizedBox();
+        }
+      },
       home: const TourList(),
     );
+  }
+}
+
+class BouncingScrollBehavior extends ScrollBehavior {
+  const BouncingScrollBehavior();
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const BouncingScrollPhysics();
   }
 }

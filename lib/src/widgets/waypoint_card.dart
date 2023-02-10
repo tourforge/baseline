@@ -129,7 +129,10 @@ class _WaypointCardState extends State<WaypointCard> {
                         onPressed: widget.onPlayed ?? () {},
                         iconSize: 28,
                         padding: const EdgeInsets.all(16),
-                        icon: const Icon(Icons.play_arrow),
+                        icon: Icon(
+                          Icons.play_arrow,
+                          color: Theme.of(context).iconTheme.color,
+                        ),
                       ),
                     ),
                   ),
@@ -140,7 +143,7 @@ class _WaypointCardState extends State<WaypointCard> {
           ),
           if (widget.currentlyPlaying)
             Material(
-              color: Theme.of(context).colorScheme.onPrimary.withAlpha(192),
+              color: Theme.of(context).colorScheme.onSecondary.withAlpha(192),
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   bottomLeft: borderRadius,
@@ -152,10 +155,8 @@ class _WaypointCardState extends State<WaypointCard> {
                 child: Center(
                   child: Text(
                     "Currently Playing",
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelLarge!
-                        .copyWith(color: Theme.of(context).colorScheme.primary),
+                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
                 ),
               ),

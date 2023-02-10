@@ -21,41 +21,58 @@ class Gallery extends StatefulWidget {
 class _GalleryState extends State<Gallery> {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      padding: widget.padding,
+    return Stack(
+      fit: StackFit.passthrough,
       children: [
-        for (var index in widget.images.asMap().keys)
-          Padding(
-            padding: index != 0
-                ? const EdgeInsets.only(left: 12.0)
-                : EdgeInsets.zero,
-            child: InkWell(
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => GalleryPage(
-                      images: widget.images,
-                      initialImage: index,
-                    ),
-                  ),
-                );
-              },
-              child: Material(
-                elevation: 3,
+        PageView(
+          children: [
+            for (var index in widget.images.asMap().keys)
+              InkWell(
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
-                clipBehavior: Clip.antiAlias,
-                shadowColor: Colors.transparent,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => GalleryPage(
+                        images: widget.images,
+                        initialImage: index,
+                      ),
+                    ),
+                  );
+                },
                 child: AssetImageBuilder(
                   widget.images[index],
                   builder: (image) {
-                    return Image(image: image);
+                    return Image(
+                      image: image,
+                      fit: BoxFit.cover,
+                    );
                   },
                 ),
+              )
+          ],
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            /*IconButton(
+              onPressed: () {},
+              iconSize: 48,
+              icon: const Icon(
+                Icons.arrow_left,
+                color: Colors.white,
               ),
             ),
-          )
+            IconButton(
+              onPressed: () {},
+              iconSize: 48,
+              icon: const Icon(
+                Icons.arrow_right,
+                color: Colors.white,
+              ),
+            ),*/
+          ],
+        ),
       ],
     );
   }
