@@ -114,7 +114,7 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
 
         var img = decodeImage(imgContent)!;
 
-        var square = copyResizeCropSquare(img, 512);
+        var square = copyResizeCropSquare(img, size: 512);
 
         await File(squarePath).writeAsBytes(encodeJpg(square));
       }
