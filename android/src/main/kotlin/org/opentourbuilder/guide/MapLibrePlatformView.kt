@@ -200,7 +200,9 @@ class MapLibrePlatformView(
                     .withSource(GeoJsonSource("tour_path",
                         FeatureCollection.fromJson(pathGeoJson)))
                     .withSource(GeoJsonSource("tour_points",
-                        FeatureCollection.fromJson(pointsGeoJson))))
+                        FeatureCollection.fromJson(pointsGeoJson)))
+                    .withSource(GeoJsonSource("tour_pois",
+                        FeatureCollection.fromJson(poisGeoJson))))
                 result.success(null)
             }
         }

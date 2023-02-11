@@ -295,7 +295,7 @@ String _poisToGeoJson(List<PoiModel> pois) {
       for (var poi in pois.asMap().entries)
         {
           "type": "Feature",
-          "properties": {},
+          "properties": {"name": poi.value.name},
           "geometry": {
             "type": "Point",
             "coordinates": [poi.value.lng, poi.value.lat],

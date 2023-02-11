@@ -705,5 +705,19 @@
     "width": 17,
     "x": 263,
     "y": 21
+  },
+  "waypoint": {
+    "height": 46,
+    "pixelRatio": 1,
+    "width": 46,
+    "x": 284,
+    "y": 107
+  },
+  "poi": {
+    "pixelRatio": 1,
+    "width": 40,
+    "height": 38,
+    "x": 155,
+    "y": 72
   }
 }

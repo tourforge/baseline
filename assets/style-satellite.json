@@ -655,6 +655,20 @@
       }
     },
     {
+      "id": "tour_path_layer",
+      "type": "line",
+      "source": "tour_path",
+      "layout": {
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-opacity": 0.4,
+        "line-width": 7,
+        "line-color": "#ff0000"
+      }
+    },
+    {
       "id": "waterway-name",
       "type": "symbol",
       "source": "openmaptiles",
@@ -1349,39 +1363,27 @@
       "paint": {"text-color": "#ffffff"}
     },
     {
-      "id": "tour_path_layer",
-      "type": "line",
-      "source": "tour_path",
+      "id": "pois_symbol_layer",
+      "type": "symbol",
+      "source": "tour_pois",
       "layout": {
-        "line-cap": "round",
-        "line-join": "round"
+        "text-field": ["get", "name"],
+        "text-anchor": "top",
+        "text-font": ["Noto Sans Bold"],
+        "text-max-width": 9,
+        "text-offset": [0, 2.0],
+        "text-padding": 2,
+        "text-size": 13,
+        "visibility": "visible",
+        "text-ignore-placement": true,
+        "icon-allow-overlap": true,
+        "text-optional": true,
+        "icon-image": "poi"
       },
       "paint": {
-        "line-opacity": 0.7,
-        "line-width": 7,
-        "line-color": "#ff0000"
-      }
-    },
-    {
-      "id": "pois_circle_layer",
-      "type": "circle",
-      "source": "tour_pois",
-      "paint": {
-        "circle-radius": 8,
-        "circle-color": "#47d847",
-        "circle-stroke-color": "#1c471c",
-        "circle-stroke-width": 3
-      }
-    },
-    {
-      "id": "tour_points_circle_layer",
-      "type": "circle",
-      "source": "tour_points",
-      "paint": {
-        "circle-radius": 16,
-        "circle-color": "#ff0000",
-        "circle-stroke-color": "#000000",
-        "circle-stroke-width": 4
+        "text-color": "#ffffff",
+        "text-halo-color": "#000000",
+        "text-halo-width": 1.5
       }
     },
     {
@@ -1391,7 +1393,9 @@
       "layout": {
         "text-field": ["get", "number"],
         "text-size": 18,
-        "text-ignore-placement": true
+        "text-ignore-placement": true,
+        "icon-image": "waypoint",
+        "icon-allow-overlap": true
       },
       "paint": {
         "text-color": "#ffffff"
