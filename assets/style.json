@@ -2459,16 +2459,17 @@
       "source": "tour_pois",
       "layout": {
         "text-field": ["get", "name"],
-        "text-anchor": "top",
-        "text-offset": [0, 2.0],
-        "text-ignore-placement": true,
-        "icon-allow-overlap": true,
-        "text-optional": true,
-        "icon-image": "poi",
         "text-font": ["Noto Sans Regular"],
         "text-max-width": 9,
         "text-padding": 2,
         "text-size": 12,
+        "text-anchor": "top",
+        "text-offset": [0, 0.1],
+        "text-ignore-placement": true,
+        "text-optional": true,
+        "icon-image": "poi",
+        "icon-anchor": "bottom",
+        "icon-allow-overlap": true,
         "visibility": "visible"
       },
       "paint": {
@@ -2484,14 +2485,17 @@
       "source": "tour_points",
       "layout": {
         "text-field": ["get", "number"],
+        "text-font": ["Noto Sans Bold"],
         "text-size": 18,
+        "text-offset": [0, -1.63],
         "text-ignore-placement": true,
+        "text-allow-overlap": true,
         "icon-image": "waypoint",
-        "icon-allow-overlap": true,
-        "text-allow-overlap": true
+        "icon-anchor": "bottom",
+        "icon-allow-overlap": true
       },
       "paint": {
-        "text-color": "#ffffff"
+        "text-color": "#ffdddd"
       }
     },
     {
