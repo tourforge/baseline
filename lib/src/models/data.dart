@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
 import 'package:path/path.dart' as p;
@@ -18,36 +17,11 @@ class TourSummary {
     required this.thumbnail,
   });
 
-  static final Uri _toursJsonUri =
-      Uri.parse("${DownloadManager.instance.networkBase}/tours.json");
-
   static Future<List<TourSummary>> list() async {
-    dynamic json;
-    try {
-      var res = await get(_toursJsonUri);
-      if (res.statusCode != 200) {
-        throw Exception("Failed to get tours.json");
-      }
-
-      try {
-        await File(p.join(DownloadManager.instance.localBase, "tours.json"))
-            .writeAsString(res.body);
-      } on IOException {
-        // Don't care if this fails. Just a caching method.
-      }
-
-      json = jsonDecode(res.body);
-    } on ClientException {
-      try {
-        json = jsonDecode(
-            await File(p.join(DownloadManager.instance.localBase, "tours.json"))
-                .readAsString());
-      } on IOException {
-        throw Exception("Failed to load tours.json");
-      }
-    }
-
-    return TourSummary._parse(json);
+    var download =
+        await DownloadManager.instance.download("tours.json", reDownload: true);
+    var toursJsonFile = await download.file;
+    return TourSummary._parse(jsonDecode(await toursJsonFile.readAsString()));
   }
 
   static List<TourSummary> _parse(dynamic json) =>
@@ -119,30 +93,28 @@ class TourModel {
           await DownloadManager.instance.download("$id/assets.json");
       var assets = AssetMeta._parse(
           jsonDecode(await (await assetsDownload.file).readAsString()));
-      for (var entry in assets.entries) {
-        futures.add(DownloadManager.instance.download("assets/${entry.key}"));
+      for (var assetName in assets.keys) {
+        futures.add(DownloadManager.instance.download("assets/$assetName"));
       }
 
-      var totalDownloadSize = 0;
-      var downloadedSizes = [];
+      var totalDownloadSizes = <int>[];
+      var downloadedSizes = <int>[];
       for (int i = 0; i < futures.length; i++) {
+        totalDownloadSizes.add(0);
         downloadedSizes.add(0);
       }
 
       for (var futEntry in futures.asMap().entries) {
         var idx = futEntry.key;
         futEntry.value.then((download) {
-          if (download.downloadSize != null && download.downloadSize != 0) {
-            totalDownloadSize += download.downloadSize!;
+          download.downloadProgress.listen((progress) {
+            totalDownloadSizes[idx] = progress.totalDownloadSize ?? 0;
+            downloadedSizes[idx] = progress.downloadedSize;
 
-            download.downloadProgress.listen((downloadedSize) {
-              downloadedSizes[idx] = downloadedSize;
-
-              downloadProgress?.add(
-                  downloadedSizes.reduce((a, b) => a + b).toDouble() /
-                      totalDownloadSize.toDouble());
-            });
-          }
+            downloadProgress?.add(
+                downloadedSizes.reduce((a, b) => a + b).toDouble() /
+                    totalDownloadSizes.reduce((a, b) => a + b).toDouble());
+          });
         });
       }
 

@@ -69,10 +69,12 @@ class _TourListState extends State<TourList> {
             return Container(
               padding: const EdgeInsets.all(32.0),
               alignment: Alignment.topCenter,
-              child: const SizedBox(
+              child: SizedBox(
                 width: 64,
                 height: 64,
-                child: CircularProgressIndicator(color: Colors.black),
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
               ),
             );
           }

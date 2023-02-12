@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
-import 'package:path/path.dart' as p;
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as p;
 
 class DownloadManager {
   DownloadManager(this.localBaseFut, this.networkBaseFut) {
@@ -14,11 +15,13 @@ class DownloadManager {
 
   final Future<String> localBaseFut;
   final Future<String> networkBaseFut;
-  final Map<String, Future<Download>> _currentDownloads = {};
+  final Map<String, Download> _currentDownloads = {};
   final Set<String> _downloadedAssetNames = {};
 
   late final String localBase;
   late final String networkBase;
+
+  String localPath(String path) => "$localBase/$path";
 
   void markDownloaded(String path) {
     _downloadedAssetNames.add(path);
@@ -26,69 +29,130 @@ class DownloadManager {
 
   bool isDownloaded(String path) => _downloadedAssetNames.contains(path);
 
-  Future<Download> download(String path, [String? localPath]) async {
+  Future<Download> download(String path, {bool reDownload = false}) async {
+    var preexistingDownload = _currentDownloads[path];
+    if (preexistingDownload != null) return preexistingDownload;
+
+    final downloadProgressStream =
+        StreamController<DownloadProgress>.broadcast();
+    final fileCompleter = Completer<File>();
+
+    var download = _currentDownloads[path] = Download(
+      downloadProgress: downloadProgressStream.stream,
+      file: fileCompleter.future,
+    );
+
+    (() async {
+      final rng = Random();
+
+      var retryIn = 0;
+      for (var i = 0;; i++) {
+        if (retryIn > 0) {
+          await Future.delayed(Duration(milliseconds: retryIn));
+        }
+
+        var downloadFut = _downloadInner(path, reDownload: reDownload);
+
+        StreamSubscription<DownloadProgress>? progressSubscription;
+        try {
+          var download = await downloadFut;
+
+          progressSubscription = download.downloadProgress.listen((progress) {
+            downloadProgressStream.add(progress);
+          }, onError: (e) {
+            _printDebug("Silenced error from download progress stream: $e");
+          });
+
+          var downloadedFile = await download.file;
+
+          await downloadProgressStream.close();
+
+          fileCompleter.complete(downloadedFile);
+
+          break;
+        } on Exception catch (e) {
+          // exponential backoff: wait 0ms, then 500ms, then 1000ms, then 2000ms...
+          // also multiply by random coefficient to prevent making lots of requests
+          // at the same time when lots of requests fail at the same time
+          retryIn = ((rng.nextDouble() + 0.5) * 500 * pow(2, i)).toInt();
+          _printDebug(
+              "Download of $path failed. Retrying in ${retryIn}ms... Context: $e");
+        } finally {
+          progressSubscription?.cancel();
+        }
+      }
+    })();
+
+    return download;
+  }
+
+  Future<Download> _downloadInner(String path,
+      {bool reDownload = false}) async {
     await Future.wait([localBaseFut, networkBaseFut]);
 
     var uri = Uri.parse("$networkBase/$path");
-    var outPath = "$localBase/${localPath ?? path}";
+    var outPath = "$localBase/$path";
 
     var file = File(outPath);
 
-    var currentDownloadCompleter = Completer<Download>();
-
-    if (_currentDownloads.containsKey(path)) {
-      return _currentDownloads[path]!;
-    } else {
-      _currentDownloads[path] = currentDownloadCompleter.future;
-    }
-
-    await Directory(p.dirname(outPath)).create(recursive: true);
-
-    if (await file.exists()) {
+    if (!reDownload && await file.exists()) {
       markDownloaded(path);
 
-      var res = Download(
-        downloadSize: 0,
+      return Download(
         downloadProgress: const Stream.empty(),
         file: Future.value(file),
       );
-
-      currentDownloadCompleter.complete(res);
-
-      return res;
     }
 
     _printDebug("Downloading $uri...");
     var client = HttpClient();
     var req = await client.getUrl(uri);
     var resp = await req.close();
-    var downloadSize = resp.contentLength != -1 ? resp.contentLength : null;
-    var downloadProgress = StreamController<int>();
+    var totalDownloadSize =
+        resp.contentLength != -1 ? resp.contentLength : null;
+    var downloadProgress = StreamController<DownloadProgress>.broadcast();
 
-    var dl = Download(
-      downloadSize: downloadSize,
+    await Directory(p.dirname(outPath)).create(recursive: true);
+
+    return Download(
       downloadProgress: downloadProgress.stream,
       file: (() async {
         var outFile = File("$outPath.part");
 
         var downloadedSize = 0;
         var outSink = outFile.openWrite();
-        await outSink.addStream(resp.map((event) {
-          downloadedSize += event.length;
-          downloadProgress.add(downloadedSize);
-          return event;
-        }));
-        await outSink.flush();
-        await outSink.close();
-        downloadProgress.add(downloadedSize);
+        try {
+          await outSink.addStream(resp.map((chunk) {
+            downloadedSize += chunk.length;
+            downloadProgress.add(DownloadProgress(
+              totalDownloadSize: totalDownloadSize,
+              downloadedSize: downloadedSize,
+            ));
+            return chunk;
+          }));
+        } on IOException {
+          try {
+            await outFile.delete();
+          } catch (_) {}
+
+          rethrow;
+        } finally {
+          try {
+            await outSink.flush();
+            await outSink.close();
+          } catch (_) {}
+        }
+
+        downloadProgress.add(DownloadProgress(
+          totalDownloadSize: downloadedSize,
+          downloadedSize: downloadedSize,
+        ));
         downloadProgress.close();
 
         await outFile.rename(outPath);
         _printDebug("Finished downloading $uri.");
 
         if (!await file.exists()) {
-          currentDownloadCompleter.completeError(Exception(
-              "Download of $uri has completed but file wasn't saved to disk?!"));
           throw Exception(
               "Download of $uri has completed but file wasn't saved to disk?!");
         }
@@ -98,10 +162,6 @@ class DownloadManager {
         return file;
       })(),
     );
-
-    currentDownloadCompleter.complete(dl);
-
-    return dl;
   }
 
   void _printDebug(String message) {
@@ -111,19 +171,26 @@ class DownloadManager {
 
 class Download {
   const Download({
-    required this.downloadSize,
     required this.downloadProgress,
     required this.file,
   });
 
-  /// The size of the file to be downloaded. Null if the download size is unknown.
-  /// Zero if the file is already downloaded.
-  final int? downloadSize;
-
-  /// A stream that's updated with the number of bytes of the file downloaded so
-  /// far. If the file is already downloaded, this stream is empty.
-  final Stream<int> downloadProgress;
+  /// A stream that is updated with download progress as the file is downloaded.
+  final Stream<DownloadProgress> downloadProgress;
 
   /// An object pointing to the downloaded file.
   final Future<File> file;
+}
+
+class DownloadProgress {
+  const DownloadProgress({
+    this.totalDownloadSize,
+    required this.downloadedSize,
+  });
+
+  /// Total number of bytes that the remote file contains. May be null if unknown.
+  final int? totalDownloadSize;
+
+  /// Total number of bytes downloaded so far.
+  final int downloadedSize;
 }
