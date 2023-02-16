@@ -26,7 +26,7 @@ Future<void> otbGuideInit(OtbGuideAppConfig withAppConfig) async {
   DownloadManager.instance = DownloadManager(
     getApplicationSupportDirectory()
         .then((appSuppDir) => p.join(appSuppDir.path, "tours")),
-    Future.value("https://fsrv.fly.dev"),
+    Future.value("https://fsrv.fly.dev/v2"),
   );
 
   final session = await AudioSession.instance;

@@ -94,7 +94,7 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
       _updatePlaybackState();
     } else {
       await _player.setAudioSource(
-          ProgressiveAudioSource(Uri.file(_currentNarration!.downloadPath)));
+          ProgressiveAudioSource(Uri.file(_currentNarration!.localPath)));
       await play();
     }
   }
@@ -108,9 +108,8 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
       artUri = Uri.file(squarePath);
 
       if (!await File(squarePath).exists()) {
-        var imgContent = await File(
-                "${DownloadManager.instance.localBase}/${waypoint.gallery.first.localPath}")
-            .readAsBytes();
+        var imgContent =
+            await File(waypoint.gallery.first.localPath).readAsBytes();
 
         var img = decodeImage(imgContent)!;
 
@@ -121,7 +120,7 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
     }
 
     return MediaItem(
-      id: waypoint.narration?.downloadPath ?? "${tour.name}/${waypoint.name}",
+      id: waypoint.narration?.localPath ?? "${tour.name}/${waypoint.name}",
       title: waypoint.name,
       album: tour.name,
       artUri: artUri,

@@ -14,13 +14,13 @@ class TourList extends StatefulWidget {
 }
 
 class _TourListState extends State<TourList> {
-  late Future<List<TourSummary>> tours;
+  late Future<TourIndex> tourIndex;
 
   @override
   void initState() {
     super.initState();
 
-    tours = TourSummary.list();
+    tourIndex = TourIndex.load();
   }
 
   @override
@@ -53,10 +53,10 @@ class _TourListState extends State<TourList> {
           ),
         ],
       ),
-      body: FutureBuilder<List<TourSummary>>(
-        future: tours,
+      body: FutureBuilder<TourIndex>(
+        future: tourIndex,
         builder: (context, snapshot) {
-          var tours = snapshot.data;
+          var tours = snapshot.data?.tours;
 
           if (tours != null) {
             return ListView.builder(
@@ -87,26 +87,13 @@ class _TourListState extends State<TourList> {
 class _TourListItem extends StatefulWidget {
   const _TourListItem(this.tour);
 
-  final TourSummary tour;
+  final TourIndexEntry tour;
 
   @override
   State<_TourListItem> createState() => _TourListItemState();
 }
 
 class _TourListItemState extends State<_TourListItem> {
-  final ValueNotifier<double> downloadProgress = ValueNotifier(0);
-
-  late final _DownloadIconClipper _clipper =
-      _DownloadIconClipper(downloadProgress);
-  late Future<bool> _isDownloaded = TourModel.isDownloaded(widget.tour.id);
-
-  @override
-  void dispose() {
-    _clipper.dispose();
-
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -116,36 +103,11 @@ class _TourListItemState extends State<_TourListItem> {
       shadowColor: Colors.transparent,
       child: InkWell(
         onTap: () async {
-          var isDownloaded = await _isDownloaded;
+          final tourModel = await widget.tour.loadDetails();
           if (!mounted) return;
 
-          if (isDownloaded) {
-            final tourModel = await widget.tour.loadDetails();
-            if (!mounted) return;
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => TourDetails(tourModel)));
-          } else if (downloadProgress.value == 0) {
-            var shouldDownload = await Navigator.of(context).push<bool>(
-                DialogRoute(
-                    context: context, builder: (context) => _DownloadDialog()));
-            if (!mounted) return;
-
-            if (shouldDownload == true) {
-              await TourModel.download(
-                widget.tour.id,
-                _CallbackSink((progress) => downloadProgress.value = progress),
-              );
-
-              downloadProgress.value = 1;
-
-              setState(() {
-                _isDownloaded = Future.value(true);
-              });
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('This tour is still downloading.')));
-          }
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => TourDetails(tourModel)));
         },
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         child: SizedBox(
@@ -204,63 +166,6 @@ class _TourListItemState extends State<_TourListItem> {
                   ),
                 ),
               ),
-              FutureBuilder<bool>(
-                future: _isDownloaded,
-                builder: (context, isDownloadedSnapshot) {
-                  if (isDownloadedSnapshot.data == true) {
-                    return const SizedBox(width: 20);
-                  } else if (isDownloadedSnapshot.error == null) {
-                    return SizedBox(
-                      width: 96,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Stack(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12.0,
-                                  horizontal: 4.0,
-                                ),
-                                decoration: const BoxDecoration(
-                                    color: Color.fromARGB(255, 245, 245, 245),
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(12.0))),
-                                child: const Icon(
-                                  Icons.download,
-                                  size: 40,
-                                  color: Color.fromARGB(255, 211, 211, 211),
-                                ),
-                              ),
-                              ClipRect(
-                                clipper: _DownloadIconClipper(downloadProgress),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12.0,
-                                    horizontal: 4.0,
-                                  ),
-                                  decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 61, 252, 109),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(12.0))),
-                                  child: const Icon(
-                                    Icons.download,
-                                    size: 40,
-                                    color: Color.fromARGB(255, 0, 192, 48),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          _DownloadPercentage(downloadProgress),
-                        ],
-                      ),
-                    );
-                  } else {
-                    throw isDownloadedSnapshot.error!;
-                  }
-                },
-              ),
             ],
           ),
         ),
@@ -315,78 +220,4 @@ class _DownloadPercentageState extends State<_DownloadPercentage> {
       return const SizedBox();
     }
   }
-}
-
-class _DownloadIconClipper extends CustomClipper<Rect> {
-  _DownloadIconClipper(this.reclip) : super(reclip: reclip) {
-    reclip.addListener(_onClipChanged);
-  }
-
-  void dispose() {
-    reclip.removeListener(_onClipChanged);
-  }
-
-  final ValueNotifier<double> reclip;
-
-  late double currentClip = reclip.value;
-
-  @override
-  Rect getClip(Size size) {
-    return Rect.fromLTRB(0, 0, size.width, size.height * currentClip);
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Rect> oldClipper) => true;
-
-  void _onClipChanged() {
-    currentClip = reclip.value;
-  }
-}
-
-class _DownloadDialog extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Download Tour'),
-      content: SingleChildScrollView(
-        child: ListBody(
-          children: const <Widget>[
-            Text(
-              'This tour must be downloaded before it can be viewed. '
-              'Downloading the tour may incur data charges. '
-              'It is recommended to connect to WiFi before proceeding.',
-            ),
-          ],
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Cancel'),
-          onPressed: () {
-            Navigator.of(context).pop(false);
-          },
-        ),
-        TextButton(
-          child: const Text('Download'),
-          onPressed: () {
-            Navigator.of(context).pop(true);
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class _CallbackSink<T> implements Sink<T> {
-  const _CallbackSink(this.callback);
-
-  final void Function(T) callback;
-
-  @override
-  void add(T data) {
-    callback(data);
-  }
-
-  @override
-  void close() {}
 }

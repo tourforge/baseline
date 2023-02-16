@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -10,34 +11,51 @@ import 'package:path/path.dart' as p;
 import '../asset_image.dart';
 import '../download_manager.dart';
 
-class TourSummary {
-  TourSummary._({
-    required this.id,
-    required this.name,
-    required this.thumbnail,
+class TourIndex {
+  TourIndex._({
+    required this.tours,
   });
 
-  static Future<List<TourSummary>> list() async {
+  final List<TourIndexEntry> tours;
+
+  static Future<TourIndex> load() async {
     var download =
-        await DownloadManager.instance.download("tours.json", reDownload: true);
-    var toursJsonFile = await download.file;
-    return TourSummary._parse(jsonDecode(await toursJsonFile.readAsString()));
+        await DownloadManager.instance.download("index.json", reDownload: true);
+    var indexJsonFile = await download.file;
+    return _parse(jsonDecode(await indexJsonFile.readAsString()));
   }
 
-  static List<TourSummary> _parse(dynamic json) =>
-      List.unmodifiable((json! as List<dynamic>).map(
-        (eJson) => TourSummary._(
-          id: eJson["id"]! as String,
-          name: eJson["name"]! as String,
-          thumbnail: AssetModel._parse(eJson["thumbnail"], {}),
+  static TourIndex _parse(dynamic json) => TourIndex._(
+        tours: List.unmodifiable(
+          ((json as Map<String, dynamic>)["tours"] as List<dynamic>)
+              .map((e) => TourIndexEntry._parse(e)),
         ),
-      ));
+      );
+}
 
-  final String id;
+class TourIndexEntry {
+  TourIndexEntry._({
+    required this.name,
+    required this.thumbnail,
+    required String contentPath,
+  }) : _contentPath = contentPath;
+
+  static TourIndexEntry _parse(dynamic json) => TourIndexEntry._(
+        name: json["name"]! as String,
+        thumbnail: AssetModel._(json["thumbnail"]),
+        contentPath: json["content"]! as String,
+      );
+
   final String name;
   final AssetModel? thumbnail;
+  final String _contentPath;
 
-  Future<TourModel> loadDetails() => TourModel.load(id);
+  Future<TourModel> loadDetails() async {
+    var download = await DownloadManager.instance.download(_contentPath);
+    var tourJsonFile = await download.file;
+    var tourJson = await tourJsonFile.readAsString();
+    return TourModel._parse(_contentPath, jsonDecode(tourJson));
+  }
 }
 
 class TourModel {
@@ -49,102 +67,24 @@ class TourModel {
     required this.gallery,
     required this.pois,
     required this.path,
+    required this.tiles,
   });
 
-  static Future<TourModel> load(String id) async {
-    if (!await isDownloaded(id)) {
-      throw Exception("Tour '$id' is not downloaded.");
-    }
-
-    var tourJsonContent =
-        await File(p.join(DownloadManager.instance.localBase, id, "tour.json"))
-            .readAsString();
-
-    var assetsJsonContent = AssetMeta._parse(jsonDecode(await File(
-            p.join(DownloadManager.instance.localBase, id, "assets.json"))
-        .readAsString()));
-
-    return TourModel._parse(id, jsonDecode(tourJsonContent), assetsJsonContent);
-  }
-
-  static Future<bool> isDownloaded(String id) async {
-    return await File("${DownloadManager.instance.localBase}/$id/downloaded")
-        .exists();
-  }
-
-  static Future<void> download(String id,
-      [Sink<double>? downloadProgress]) async {
-    if (await isDownloaded(id)) {
-      return;
-    }
-
-    await Directory(p.join(DownloadManager.instance.localBase, "assets"))
-        .create(recursive: true);
-    await Directory(p.join(DownloadManager.instance.localBase, id))
-        .create(recursive: true);
-
-    try {
-      var futures = <Future<Download>>[];
-
-      _printDebug("Starting tour download...");
-      futures.add(DownloadManager.instance.download("$id/tiles.mbtiles"));
-      futures.add(DownloadManager.instance.download("$id/tour.json"));
-      var assetsDownload =
-          await DownloadManager.instance.download("$id/assets.json");
-      var assets = AssetMeta._parse(
-          jsonDecode(await (await assetsDownload.file).readAsString()));
-      for (var assetName in assets.keys) {
-        futures.add(DownloadManager.instance.download("assets/$assetName"));
-      }
-
-      var totalDownloadSizes = <int>[];
-      var downloadedSizes = <int>[];
-      for (int i = 0; i < futures.length; i++) {
-        totalDownloadSizes.add(0);
-        downloadedSizes.add(0);
-      }
-
-      for (var futEntry in futures.asMap().entries) {
-        var idx = futEntry.key;
-        futEntry.value.then((download) {
-          download.downloadProgress.listen((progress) {
-            totalDownloadSizes[idx] = progress.totalDownloadSize ?? 0;
-            downloadedSizes[idx] = progress.downloadedSize;
-
-            downloadProgress?.add(
-                downloadedSizes.reduce((a, b) => a + b).toDouble() /
-                    totalDownloadSizes.reduce((a, b) => a + b).toDouble());
-          });
-        });
-      }
-
-      var downloads = await Future.wait(futures);
-      await Future.wait(downloads.map((download) => download.file));
-      await File(p.join(DownloadManager.instance.localBase, id, "downloaded"))
-          .create();
-      _printDebug("Finished tour download.");
-    } catch (e) {
-      _printDebug("Error occurred while downloading: $e");
-      rethrow;
-    }
-  }
-
-  static TourModel _parse(
-          String tourId, dynamic json, Map<String, AssetMeta> assets) =>
-      TourModel._(
-        id: tourId,
+  static TourModel _parse(String path, dynamic json) => TourModel._(
+        id: path,
         name: json["name"]! as String,
         desc: json["desc"]! as String,
         waypoints: List<WaypointModel>.unmodifiable(
             (json["waypoints"]! as List<dynamic>)
-                .map((e) => WaypointModel._parse(e, assets))),
+                .where((element) => element["type"] == "waypoint")
+                .map(WaypointModel._parse)),
         gallery: List<AssetModel>.unmodifiable(
-            (json["gallery"]! as List<dynamic>)
-                .map((e) => AssetModel._parse(e, assets))),
-        pois: List<PoiModel>.unmodifiable((json["pois"]! as List<dynamic>)
-            .map((e) => PoiModel._parse(tourId, e, assets))),
+            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
+        pois: List<PoiModel>.unmodifiable(
+            (json["pois"]! as List<dynamic>).map(PoiModel._parse)),
         path: List.unmodifiable(mtk.PolygonUtil.decode(json["path"]! as String)
             .map((e) => LatLng(e.latitude, e.longitude))),
+        tiles: AssetModel._(json["tiles"]),
       );
 
   final String id;
@@ -154,29 +94,69 @@ class TourModel {
   final List<AssetModel> gallery;
   final List<PoiModel> pois;
   final List<LatLng> path;
+  final AssetModel tiles;
 
-  AssetModel? get thumbnail => gallery[0];
+  /// Ensures that all of the tour's assets are downloaded.
+  ///
+  /// `downloadProgress`, if provided, will be updated with the download progress
+  /// as the download is completed. Values added to the sink will be between 0.0
+  /// and 1.0 (inclusive).
+  Future<void> downloadAssets([Sink<double>? downloadProgress]) async {
+    var downloadFutures = <Future<Download>>[];
 
-  String get tilesPath =>
-      p.join(DownloadManager.instance.localBase, id, "tiles.mbtiles");
-}
+    for (final asset in HashSet<AssetModel>.from(_allAssets())) {
+      downloadFutures.add(DownloadManager.instance.download(asset.name));
+    }
 
-class AssetMeta {
-  AssetMeta._({
-    required this.alt,
-    required this.attribution,
-  });
+    var progresses = <DownloadProgress>[];
+    for (final downloadFuture in downloadFutures) {
+      final index = progresses.length;
 
-  static Map<String, AssetMeta> _parse(Map<String, dynamic> json) =>
-      (json["assets"]! as Map<String, dynamic>)
-          .map((key, value) => MapEntry(key, _parseItem(value)));
-  static AssetMeta _parseItem(Map<String, dynamic> json) => AssetMeta._(
-        alt: json["alt"],
-        attribution: json["attribution"],
-      );
+      progresses.add(const DownloadProgress(downloadedSize: 0));
+      downloadFuture.then((download) {
+        download.downloadProgress.listen((progress) {
+          progresses[index] = progress;
 
-  final String? alt;
-  final String? attribution;
+          downloadProgress?.add(progresses
+                  .map((p) => p.downloadedSize)
+                  .reduce((a, b) => a + b)
+                  .toDouble() /
+              progresses
+                  .map((p) => p.totalDownloadSize ?? 0)
+                  .reduce((a, b) => a + b)
+                  .toDouble());
+        });
+      });
+    }
+
+    var downloads = await Future.wait(downloadFutures);
+    await Future.wait(downloads.map((download) => download.file));
+  }
+
+  Future<bool> isFullyDownloaded() async {
+    for (final asset in HashSet<AssetModel>.from(_allAssets())) {
+      if (!await asset.isDownloaded) return false;
+    }
+
+    return true;
+  }
+
+  Iterable<AssetModel> _allAssets() sync* {
+    yield* gallery;
+    yield tiles;
+
+    for (final waypoint in waypoints) {
+      yield* waypoint.gallery;
+
+      if (waypoint.narration != null) {
+        yield waypoint.narration!;
+      }
+    }
+
+    for (final poi in pois) {
+      yield* poi.gallery;
+    }
+  }
 }
 
 class WaypointModel {
@@ -191,18 +171,17 @@ class WaypointModel {
     required this.gallery,
   });
 
-  static WaypointModel _parse(dynamic json, Map<String, AssetMeta> assets) =>
-      WaypointModel._(
+  static WaypointModel _parse(dynamic json) => WaypointModel._(
         name: json["name"]! as String,
         desc: json["desc"]! as String,
         lat: json["lat"]! as double,
         lng: json["lng"]! as double,
         triggerRadius: json["trigger_radius"]! as double,
-        narration: AssetModel._parse(json["narration"], assets),
+        narration:
+            json["narration"] != null ? AssetModel._(json["narration"]) : null,
         transcript: json["transcript"] as String?,
         gallery: List<AssetModel>.unmodifiable(
-            (json["gallery"]! as List<dynamic>)
-                .map((e) => AssetModel._parse(e, assets))),
+            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
       );
 
   final String name;
@@ -224,16 +203,13 @@ class PoiModel {
     required this.gallery,
   });
 
-  static PoiModel _parse(
-          String tourName, dynamic json, Map<String, AssetMeta> assets) =>
-      PoiModel._(
+  static PoiModel _parse(dynamic json) => PoiModel._(
         name: json["name"]! as String,
         desc: json["desc"]! as String,
         lat: json["lat"]! as double,
         lng: json["lng"]! as double,
         gallery: List<AssetModel>.unmodifiable(
-            (json["gallery"]! as List<dynamic>)
-                .map((e) => AssetModel._parse(e, assets))),
+            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
       );
 
   final String name;
@@ -244,20 +220,36 @@ class PoiModel {
 }
 
 class AssetModel {
-  AssetModel._(this.name, [this.meta]);
-
-  static AssetModel? _parse(dynamic name, Map<String, AssetMeta> assets) =>
-      name != null ? AssetModel._(name as String, assets[name]) : null;
+  AssetModel._(this.name);
 
   final String name;
-  final AssetMeta? meta;
 
-  String get localPath => "assets/$name";
-  String get downloadPath =>
-      p.join(DownloadManager.instance.localBase, "assets", name);
-  File get downloadedFile => File(downloadPath);
-  Future<bool> get isDownloaded async => await File(downloadPath).exists();
+  Future<AssetMeta?> get meta async {}
+  String get localPath => p.join(DownloadManager.instance.localBase, name);
+  File get downloadedFile => File(localPath);
+  Future<bool> get isDownloaded async => await File(localPath).exists();
   AssetImage get imageProvider => AssetImage(this);
+
+  @override
+  bool operator ==(Object other) => other is AssetModel && name == other.name;
+
+  @override
+  int get hashCode => name.hashCode;
+}
+
+class AssetMeta {
+  AssetMeta._({
+    required this.alt,
+    required this.attribution,
+  });
+
+  static AssetMeta _parse(dynamic json) => AssetMeta._(
+        alt: json["alt"],
+        attribution: json["attrib"],
+      );
+
+  final String? alt;
+  final String? attribution;
 }
 
 void _printDebug(Object? s) {

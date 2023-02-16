@@ -41,7 +41,7 @@ class DetailsScreenHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
-      false;
+      true;
 
   @override
   Widget build(

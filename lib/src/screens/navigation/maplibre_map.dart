@@ -177,7 +177,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
       satStyle["sprite"] = "file://$spriteSatPath";
       style["sprite"] = "file://$spritePath";
       satStyle["sources"]["openmaptiles"]["url"] = style["sources"]
-          ["openmaptiles"]["url"] = "mbtiles://${widget.tour.tilesPath}";
+          ["openmaptiles"]["url"] = "mbtiles://${widget.tour.tiles.localPath}";
       satStyle["sources"]["satellite"]["tiles"][0] =
           "https://api.tomtom.com/map/1/tile/sat/main/{z}/{x}/{y}.jpg?key=$tomtomKey";
 

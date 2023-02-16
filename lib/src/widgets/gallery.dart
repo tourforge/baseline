@@ -32,7 +32,7 @@ class _GalleryState extends State<Gallery> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => GalleryPage(
+                      builder: (context) => GalleryScreen(
                         images: widget.images,
                         initialImage: index,
                       ),
@@ -78,8 +78,8 @@ class _GalleryState extends State<Gallery> {
   }
 }
 
-class GalleryPage extends StatefulWidget {
-  const GalleryPage({
+class GalleryScreen extends StatefulWidget {
+  const GalleryScreen({
     super.key,
     required this.images,
     required this.initialImage,
@@ -89,10 +89,10 @@ class GalleryPage extends StatefulWidget {
   final int initialImage;
 
   @override
-  State<GalleryPage> createState() => _GalleryPageState();
+  State<GalleryScreen> createState() => _GalleryScreenState();
 }
 
-class _GalleryPageState extends State<GalleryPage> {
+class _GalleryScreenState extends State<GalleryScreen> {
   late final PageController controller =
       PageController(initialPage: widget.initialImage);
   late int currentPage = widget.initialImage;
@@ -162,53 +162,77 @@ class _GalleryPageState extends State<GalleryPage> {
               ),
             ),
           ),
-          if (currentImage.meta?.alt != null ||
-              currentImage.meta?.attribution != null)
-            IgnorePointer(
-              ignoring: true,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: SafeArea(
-                  child: Material(
-                    color: Colors.black45,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (currentImage.meta?.alt != null)
-                              Text(
-                                currentImage.meta!.alt!,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            if (currentImage.meta?.alt != null &&
-                                currentImage.meta?.attribution != null)
-                              const SizedBox(height: 8.0),
-                            if (currentImage.meta?.attribution != null)
-                              Text(
-                                currentImage.meta!.attribution!,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(color: Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                          ],
-                        ),
-                      ),
+          _GalleryScreenMetadataOverlay(image: currentImage),
+        ],
+      ),
+    );
+  }
+}
+
+class _GalleryScreenMetadataOverlay extends StatefulWidget {
+  const _GalleryScreenMetadataOverlay({required this.image});
+
+  final AssetModel image;
+
+  @override
+  State<_GalleryScreenMetadataOverlay> createState() =>
+      _GalleryScreenMetadataOverlayState();
+}
+
+class _GalleryScreenMetadataOverlayState
+    extends State<_GalleryScreenMetadataOverlay> {
+  late final Future<AssetMeta?> meta = widget.image.meta;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: meta,
+      builder: (context, snapshot) {
+        final meta = snapshot.data;
+
+        return IgnorePointer(
+          ignoring: true,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              child: Material(
+                color: Colors.black45,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (meta?.alt != null)
+                          Text(
+                            meta!.alt!,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                        if (meta?.alt != null && meta?.attribution != null)
+                          const SizedBox(height: 8.0),
+                        if (meta?.attribution != null)
+                          Text(
+                            meta!.attribution!,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
 }
