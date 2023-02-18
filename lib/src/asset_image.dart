@@ -13,7 +13,7 @@ class AssetImage extends ImageProvider<FileImage> {
 
   @override
   Future<FileImage> obtainKey(ImageConfiguration configuration) {
-    if (DownloadManager.instance.isDownloaded(_asset.localPath)) {
+    if (DownloadManager.instance.isDownloaded(_asset.name)) {
       return _fileImage.obtainKey(configuration);
     } else {
       return (() async {
