@@ -30,7 +30,7 @@ class About extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyLarge),
             ),
           CollapsibleSection(
-            title: "Open Source Libraries",
+            title: "Licensing Information",
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
