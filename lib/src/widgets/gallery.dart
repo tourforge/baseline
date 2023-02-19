@@ -62,27 +62,24 @@ class _GalleryState extends State<Gallery> {
             child: IgnorePointer(
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: Container(
-                  color: Colors.black.withAlpha(128),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (var index in widget.images.asMap().keys)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                          child: Container(
-                            width: 8.0,
-                            height: 8.0,
-                            decoration: BoxDecoration(
-                              color: index == _currentImageIndex
-                                  ? Colors.white.withAlpha(192)
-                                  : Colors.white.withAlpha(96),
-                              shape: BoxShape.circle,
-                            ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (var index in widget.images.asMap().keys)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                        child: Container(
+                          width: 8.0,
+                          height: 8.0,
+                          decoration: BoxDecoration(
+                            color: index == _currentImageIndex
+                                ? Colors.white.withAlpha(192)
+                                : Colors.white.withAlpha(96),
+                            shape: BoxShape.circle,
                           ),
-                        )
-                    ],
-                  ),
+                        ),
+                      )
+                  ],
                 ),
               ),
             ),
