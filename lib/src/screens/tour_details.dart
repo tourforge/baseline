@@ -81,6 +81,8 @@ class _TourDetailsState extends State<TourDetails>
                 action: action,
               ),
             ),
+            if (!_isFullyDownloaded)
+              const SliverToBoxAdapter(child: TourNotDownloadedWarning()),
             SliverToBoxAdapter(
                 child: DetailsDescription(desc: widget.tour.desc)),
             const SliverToBoxAdapter(
@@ -92,6 +94,41 @@ class _TourDetailsState extends State<TourDetails>
             const SliverToBoxAdapter(child: SizedBox(height: 6)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class TourNotDownloadedWarning extends StatelessWidget {
+  const TourNotDownloadedWarning({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20.0,
+        vertical: 16.0,
+      ),
+      color: Theme.of(context).colorScheme.secondary.withAlpha(128),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Note",
+            style: Theme.of(context)
+                .textTheme
+                .labelMedium!
+                .copyWith(color: Colors.white.withAlpha(128)),
+          ),
+          const SizedBox(height: 6.0),
+          Text(
+            "You can view information about this tour before downloading it, but "
+            "the tour must be fully downloaded before use.",
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
       ),
     );
   }
@@ -208,7 +245,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
               const SizedBox(width: 12.0),
               const Icon(Icons.download),
               const SizedBox(width: 8.0),
-              Text(_tourDownload != null ? "Downloading.." : "Download"),
+              Text(_tourDownload != null ? "Downloading..." : "Download"),
               const SizedBox(width: 12.0),
             ],
           ),
@@ -318,8 +355,7 @@ class _DownloadDialog extends StatelessWidget {
         child: ListBody(
           children: const <Widget>[
             Text(
-              'This tour must be downloaded before it can be viewed. '
-              'Downloading the tour may incur data charges. '
+              'Downloading this tour may incur data charges. '
               'It is recommended to connect to WiFi before proceeding.',
             ),
           ],
