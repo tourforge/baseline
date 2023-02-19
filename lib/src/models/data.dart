@@ -20,7 +20,7 @@ class TourIndex {
 
   static Future<TourIndex> load() async {
     var download =
-        await DownloadManager.instance.download("index.json", reDownload: true);
+        DownloadManager.instance.download("index.json", reDownload: true);
     var indexJsonFile = await download.file;
     return _parse(jsonDecode(await indexJsonFile.readAsString()));
   }
@@ -51,7 +51,7 @@ class TourIndexEntry {
   final String _contentPath;
 
   Future<TourModel> loadDetails() async {
-    var download = await DownloadManager.instance.download(_contentPath);
+    var download = DownloadManager.instance.download(_contentPath);
     var tourJsonFile = await download.file;
     var tourJson = await tourJsonFile.readAsString();
     return TourModel._parse(_contentPath, jsonDecode(tourJson));
@@ -96,45 +96,10 @@ class TourModel {
   final List<LatLng> path;
   final AssetModel tiles;
 
-  /// Ensures that all of the tour's assets are downloaded.
-  ///
-  /// `downloadProgress`, if provided, will be updated with the download progress
-  /// as the download is completed. Values added to the sink will be between 0.0
-  /// and 1.0 (inclusive).
-  Future<void> downloadAssets([Sink<double>? downloadProgress]) async {
-    var downloadFutures = <Future<Download>>[];
-
-    for (final asset in HashSet<AssetModel>.from(_allAssets())) {
-      downloadFutures.add(DownloadManager.instance.download(asset.name));
-    }
-
-    var progresses = <DownloadProgress>[];
-    for (final downloadFuture in downloadFutures) {
-      final index = progresses.length;
-
-      progresses.add(const DownloadProgress(downloadedSize: 0));
-      downloadFuture.then((download) {
-        download.downloadProgress.listen((progress) {
-          progresses[index] = progress;
-
-          downloadProgress?.add(progresses
-                  .map((p) => p.downloadedSize)
-                  .reduce((a, b) => a + b)
-                  .toDouble() /
-              progresses
-                  .map((p) => p.totalDownloadSize ?? 0)
-                  .reduce((a, b) => a + b)
-                  .toDouble());
-        });
-      });
-    }
-
-    var downloads = await Future.wait(downloadFutures);
-    await Future.wait(downloads.map((download) => download.file));
-  }
+  Iterable<AssetModel> get allAssets => HashSet<AssetModel>.from(_allAssets());
 
   Future<bool> isFullyDownloaded() async {
-    for (final asset in HashSet<AssetModel>.from(_allAssets())) {
+    for (final asset in allAssets) {
       if (!await asset.isDownloaded) return false;
     }
 
@@ -250,8 +215,4 @@ class AssetMeta {
 
   final String? alt;
   final String? attribution;
-}
-
-void _printDebug(Object? s) {
-  if (kDebugMode) print(s);
 }

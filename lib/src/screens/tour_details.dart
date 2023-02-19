@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:opentourguide/src/download_manager.dart';
 
 import '../models/data.dart';
 import '../widgets/details_description.dart';
@@ -57,7 +59,10 @@ class _TourDetailsState extends State<TourDetails>
     } else {
       action = _DownloadButton(
         tour: widget.tour,
-        onDownloaded: () => setState(() => _isFullyDownloaded = true),
+        onDownloaded: () {
+          if (!mounted) return;
+          setState(() => _isFullyDownloaded = true);
+        },
       );
     }
 
@@ -103,6 +108,58 @@ class _DownloadButton extends StatefulWidget {
 
 class _DownloadButtonState extends State<_DownloadButton> {
   final ValueNotifier<double> _downloadProgress = ValueNotifier(0.0);
+  MultiDownload? _tourDownload;
+
+  @override
+  void initState() {
+    super.initState();
+
+    (() async {
+      var allDownloaded = true;
+      var inProgress = true;
+      var downloadsInProgress = <Download>[];
+      for (final asset in widget.tour.allAssets) {
+        var isDownloaded = await asset.isDownloaded;
+
+        if (!isDownloaded) {
+          allDownloaded = false;
+
+          var downloadInProgress =
+              DownloadManager.instance.downloadInProgress(asset.name);
+
+          if (downloadInProgress == null) {
+            inProgress = false;
+          } else {
+            downloadsInProgress.add(downloadInProgress);
+          }
+        }
+      }
+
+      if (allDownloaded) {
+        widget.onDownloaded();
+      } else if (inProgress) {
+        var download = MultiDownload.of(downloadsInProgress);
+
+        download.downloadProgress.listen((progress) {
+          _downloadProgress.value =
+              progress.downloadedSize / (progress.totalDownloadSize ?? 0);
+        });
+
+        download.completed.then((_) {
+          widget.onDownloaded();
+        }).onError((error, stackTrace) {
+          if (kDebugMode) {
+            print("Fatal error while downloading: $error");
+            print("Stack trace: $stackTrace");
+          }
+        });
+
+        setState(() {
+          _tourDownload = download;
+        });
+      }
+    })();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +178,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
             clipper: _DownloadIconClipper(_downloadProgress),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.secondaryContainer,
                 borderRadius: const BorderRadius.all(Radius.circular(12.0)),
               ),
             ),
@@ -142,12 +199,12 @@ class _DownloadButtonState extends State<_DownloadButton> {
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
           child: Row(
-            children: const [
-              SizedBox(width: 12.0),
-              Icon(Icons.download),
-              SizedBox(width: 8.0),
-              Text("Download"),
-              SizedBox(width: 12.0),
+            children: [
+              const SizedBox(width: 12.0),
+              const Icon(Icons.download),
+              const SizedBox(width: 8.0),
+              Text(_tourDownload != null ? "Downloading.." : "Download"),
+              const SizedBox(width: 12.0),
             ],
           ),
         ),
@@ -156,17 +213,40 @@ class _DownloadButtonState extends State<_DownloadButton> {
   }
 
   Future<void> _download() async {
-    bool shouldDownload = await Navigator.push(context,
-        DialogRoute(context: context, builder: (context) => _DownloadDialog()));
+    if (_tourDownload == null) {
+      bool shouldDownload = await Navigator.push(
+          context,
+          DialogRoute(
+              context: context, builder: (context) => _DownloadDialog()));
 
-    if (!shouldDownload || !mounted) return;
+      if (!shouldDownload || !mounted) return;
 
-    await widget.tour.downloadAssets(_CallbackSink((progress) {
-      _downloadProgress.value = progress;
-    }));
+      var download = DownloadManager.instance.downloadAll(
+        widget.tour.allAssets.map((a) => a.name),
+        _CallbackSink((progress) {
+          _downloadProgress.value = progress.downloadedSize.toDouble() /
+              (progress.totalDownloadSize ?? 0).toDouble();
+        }),
+      );
 
-    print('downloaded');
-    widget.onDownloaded();
+      download.downloadProgress.listen((progress) {
+        _downloadProgress.value =
+            progress.downloadedSize / (progress.totalDownloadSize ?? 0);
+      });
+
+      download.completed.then((_) {
+        widget.onDownloaded();
+      }).onError((error, stackTrace) {
+        if (kDebugMode) {
+          print("Fatal error while downloading: $error");
+          print("Stack trace: $stackTrace");
+        }
+      });
+
+      setState(() {
+        _tourDownload = download;
+      });
+    } else {}
   }
 }
 
