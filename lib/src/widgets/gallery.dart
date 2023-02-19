@@ -19,12 +19,15 @@ class Gallery extends StatefulWidget {
 }
 
 class _GalleryState extends State<Gallery> {
+  int _currentImageIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       fit: StackFit.passthrough,
       children: [
         PageView(
+          onPageChanged: (index) => setState(() => _currentImageIndex = index),
           children: [
             for (var index in widget.images.asMap().keys)
               InkWell(
@@ -51,28 +54,39 @@ class _GalleryState extends State<Gallery> {
               )
           ],
         ),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            /*IconButton(
-              onPressed: () {},
-              iconSize: 48,
-              icon: const Icon(
-                Icons.arrow_left,
-                color: Colors.white,
+        if (widget.images.length > 1)
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Container(
+                  color: Colors.black.withAlpha(128),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var index in widget.images.asMap().keys)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                          child: Container(
+                            width: 8.0,
+                            height: 8.0,
+                            decoration: BoxDecoration(
+                              color: index == _currentImageIndex
+                                  ? Colors.white.withAlpha(192)
+                                  : Colors.white.withAlpha(96),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        )
+                    ],
+                  ),
+                ),
               ),
             ),
-            IconButton(
-              onPressed: () {},
-              iconSize: 48,
-              icon: const Icon(
-                Icons.arrow_right,
-                color: Colors.white,
-              ),
-            ),*/
-          ],
-        ),
+          ),
       ],
     );
   }
