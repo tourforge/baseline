@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:opentourguide/src/download_manager.dart';
 
 import '../models/data.dart';
@@ -66,27 +67,31 @@ class _TourDetailsState extends State<TourDetails>
       );
     }
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: DetailsScreenHeaderDelegate(
-              tickerProvider: this,
-              gallery: widget.tour.gallery,
-              title: widget.tour.name,
-              action: action,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: DetailsScreenHeaderDelegate(
+                tickerProvider: this,
+                gallery: widget.tour.gallery,
+                title: widget.tour.name,
+                action: action,
+              ),
             ),
-          ),
-          SliverToBoxAdapter(child: DetailsDescription(desc: widget.tour.desc)),
-          const SliverToBoxAdapter(
-            child: DetailsHeader(
-              title: "Tour Stops",
+            SliverToBoxAdapter(
+                child: DetailsDescription(desc: widget.tour.desc)),
+            const SliverToBoxAdapter(
+              child: DetailsHeader(
+                title: "Tour Stops",
+              ),
             ),
-          ),
-          _WaypointList(tour: widget.tour),
-          const SliverToBoxAdapter(child: SizedBox(height: 6)),
-        ],
+            _WaypointList(tour: widget.tour),
+            const SliverToBoxAdapter(child: SizedBox(height: 6)),
+          ],
+        ),
       ),
     );
   }
