@@ -126,7 +126,10 @@ class TourNotDownloadedWarning extends StatelessWidget {
           Text(
             "You can view information about this tour before downloading it, but "
             "the tour must be fully downloaded before use.",
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge!
+                .copyWith(color: Colors.white),
           ),
         ],
       ),
