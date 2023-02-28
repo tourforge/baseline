@@ -17,7 +17,7 @@ class AssetImage extends ImageProvider<FileImage> {
       return _fileImage.obtainKey(configuration);
     } else {
       return (() async {
-        await DownloadManager.instance.download(_asset.name).file;
+        await DownloadManager.instance.download(_asset).file;
 
         return _fileImage.obtainKey(configuration);
       })();

@@ -4,7 +4,10 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:opentourguide/src/models/data.dart';
 import 'package:path/path.dart' as p;
+
+class DownloadFailedException implements Exception {}
 
 class DownloadManager {
   DownloadManager(this.localBaseFut, this.networkBaseFut) {
@@ -32,11 +35,11 @@ class DownloadManager {
   /// is actually downloaded.
   bool cachedIsDownloaded(String path) => _downloadedAssetNames.contains(path);
 
-  MultiDownload downloadAll(Iterable<String> paths,
+  MultiDownload downloadAll(Iterable<AssetModel> assets,
       [Sink<DownloadProgress>? downloadProgress]) {
     var downloads = <Download>[];
-    for (final path in HashSet<String>.from(paths)) {
-      downloads.add(download(path));
+    for (final asset in HashSet<AssetModel>.from(assets)) {
+      downloads.add(download(asset));
     }
 
     return MultiDownload.of(downloads);
@@ -45,25 +48,27 @@ class DownloadManager {
   /// Downloads the asset with the given `path`. If there is already a download
   /// in progress for that asset, that download object is returned. Retries with
   /// exponential backoff in the case of network error.
-  Download download(String path, {bool reDownload = false}) {
-    var currentDownload = _currentDownloads[path];
+  Download download(AssetModel asset, {bool reDownload = false}) {
+    var name = asset.name;
+
+    var currentDownload = _currentDownloads[name];
     if (currentDownload != null) return currentDownload;
 
     final downloadProgress = StreamController<DownloadProgress>.broadcast();
 
-    return _currentDownloads[path] = Download(
+    return _currentDownloads[name] = Download(
       downloadProgress: downloadProgress.stream,
       file: (() async {
         await Future.wait([localBaseFut, networkBaseFut]);
 
-        var srcUri = Uri.parse("$networkBase/$path");
-        var outDir = p.dirname("$localBase/$path");
-        var outPath = "$localBase/$path";
-        var partPath = "$localBase/$path.part";
+        var srcUri = Uri.parse("$networkBase/$name");
+        var outDir = p.dirname("$localBase/$name");
+        var outPath = "$localBase/$name";
+        var partPath = "$localBase/$name.part";
 
         // don't redownload if it's unnecessary
         if (!reDownload && await File(outPath).exists()) {
-          _markDownloaded(path);
+          _markDownloaded(name);
 
           await downloadProgress.close();
           return File(outPath);
@@ -87,16 +92,24 @@ class DownloadManager {
             await downloadProgress.close();
             await File(partPath).rename(outPath);
 
-            _markDownloaded(path);
+            _markDownloaded(name);
 
             return File(outPath);
           } on Exception catch (e) {
+            if (e is DownloadFailedException) {
+              if (asset.required) {
+                rethrow;
+              } else {
+                return File(outPath);
+              }
+            }
+
             // exponential backoff: wait 0ms, then 500ms, then 1000ms, then 2000ms...
             // also multiply by random coefficient to prevent making lots of requests
             // at the same time when lots of requests fail at the same time
             retryIn = ((rng.nextDouble() + 0.5) * 500 * pow(2, i)).toInt();
             _printDebug(
-                "Download of $path failed. Retrying in ${retryIn}ms... Context: $e");
+                "Download of $name failed. Retrying in ${retryIn}ms... Context: $e");
           }
         }
       })(),
@@ -108,6 +121,11 @@ class DownloadManager {
     var client = HttpClient();
     var req = await client.getUrl(srcUri);
     var resp = await req.close();
+
+    if (resp.statusCode != 200) {
+      throw DownloadFailedException();
+    }
+
     var totalDownloadSize =
         resp.contentLength != -1 ? resp.contentLength : null;
 

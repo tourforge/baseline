@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
 import 'package:path/path.dart' as p;
@@ -19,8 +18,8 @@ class TourIndex {
   final List<TourIndexEntry> tours;
 
   static Future<TourIndex> load() async {
-    var download =
-        DownloadManager.instance.download("index.json", reDownload: true);
+    var download = DownloadManager.instance
+        .download(AssetModel._("index.json"), reDownload: true);
     var indexJsonFile = await download.file;
     return _parse(jsonDecode(await indexJsonFile.readAsString()));
   }
@@ -51,7 +50,8 @@ class TourIndexEntry {
   final String _contentPath;
 
   Future<TourModel> loadDetails() async {
-    var download = DownloadManager.instance.download(_contentPath);
+    var download =
+        DownloadManager.instance.download(AssetModel._(_contentPath));
     var tourJsonFile = await download.file;
     var tourJson = await tourJsonFile.readAsString();
     return TourModel._parse(_contentPath, jsonDecode(tourJson));
@@ -96,7 +96,8 @@ class TourModel {
   final List<LatLng> path;
   final AssetModel tiles;
 
-  Iterable<AssetModel> get allAssets => HashSet<AssetModel>.from(_allAssets());
+  Iterable<AssetModel> get allAssets =>
+      HashSet<AssetModel>.from(_allAssets().followedBy(_allAssets()));
 
   Future<bool> isFullyDownloaded() async {
     for (final asset in allAssets) {
@@ -108,10 +109,14 @@ class TourModel {
 
   Iterable<AssetModel> _allAssets() sync* {
     yield* gallery;
+    yield* gallery
+        .map((a) => AssetModel._("${a.name}.meta.json", required: false));
     yield tiles;
 
     for (final waypoint in waypoints) {
       yield* waypoint.gallery;
+      yield* waypoint.gallery
+          .map((a) => AssetModel._("${a.name}.meta.json", required: false));
 
       if (waypoint.narration != null) {
         yield waypoint.narration!;
@@ -120,6 +125,8 @@ class TourModel {
 
     for (final poi in pois) {
       yield* poi.gallery;
+      yield* poi.gallery
+          .map((a) => AssetModel._("${a.name}.meta.json", required: false));
     }
   }
 }
@@ -185,11 +192,24 @@ class PoiModel {
 }
 
 class AssetModel {
-  AssetModel._(this.name);
+  AssetModel._(this.name, {this.required = true});
 
   final String name;
+  final bool required;
 
-  Future<AssetMeta?> get meta async {}
+  Future<AssetMeta?> get meta async {
+    var metaModel = AssetModel._("$name.meta.json", required: false);
+    var metaFile = await DownloadManager.instance.download(metaModel).file;
+
+    if (await metaFile.exists()) {
+      var metaText = await metaFile.readAsString();
+      var metaJson = jsonDecode(metaText);
+      return AssetMeta._parse(metaJson);
+    } else {
+      return null;
+    }
+  }
+
   String get localPath => p.join(DownloadManager.instance.localBase, name);
   File get downloadedFile => File(localPath);
   Future<bool> get isDownloaded async => await File(localPath).exists();

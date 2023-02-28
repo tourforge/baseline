@@ -267,7 +267,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
       if (!shouldDownload || !mounted) return;
 
       var download = DownloadManager.instance.downloadAll(
-        widget.tour.allAssets.map((a) => a.name),
+        widget.tour.allAssets,
         _CallbackSink((progress) {
           _downloadProgress.value = progress.downloadedSize.toDouble() /
               (progress.totalDownloadSize ?? 0).toDouble();
