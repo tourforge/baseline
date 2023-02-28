@@ -21,21 +21,25 @@ class TourDetails extends StatefulWidget {
 
 class _TourDetailsState extends State<TourDetails>
     with SingleTickerProviderStateMixin {
+  bool _isLoaded = false;
   bool _isFullyDownloaded = false;
 
   @override
   void initState() {
     super.initState();
 
-    widget.tour
-        .isFullyDownloaded()
-        .then((value) => setState(() => _isFullyDownloaded = value));
+    widget.tour.isFullyDownloaded().then((value) => setState(() {
+          _isLoaded = true;
+          _isFullyDownloaded = value;
+        }));
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget action;
-    if (_isFullyDownloaded) {
+    Widget? action;
+    if (!_isLoaded) {
+      action = null;
+    } else if (_isFullyDownloaded) {
       action = ElevatedButton(
         onPressed: () {
           Navigator.of(context).push(NavigationRoute(widget.tour));
@@ -81,7 +85,7 @@ class _TourDetailsState extends State<TourDetails>
                 action: action,
               ),
             ),
-            if (!_isFullyDownloaded)
+            if (_isLoaded && !_isFullyDownloaded)
               const SliverToBoxAdapter(child: TourNotDownloadedWarning()),
             SliverToBoxAdapter(
                 child: DetailsDescription(desc: widget.tour.desc)),

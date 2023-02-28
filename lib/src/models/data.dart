@@ -101,7 +101,7 @@ class TourModel {
 
   Future<bool> isFullyDownloaded() async {
     for (final asset in allAssets) {
-      if (!await asset.isDownloaded) return false;
+      if (asset.required && !await asset.isDownloaded) return false;
     }
 
     return true;
