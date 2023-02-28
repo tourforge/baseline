@@ -166,7 +166,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
       for (final asset in widget.tour.allAssets) {
         var isDownloaded = await asset.isDownloaded;
 
-        if (!isDownloaded) {
+        if (!isDownloaded && asset.required) {
           allDownloaded = false;
 
           var downloadInProgress =
