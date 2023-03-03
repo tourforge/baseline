@@ -1909,6 +1909,7 @@
         "text-offset": [0, 0.6],
         "text-padding": 2,
         "text-size": 12,
+        "text-optional": true,
         "visibility": "visible"
       },
       "paint": {
@@ -1940,6 +1941,7 @@
         "text-offset": [0, 0.6],
         "text-padding": 2,
         "text-size": 12,
+        "text-optional": true,
         "visibility": "visible"
       },
       "paint": {
@@ -1971,6 +1973,7 @@
         "text-offset": [0, 0.6],
         "text-padding": 2,
         "text-size": 12,
+        "text-optional": true,
         "visibility": "visible"
       },
       "paint": {

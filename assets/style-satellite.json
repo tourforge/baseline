@@ -575,7 +575,7 @@
         "text-halo-color": "#000000",
         "text-translate": [0, 0],
         "text-halo-blur": 0,
-        "text-halo-width": 2
+        "text-halo-width": 1.25
       }
     },
     {
@@ -841,14 +841,15 @@
         "text-font": ["Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [0, 0.6],
-        "text-padding": 2,
+        "text-padding": 12,
         "text-size": 12,
+        "text-optional": true,
         "visibility": "visible"
       },
       "paint": {
         "text-color": "#ffffff",
         "text-halo-color": "#000000",
-        "text-halo-width": 1.5
+        "text-halo-width": 1
       }
     },
     {
@@ -871,14 +872,15 @@
         "text-font": ["Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [0, 0.6],
-        "text-padding": 2,
-        "text-size": 13,
+        "text-padding": 12,
+        "text-size": 12,
+        "text-optional": true,
         "visibility": "visible"
       },
       "paint": {
         "text-color": "#ffffff",
         "text-halo-color": "#000000",
-        "text-halo-width": 1.5
+        "text-halo-width": 1
       }
     },
     {
@@ -901,15 +903,16 @@
         "text-font": ["Noto Sans Bold"],
         "text-max-width": 9,
         "text-offset": [0, 0.6],
-        "text-padding": 2,
-        "text-size": 13,
+        "text-padding": 12,
+        "text-size": 12,
+        "text-optional": true,
         "visibility": "visible",
         "text-allow-overlap": false
       },
       "paint": {
         "text-color": "#ffffff",
         "text-halo-color": "#000000",
-        "text-halo-width": 1.5
+        "text-halo-width": 1
       }
     },
     {
@@ -988,7 +991,7 @@
       "paint": {
         "text-color": "#ffffff",
         "text-halo-color": "#000000",
-        "text-halo-width": 1.5
+        "text-halo-width": 1.25
       }
     },
     {
@@ -1008,7 +1011,7 @@
       "paint": {
         "text-color": "#ffffff",
         "text-halo-color": "#000000",
-        "text-halo-width": 1.5
+        "text-halo-width": 1.25
       }
     },
     {
@@ -1370,8 +1373,8 @@
         "text-field": ["get", "name"],
         "text-font": ["Noto Sans Bold"],
         "text-max-width": 9,
-        "text-padding": 2,
-        "text-size": 13,
+        "text-padding": 12,
+        "text-size": 12,
         "text-anchor": "top",
         "text-offset": [0, 0.1],
         "text-ignore-placement": true,
@@ -1384,7 +1387,7 @@
       "paint": {
         "text-color": "#ffffff",
         "text-halo-color": "#000000",
-        "text-halo-width": 1.5
+        "text-halo-width": 1
       }
     },
     {
