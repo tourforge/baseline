@@ -8,11 +8,12 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-import '/src/config.dart';
-import '/src/controllers/narration_playback.dart';
-import '/src/download_manager.dart';
+import 'src/asset_garbage_collector.dart';
+import 'src/config.dart';
+import 'src/controllers/narration_playback.dart';
+import 'src/download_manager.dart';
 
-export '/src/config.dart' show OtbGuideAppConfig;
+export 'src/config.dart' show OtbGuideAppConfig;
 export 'src/screens/tour_list.dart' show TourList;
 
 Future<void> otbGuideInit(OtbGuideAppConfig withAppConfig) async {
@@ -24,8 +25,11 @@ Future<void> otbGuideInit(OtbGuideAppConfig withAppConfig) async {
   }
 
   DownloadManager.instance = DownloadManager(
-    getApplicationSupportDirectory()
-        .then((appSuppDir) => p.join(appSuppDir.path, "tours")),
+    getApplicationSupportDirectory().then((appSuppDir) {
+      var base = p.join(appSuppDir.path, "tours");
+      AssetGarbageCollector.base = base;
+      return base;
+    }),
     Future.value("https://fsrv.fly.dev/v2"),
   );
 

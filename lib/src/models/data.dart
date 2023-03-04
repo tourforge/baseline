@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:latlong2/latlong.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
+import 'package:opentourguide/src/asset_garbage_collector.dart';
 import 'package:path/path.dart' as p;
 
 import '../asset_image.dart';
@@ -21,10 +22,11 @@ class TourIndex {
     var download = DownloadManager.instance
         .download(AssetModel._("index.json"), reDownload: true);
     var indexJsonFile = await download.file;
-    return _parse(jsonDecode(await indexJsonFile.readAsString()));
+    AssetGarbageCollector.run();
+    return parse(jsonDecode(await indexJsonFile.readAsString()));
   }
 
-  static TourIndex _parse(dynamic json) => TourIndex._(
+  static TourIndex parse(dynamic json) => TourIndex._(
         tours: List.unmodifiable(
           ((json as Map<String, dynamic>)["tours"] as List<dynamic>)
               .map((e) => TourIndexEntry._parse(e)),
@@ -36,25 +38,24 @@ class TourIndexEntry {
   TourIndexEntry._({
     required this.name,
     required this.thumbnail,
-    required String contentPath,
-  }) : _contentPath = contentPath;
+    required this.content,
+  });
 
   static TourIndexEntry _parse(dynamic json) => TourIndexEntry._(
         name: json["name"]! as String,
         thumbnail: AssetModel._(json["thumbnail"]),
-        contentPath: json["content"]! as String,
+        content: AssetModel._(json["content"]),
       );
 
   final String name;
   final AssetModel? thumbnail;
-  final String _contentPath;
+  final AssetModel content;
 
   Future<TourModel> loadDetails() async {
-    var download =
-        DownloadManager.instance.download(AssetModel._(_contentPath));
+    var download = DownloadManager.instance.download(content);
     var tourJsonFile = await download.file;
     var tourJson = await tourJsonFile.readAsString();
-    return TourModel._parse(_contentPath, jsonDecode(tourJson));
+    return TourModel.parse(content.name, jsonDecode(tourJson));
   }
 }
 
@@ -71,7 +72,7 @@ class TourModel {
     required this.links,
   });
 
-  static TourModel _parse(String path, dynamic json) => TourModel._(
+  static TourModel parse(String path, dynamic json) => TourModel._(
         id: path,
         name: json["name"]! as String,
         desc: json["desc"]! as String,
