@@ -22,31 +22,34 @@ class CollapsibleSectionState extends State<CollapsibleSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Material(
-          type: MaterialType.card,
-          child: InkWell(
-            onTap: () {
-              setState(() => _expanded = !_expanded);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.title,
-                      style: Theme.of(context).textTheme.headlineSmall,
+        SizedBox(
+          height: 64,
+          child: Material(
+            type: MaterialType.card,
+            child: InkWell(
+              onTap: () {
+                setState(() => _expanded = !_expanded);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.title,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
                     ),
-                  ),
-                  AnimatedRotation(
-                    turns: _expanded ? -0.5 : 0,
-                    duration: const Duration(milliseconds: 192),
-                    child: const Icon(
-                      size: 32,
-                      Icons.expand_more,
+                    AnimatedRotation(
+                      turns: _expanded ? -0.5 : 0,
+                      duration: const Duration(milliseconds: 192),
+                      child: const Icon(
+                        size: 32,
+                        Icons.expand_more,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -68,6 +68,7 @@ class TourModel {
     required this.pois,
     required this.path,
     required this.tiles,
+    required this.links,
   });
 
   static TourModel _parse(String path, dynamic json) => TourModel._(
@@ -85,6 +86,10 @@ class TourModel {
         path: List.unmodifiable(mtk.PolygonUtil.decode(json["path"]! as String)
             .map((e) => LatLng(e.latitude, e.longitude))),
         tiles: AssetModel._(json["tiles"]),
+        links: json["links"] != null
+            ? (json["links"] as Map<String, dynamic>)
+                .map((key, value) => MapEntry(key, LinkModel._parse(value)))
+            : {},
       );
 
   final String id;
@@ -95,6 +100,7 @@ class TourModel {
   final List<PoiModel> pois;
   final List<LatLng> path;
   final AssetModel tiles;
+  final Map<String, LinkModel> links;
 
   Iterable<AssetModel> get allAssets =>
       HashSet<AssetModel>.from(_allAssets().followedBy(_allAssets()));
@@ -141,6 +147,7 @@ class WaypointModel {
     required this.narration,
     required this.transcript,
     required this.gallery,
+    required this.links,
   });
 
   static WaypointModel _parse(dynamic json) => WaypointModel._(
@@ -154,6 +161,10 @@ class WaypointModel {
         transcript: json["transcript"] as String?,
         gallery: List<AssetModel>.unmodifiable(
             (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
+        links: json["links"] != null
+            ? (json["links"] as Map<String, dynamic>)
+                .map((key, value) => MapEntry(key, LinkModel._parse(value)))
+            : {},
       );
 
   final String name;
@@ -164,6 +175,7 @@ class WaypointModel {
   final AssetModel? narration;
   final String? transcript;
   final List<AssetModel> gallery;
+  final Map<String, LinkModel> links;
 }
 
 class PoiModel {
@@ -173,6 +185,7 @@ class PoiModel {
     required this.lat,
     required this.lng,
     required this.gallery,
+    required this.links,
   });
 
   static PoiModel _parse(dynamic json) => PoiModel._(
@@ -182,6 +195,10 @@ class PoiModel {
         lng: json["lng"]! as double,
         gallery: List<AssetModel>.unmodifiable(
             (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
+        links: json["links"] != null
+            ? (json["links"] as Map<String, dynamic>)
+                .map((key, value) => MapEntry(key, LinkModel._parse(value)))
+            : {},
       );
 
   final String name;
@@ -189,6 +206,19 @@ class PoiModel {
   final double lat;
   final double lng;
   final List<AssetModel> gallery;
+  final Map<String, LinkModel> links;
+}
+
+class LinkModel {
+  LinkModel._({
+    required this.href,
+  });
+
+  static LinkModel _parse(dynamic json) => LinkModel._(
+        href: json["href"]! as String,
+      );
+
+  final String href;
 }
 
 class AssetModel {

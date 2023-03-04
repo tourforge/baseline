@@ -4,8 +4,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:opentourguide/src/models/data.dart';
 import 'package:path/path.dart' as p;
+
+import 'models/data.dart';
 
 class DownloadFailedException implements Exception {}
 

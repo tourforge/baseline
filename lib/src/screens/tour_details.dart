@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:opentourguide/src/download_manager.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../download_manager.dart';
 import '../models/data.dart';
+import '../widgets/details_button.dart';
 import '../widgets/details_description.dart';
 import '../widgets/details_header.dart';
 import '../widgets/details_screen_header_delegate.dart';
@@ -95,6 +97,20 @@ class _TourDetailsState extends State<TourDetails>
               ),
             ),
             _WaypointList(tour: widget.tour),
+            for (final entry in widget.tour.links.entries)
+              SliverPadding(
+                padding: const EdgeInsets.only(top: 8.0),
+                sliver: SliverToBoxAdapter(
+                  child: DetailsButton(
+                    icon: Icons.link,
+                    title: entry.key,
+                    onPressed: () {
+                      launchUrl(Uri.parse(entry.value.href),
+                          mode: LaunchMode.externalApplication);
+                    },
+                  ),
+                ),
+              ),
             const SliverToBoxAdapter(child: SizedBox(height: 6)),
           ],
         ),

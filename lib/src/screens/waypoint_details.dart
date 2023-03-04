@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/data.dart';
 import '../widgets/collapsible_section.dart';
+import '../widgets/details_button.dart';
 import '../widgets/details_description.dart';
 import '../widgets/details_screen_header_delegate.dart';
 
@@ -67,6 +69,20 @@ class _WaypointDetailsState extends State<WaypointDetails>
                       header: null,
                       desc: widget.waypoint.transcript!,
                     ),
+                  ),
+                ),
+              ),
+            for (final entry in widget.waypoint.links.entries)
+              SliverPadding(
+                padding: const EdgeInsets.only(top: 8.0),
+                sliver: SliverToBoxAdapter(
+                  child: DetailsButton(
+                    icon: Icons.link,
+                    title: entry.key,
+                    onPressed: () {
+                      launchUrl(Uri.parse(entry.value.href),
+                          mode: LaunchMode.externalApplication);
+                    },
                   ),
                 ),
               ),
