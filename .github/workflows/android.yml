@@ -31,6 +31,7 @@ jobs:
     - run: flutter pub get
       working-directory: ./example
     - run: echo "${{ secrets.MAPTILER_KEY }}" > assets/maptiler.txt
+      working-directory: ./example
     - run: flutter build apk
       working-directory: ./example
     - run: flutter build appbundle
