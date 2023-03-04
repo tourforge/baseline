@@ -141,6 +141,13 @@ class _MapLibreMapState extends State<MapLibreMap> {
       stylePath = p.join((await getTemporaryDirectory()).path, "style.json");
       satStylePath =
           p.join((await getTemporaryDirectory()).path, "style-satellite.json");
+      final fontsBasePath =
+          p.join((await getTemporaryDirectory()).path, "fonts");
+      final notoRegularPath =
+          p.join(fontsBasePath, "Noto Sans Regular", "0-255.pbf");
+      final notoBoldPath = p.join(fontsBasePath, "Noto Sans Bold", "0-255.pbf");
+      final notoItalicPath =
+          p.join(fontsBasePath, "Noto Sans Italic", "0-255.pbf");
 
       if (!mounted) return satStylePath;
       var assetBundle = DefaultAssetBundle.of(context);
@@ -149,7 +156,6 @@ class _MapLibreMapState extends State<MapLibreMap> {
           await assetBundle.loadString('$assetPrefix/assets/style.json');
       var satStyleText = await assetBundle
           .loadString('$assetPrefix/assets/style-satellite.json');
-      var key = await assetBundle.loadString('assets/maptiler.txt');
       var tomtomKey = await assetBundle.loadString('assets/tomtom.txt');
       var spritePng = await assetBundle.load('$assetPrefix/assets/sprite.png');
       var spriteJson =
@@ -166,12 +172,18 @@ class _MapLibreMapState extends State<MapLibreMap> {
           await assetBundle.load('$assetPrefix/assets/sprite-satellite@2x.png');
       var spriteSat2xJson = await assetBundle
           .loadString('$assetPrefix/assets/sprite-satellite@2x.json');
+      var notoRegular = await assetBundle
+          .load('$assetPrefix/assets/fonts/Noto Sans Regular/0-255.pbf');
+      var notoBold = await assetBundle
+          .load('$assetPrefix/assets/fonts/Noto Sans Bold/0-255.pbf');
+      var notoItalic = await assetBundle
+          .load('$assetPrefix/assets/fonts/Noto Sans Italic/0-255.pbf');
 
       var style = jsonDecode(styleText);
       var satStyle = jsonDecode(satStyleText);
 
-      satStyle["glyphs"] = style["glyphs"] =
-          "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=$key";
+      satStyle["glyphs"] =
+          style["glyphs"] = "file://$fontsBasePath/{fontstack}/{range}.pbf";
       satStyle["sprite"] = "file://$spriteSatPath";
       style["sprite"] = "file://$spritePath";
       satStyle["sources"]["openmaptiles"]["url"] = style["sources"]
@@ -196,6 +208,13 @@ class _MapLibreMapState extends State<MapLibreMap> {
       await File("$spriteSatPath@2x.json").writeAsString(spriteSat2xJson);
       await File(stylePath).writeAsString(styleText);
       await File(satStylePath).writeAsString(satStyleText);
+      await Directory(p.dirname(notoRegularPath)).create(recursive: true);
+      await File(notoRegularPath)
+          .writeAsBytes(notoRegular.buffer.asUint8List());
+      await Directory(p.dirname(notoBoldPath)).create(recursive: true);
+      await File(notoBoldPath).writeAsBytes(notoBold.buffer.asUint8List());
+      await Directory(p.dirname(notoItalicPath)).create(recursive: true);
+      await File(notoItalicPath).writeAsBytes(notoItalic.buffer.asUint8List());
     } catch (e) {
       if (kDebugMode) {
         print(e);

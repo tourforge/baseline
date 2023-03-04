@@ -110,6 +110,9 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
     - assets/
+    - assets/fonts/Noto Sans Regular/
+    - assets/fonts/Noto Sans Bold/
+    - assets/fonts/Noto Sans Italic/
 
   plugin:
     platforms:
