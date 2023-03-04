@@ -32,6 +32,8 @@ jobs:
       working-directory: ./example
     - run: echo "${{ secrets.MAPTILER_KEY }}" > assets/maptiler.txt
       working-directory: ./example
+    - run: touch assets/tomtom.txt
+      working-directory: ./example
     - run: flutter build apk
       working-directory: ./example
     - run: flutter build appbundle
