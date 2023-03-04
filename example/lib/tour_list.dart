@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../config.dart';
-import '../models/data.dart';
-import '../screens/about.dart';
-import '../screens/tour_details.dart';
-import '../widgets/asset_image_builder.dart';
+import 'package:opentourguide/opentourguide.dart';
 
 class TourList extends StatefulWidget {
   const TourList({super.key});
@@ -27,7 +23,7 @@ class _TourListState extends State<TourList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(appConfig.appName),
+        title: const Text("OpenTourGuide"),
         actions: [
           PopupMenuButton(
             icon: Icon(

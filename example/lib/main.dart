@@ -3,11 +3,14 @@ import 'package:flutter/scheduler.dart';
 import 'package:opentourguide/opentourguide.dart';
 import 'package:opentourguide/theme.dart';
 
+import 'tour_list.dart';
+
 Future<void> main() async {
   await otbGuideInit(const OtbGuideAppConfig(
     appName: "OpenTourGuide",
     appDesc:
         '''OpenTourGuide is the example app for the OpenTourBuilder Guide library.''',
+    baseUrl: "https://fsrv.fly.dev/v2",
   ));
   runApp(const OtbGuideApp());
 }
