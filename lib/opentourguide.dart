@@ -15,6 +15,7 @@ import 'src/download_manager.dart';
 
 export 'src/asset_image.dart' show AssetImage;
 export 'src/config.dart' show OtbGuideAppConfig;
+export 'src/location.dart' show requestGpsPermissions;
 export 'src/models/data.dart';
 export 'src/screens/about.dart' show About;
 export 'src/screens/tour_details.dart' show TourDetails;

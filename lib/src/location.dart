@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
-Future<Stream<LatLng>?> getLocationStream(BuildContext context) async {
+Future<bool> requestGpsPermissions(BuildContext context) async {
   if (!await Geolocator.isLocationServiceEnabled()) {
+    if (!context.mounted) return false;
     showDialog(
       context: context,
       builder: (context) {
@@ -25,13 +26,14 @@ Future<Stream<LatLng>?> getLocationStream(BuildContext context) async {
       },
     );
 
-    return null;
+    return false;
   }
 
   var permission = await Geolocator.requestPermission();
   if (permission == LocationPermission.denied) {
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.denied) {
+      if (!context.mounted) return false;
       showDialog(
         context: context,
         builder: (context) {
@@ -53,11 +55,12 @@ Future<Stream<LatLng>?> getLocationStream(BuildContext context) async {
         },
       );
 
-      return null;
+      return false;
     }
   }
 
   if (permission == LocationPermission.deniedForever) {
+    if (!context.mounted) return false;
     showDialog(
       context: context,
       builder: (context) {
@@ -79,10 +82,18 @@ Future<Stream<LatLng>?> getLocationStream(BuildContext context) async {
         );
       },
     );
-
-    return null;
   }
 
-  return Geolocator.getPositionStream()
-      .map((pos) => LatLng(pos.latitude, pos.longitude));
+  return true;
+}
+
+Future<Stream<LatLng>?> getLocationStream(BuildContext context) async {
+  if (!context.mounted) return null;
+
+  if (await requestGpsPermissions(context)) {
+    return Geolocator.getPositionStream()
+        .map((pos) => LatLng(pos.latitude, pos.longitude));
+  } else {
+    return null;
+  }
 }
