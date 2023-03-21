@@ -52,7 +52,7 @@ dependencies:
   just_audio: ^0.9.30
   audio_service: ^0.18.7
   audio_session: ^0.1.13
-  image: ^4.0.14
+  image: ^4.0.15
   wakelock: ^0.6.2
 
 dev_dependencies:
