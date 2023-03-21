@@ -4,6 +4,7 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_dragmarker/dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:wakelock/wakelock.dart';
 
 import '../../models/current_location.dart';
 import '../../models/data.dart';
@@ -58,6 +59,7 @@ class NavigationMapState extends State<NavigationMap> {
   @override
   void initState() {
     super.initState();
+    Wakelock.enable();
     widget.controller._state = this;
 
     var currentLocation = context.read<CurrentLocationModel>();
@@ -73,6 +75,7 @@ class NavigationMapState extends State<NavigationMap> {
   @override
   void dispose() {
     removeListeners();
+    Wakelock.disable();
     super.dispose();
   }
 
