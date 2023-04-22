@@ -1369,6 +1369,7 @@
       "id": "pois_symbol_layer",
       "type": "symbol",
       "source": "tour_pois",
+      "minzoom": 14,
       "layout": {
         "text-field": ["get", "name"],
         "text-font": ["Noto Sans Bold"],
@@ -1394,6 +1395,7 @@
       "id": "tour_points_symbol_layer",
       "type": "symbol",
       "source": "tour_points",
+      "minzoom": 14,
       "layout": {
         "text-field": ["get", "number"],
         "text-font": ["Noto Sans Bold"],
@@ -1407,6 +1409,29 @@
       },
       "paint": {
         "text-color": "#ffdddd"
+      }
+    },
+    {
+      "id": "mini_pois_symbol_layer",
+      "type": "symbol",
+      "source": "tour_pois",
+      "maxzoom": 14,
+      "layout": {
+        "icon-image": "poi-mini",
+        "icon-anchor": "bottom",
+        "icon-allow-overlap": true,
+        "visibility": "visible"
+      }
+    },
+    {
+      "id": "mini_tour_points_symbol_layer",
+      "type": "symbol",
+      "source": "tour_points",
+      "maxzoom": 14,
+      "layout": {
+        "icon-image": "waypoint-mini",
+        "icon-anchor": "bottom",
+        "icon-allow-overlap": true
       }
     },
     {
