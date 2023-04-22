@@ -719,5 +719,19 @@
     "height": 98,
     "x": 505,
     "y": 215
+  },
+  "waypoint-mini": {
+    "pixelRatio": 2,
+    "width": 38,
+    "height": 48,
+    "x": 621,
+    "y": 163
+  },
+  "poi-mini": {
+    "pixelRatio": 2,
+    "width": 38,
+    "height": 48,
+    "x": 565,
+    "y": 163
   }
 }
