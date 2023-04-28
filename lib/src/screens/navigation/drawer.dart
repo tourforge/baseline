@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../theme.dart';
+import '../../config.dart';
 import '../../models/current_waypoint.dart';
 import '../../models/data.dart';
 import '../../widgets/waypoint_card.dart';
@@ -93,7 +93,7 @@ class TourNavigationDrawerState extends State<TourNavigationDrawer>
               child: SizedBox(
                 height: _innerSize,
                 child: Theme(
-                  data: darkThemeData,
+                  data: appConfig.darkThemeData,
                   child: Material(
                     child: OverflowBox(
                       child: Column(
