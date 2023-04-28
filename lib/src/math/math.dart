@@ -36,17 +36,6 @@ double pointDistanceToGeoSegment(LatLng l1, LatLng l2, LatLng p) {
 LatLng averagePoint(Iterable<LatLng> points) =>
     points.map((p) => p.toVec3()).reduce((a, b) => a + b).toLatLng();
 
-GeoBox pathGeoBox(Iterable<LatLng> points) {
-  return const GeoBox(0, 0);
-}
-
-class GeoBox {
-  const GeoBox(this.width, this.height);
-
-  final double width;
-  final double height;
-}
-
 class Vec3 {
   Vec3(this.x, this.y, this.z);
 
