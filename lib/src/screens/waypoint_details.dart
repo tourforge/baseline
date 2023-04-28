@@ -32,7 +32,8 @@ class _WaypointDetailsState extends State<WaypointDetails>
                 tickerProvider: this,
                 gallery: widget.waypoint.gallery,
                 title: widget.waypoint.name,
-                action: ElevatedButton(
+                action: null,
+                /*action: ElevatedButton(
                   onPressed: () {},
                   style: ButtonStyle(
                     backgroundColor: MaterialStatePropertyAll(
@@ -53,7 +54,7 @@ class _WaypointDetailsState extends State<WaypointDetails>
                       SizedBox(width: 12.0),
                     ],
                   ),
-                ),
+                ),*/
               ),
             ),
             SliverToBoxAdapter(
