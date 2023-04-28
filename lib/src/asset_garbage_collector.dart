@@ -32,7 +32,7 @@ class AssetGarbageCollector {
 
       for (var tourEntry in index.tours) {
         if (tourEntry.thumbnail != null) {
-          usedAssets.add(tourEntry.thumbnail!.localPath);
+          usedAssets.add(tourEntry.thumbnail!.name);
         }
 
         if (await File("$base/${tourEntry.content.name}").exists()) {

@@ -19,10 +19,28 @@ class TourIndex {
   final List<TourIndexEntry> tours;
 
   static Future<TourIndex> load() async {
-    var download = DownloadManager.instance
-        .download(AssetModel._("index.json"), reDownload: true);
-    var indexJsonFile = await download.file;
+    var indexJsonFile = AssetModel._("index.json").downloadedFile;
+    var preexistingIndexExists = await indexJsonFile.exists();
+
+    var download = DownloadManager.instance.download(
+      AssetModel._("index.json"),
+      reDownload: true,
+      maxRetries: preexistingIndexExists ? 3 : null,
+    );
+
+    try {
+      indexJsonFile = await download.file;
+    } on DownloadFailedException {
+      if (preexistingIndexExists) {
+        // don't care, continue executing since we have the preexisting file
+      } else {
+        // this is an unexpected error
+        rethrow;
+      }
+    }
+
     AssetGarbageCollector.run();
+
     return parse(jsonDecode(await indexJsonFile.readAsString()));
   }
 

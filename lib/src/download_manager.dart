@@ -49,7 +49,8 @@ class DownloadManager {
   /// Downloads the asset with the given `path`. If there is already a download
   /// in progress for that asset, that download object is returned. Retries with
   /// exponential backoff in the case of network error.
-  Download download(AssetModel asset, {bool reDownload = false}) {
+  Download download(AssetModel asset,
+      {bool reDownload = false, int? maxRetries}) {
     var name = asset.name;
 
     var currentDownload = _currentDownloads[name];
@@ -80,7 +81,7 @@ class DownloadManager {
 
         final rng = Random();
         var retryIn = 0;
-        for (var i = 0;; i++) {
+        for (var i = 0; maxRetries != null ? i < maxRetries : true; i++) {
           if (retryIn > 0) {
             await Future.delayed(Duration(milliseconds: retryIn));
           }
@@ -113,6 +114,8 @@ class DownloadManager {
                 "Download of $name failed. Retrying in ${retryIn}ms... Context: $e");
           }
         }
+
+        throw DownloadFailedException();
       })(),
     );
   }
