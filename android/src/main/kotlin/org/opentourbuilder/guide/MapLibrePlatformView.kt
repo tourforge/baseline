@@ -90,6 +90,9 @@ class MapLibrePlatformView(
     ) {
         this.map = map
 
+        map.uiSettings.isRotateGesturesEnabled = false
+        map.uiSettings.isTiltGesturesEnabled = false
+
         map.cameraPosition = CameraPosition.Builder()
             .target(LatLng(lat, lng))
             .zoom(zoom - 1)
