@@ -35,14 +35,16 @@ class AssetGarbageCollector {
           usedAssets.add(tourEntry.thumbnail!.localPath);
         }
 
-        usedAssets.add(tourEntry.content.name);
+        if (await File("$base/${tourEntry.content.name}").exists()) {
+          usedAssets.add(tourEntry.content.name);
 
-        var tour = TourModel.parse(
-            "$base/${tourEntry.content.name}",
-            jsonDecode(
-                await File("$base/${tourEntry.content.name}").readAsString()));
+          var tour = TourModel.parse(
+              "$base/${tourEntry.content.name}",
+              jsonDecode(await File("$base/${tourEntry.content.name}")
+                  .readAsString()));
 
-        usedAssets.addAll(tour.allAssets.map((e) => e.name));
+          usedAssets.addAll(tour.allAssets.map((e) => e.name));
+        }
       }
 
       await for (var entry in Directory(base).list()) {
@@ -50,12 +52,20 @@ class AssetGarbageCollector {
           if (kDebugMode) {
             print("Asset garbage collector is deleting a file: ${entry.path}");
           }
-          await entry.delete();
+          try {
+            await entry.delete();
+          } catch (e, stack) {
+            if (kDebugMode) {
+              print("Error while deleting suspected garbage: $e");
+              print("Garbage collection error stack trace: $stack");
+              print("Continuing...");
+            }
+          }
         }
       }
     } catch (e, stack) {
       if (kDebugMode) {
-        print("Error while garbage collecting: $e");
+        print("Unexpected rror while garbage collecting: $e");
         print("Garbage collection error stack trace: $stack");
       }
     } finally {
