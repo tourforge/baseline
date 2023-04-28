@@ -120,8 +120,12 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
       children: [
         const SizedBox(width: 8),
         Text(
-          NarrationPlaybackController.instance.positionToString(position) ??
-              "00:00",
+          NarrationPlaybackController.instance.state !=
+                  NarrationPlaybackState.loading
+              ? NarrationPlaybackController.instance
+                      .positionToString(position) ??
+                  "00:00"
+              : "00:00",
           style: Theme.of(context)
               .textTheme
               .bodyMedium!
@@ -132,13 +136,18 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
             thumbColor: Colors.white,
             activeColor: Colors.white,
             inactiveColor: Colors.white.withAlpha(32),
-            value: position,
+            value: NarrationPlaybackController.instance.state !=
+                    NarrationPlaybackState.loading
+                ? position
+                : 0,
             label:
                 NarrationPlaybackController.instance.positionToString(position),
             min: 0,
             max: 1,
             onChanged: NarrationPlaybackController.instance.state !=
-                    NarrationPlaybackState.stopped
+                        NarrationPlaybackState.stopped &&
+                    NarrationPlaybackController.instance.state !=
+                        NarrationPlaybackState.loading
                 ? (value) {
                     setState(() {
                       position = value;
@@ -153,7 +162,11 @@ class _AudioPositionSliderState extends State<_AudioPositionSlider> {
           ),
         ),
         Text(
-          NarrationPlaybackController.instance.positionToString(1.0) ?? "00:00",
+          NarrationPlaybackController.instance.state !=
+                  NarrationPlaybackState.loading
+              ? NarrationPlaybackController.instance.positionToString(1.0) ??
+                  "00:00"
+              : "00:00",
           style: Theme.of(context)
               .textTheme
               .bodyMedium!
@@ -198,10 +211,7 @@ class _AudioControlButtonState extends State<_AudioControlButton> {
     return IconButton(
       onPressed: isEnabled ? _onPressed : null,
       iconSize: 48,
-      icon: Icon(
-        _icon(),
-        color: Colors.white,
-      ),
+      icon: _icon(),
     );
   }
 
@@ -217,20 +227,32 @@ class _AudioControlButtonState extends State<_AudioControlButton> {
         NarrationPlaybackController.instance.replay();
         break;
       case NarrationPlaybackState.stopped:
+      case NarrationPlaybackState.loading:
         break;
     }
   }
 
-  IconData _icon() {
+  Widget _icon() {
     switch (NarrationPlaybackController.instance.state) {
       case NarrationPlaybackState.playing:
-        return Icons.pause;
+        return const Icon(Icons.pause, color: Colors.white);
       case NarrationPlaybackState.paused:
-        return Icons.play_arrow;
+        return const Icon(Icons.play_arrow, color: Colors.white);
       case NarrationPlaybackState.completed:
-        return Icons.replay;
+        return const Icon(Icons.replay, color: Colors.white);
       case NarrationPlaybackState.stopped:
-        return Icons.play_arrow;
+        return const Icon(Icons.play_arrow, color: Colors.white);
+      case NarrationPlaybackState.loading:
+        return const SizedBox(
+          width: 48,
+          height: 48,
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          ),
+        );
     }
   }
 }

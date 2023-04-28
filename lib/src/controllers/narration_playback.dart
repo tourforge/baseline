@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image/image.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,6 +14,7 @@ enum NarrationPlaybackState {
   paused,
   completed,
   stopped,
+  loading,
 }
 
 class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
@@ -54,9 +56,10 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
   NarrationPlaybackState get state {
     switch (_player.processingState) {
       case ProcessingState.idle:
+        return NarrationPlaybackState.stopped;
       case ProcessingState.loading:
       case ProcessingState.buffering:
-        return NarrationPlaybackState.stopped;
+        return NarrationPlaybackState.loading;
       case ProcessingState.completed:
         return NarrationPlaybackState.completed;
       case ProcessingState.ready:
@@ -111,9 +114,11 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
         var imgContent =
             await File(waypoint.gallery.first.localPath).readAsBytes();
 
-        var img = decodeImage(imgContent)!;
+        var square = await compute((imgContent) {
+          var img = decodeImage(imgContent)!;
 
-        var square = copyResizeCropSquare(img, size: 512);
+          return copyResizeCropSquare(img, size: 512);
+        }, imgContent);
 
         await File(squarePath).writeAsBytes(encodeJpg(square));
       }
