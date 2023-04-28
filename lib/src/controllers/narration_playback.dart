@@ -6,7 +6,6 @@ import 'package:image/image.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../download_manager.dart';
 import '../models/data.dart';
 
 enum NarrationPlaybackState {
@@ -57,8 +56,9 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
       case ProcessingState.idle:
       case ProcessingState.loading:
       case ProcessingState.buffering:
-      case ProcessingState.completed:
         return NarrationPlaybackState.stopped;
+      case ProcessingState.completed:
+        return NarrationPlaybackState.completed;
       case ProcessingState.ready:
         return _player.playing
             ? NarrationPlaybackState.playing
@@ -179,6 +179,7 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
     if (narration == null) return;
 
     await _player.stop();
+    _player.seek(Duration.zero);
     _player.play();
     _onStateChanged.add(null);
 
