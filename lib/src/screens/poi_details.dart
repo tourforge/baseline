@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,6 +33,42 @@ class _PoiDetailsState extends State<PoiDetails>
                 tickerProvider: this,
                 gallery: widget.poi.gallery,
                 title: widget.poi.name,
+                action: ElevatedButton(
+                  onPressed: () {
+                    if (Platform.isIOS) {
+                      launchUrl(
+                        Uri.parse(
+                            "https://maps.apple.com/?daddr=${widget.poi.lat},${widget.poi.lng}"),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } else {
+                      launchUrl(
+                        Uri.parse(
+                            "https://www.google.com/maps/dir/?api=1&destination=${widget.poi.lat},${widget.poi.lng}"),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(
+                        Theme.of(context).colorScheme.secondary),
+                    padding: const MaterialStatePropertyAll(EdgeInsets.zero),
+                    shape: const MaterialStatePropertyAll(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    children: const [
+                      SizedBox(width: 12.0),
+                      Icon(Icons.route),
+                      SizedBox(width: 8.0),
+                      Text("Directions"),
+                      SizedBox(width: 12.0),
+                    ],
+                  ),
+                ),
               ),
             ),
             SliverToBoxAdapter(
