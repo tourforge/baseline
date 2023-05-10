@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,9 +34,22 @@ class _WaypointDetailsState extends State<WaypointDetails>
                 tickerProvider: this,
                 gallery: widget.waypoint.gallery,
                 title: widget.waypoint.name,
-                action: null,
-                /*action: ElevatedButton(
-                  onPressed: () {},
+                action: ElevatedButton(
+                  onPressed: () {
+                    if (Platform.isIOS) {
+                      launchUrl(
+                        Uri.parse(
+                            "https://maps.apple.com/?daddr=${widget.waypoint.lat},${widget.waypoint.lng}"),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } else {
+                      launchUrl(
+                        Uri.parse(
+                            "https://www.google.com/maps/dir/?api=1&destination=${widget.waypoint.lat},${widget.waypoint.lng}"),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    }
+                  },
                   style: ButtonStyle(
                     backgroundColor: MaterialStatePropertyAll(
                         Theme.of(context).colorScheme.secondary),
@@ -48,13 +63,13 @@ class _WaypointDetailsState extends State<WaypointDetails>
                   child: Row(
                     children: const [
                       SizedBox(width: 12.0),
-                      Icon(Icons.music_note),
+                      Icon(Icons.route),
                       SizedBox(width: 8.0),
-                      Text("Listen"),
+                      Text("Directions"),
                       SizedBox(width: 12.0),
                     ],
                   ),
-                ),*/
+                ),
               ),
             ),
             SliverToBoxAdapter(
