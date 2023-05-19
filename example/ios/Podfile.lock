@@ -11,10 +11,8 @@ PODS:
     - Flutter
   - just_audio (0.0.1):
     - Flutter
-  - MapLibre-iOS-SDK-Unofficial (5.13.0)
   - opentourguide (0.0.1):
     - Flutter
-    - MapLibre-iOS-SDK-Unofficial
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -41,7 +39,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - FMDB
-    - MapLibre-iOS-SDK-Unofficial
 
 EXTERNAL SOURCES:
   audio_service:
@@ -72,13 +69,12 @@ SPEC CHECKSUMS:
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
-  MapLibre-iOS-SDK-Unofficial: 07b3d4b9c4203fb9951aa6aae7cf48b5e4245f3d
-  opentourguide: 34672520601f61ba247c63b026eddfeab297c641
+  opentourguide: 6ade8650486e2e814a01a1c84516b791fbee0d33
   path_provider_foundation: 37748e03f12783f9de2cb2c4eadfaa25fe6d4852
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   url_launcher_ios: ae1517e5e344f5544fb090b079e11f399dfbe4d2
   wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
 
-PODFILE CHECKSUM: 5e31f0bd2d99a4ce463131a3a6c8bb20549b5cd6
+PODFILE CHECKSUM: 488487da2174c2c121fa66526ace06059a65365e
 
 COCOAPODS: 1.11.3
