@@ -49,7 +49,7 @@ dependencies:
   path: ^1.8.2
   sliver_tools: ^0.2.8
   url_launcher: ^6.1.10
-  just_audio: ^0.9.30
+  just_audio: ^0.9.33
   audio_service: ^0.18.7
   audio_session: ^0.1.13
   image: ^4.0.15
