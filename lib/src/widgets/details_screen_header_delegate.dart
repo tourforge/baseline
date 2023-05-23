@@ -112,7 +112,7 @@ class DetailsScreenHeaderDelegate extends SliverPersistentHeaderDelegate {
             icon: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(
-                Icons.adaptive.arrow_back,
+                Icons.arrow_back,
                 color: Theme.of(context).appBarTheme.foregroundColor,
               ),
             ),

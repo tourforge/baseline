@@ -398,31 +398,35 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 left: 0.0,
                 right: 0.0,
                 bottom: bottomHeight,
-                child: TourNavigationDrawer(
-                  key: _drawerKey,
-                  handleHeight: drawerHandleHeight,
-                  tour: widget.tour,
-                  playWaypoint: (waypointIdx) {
-                    _currentWaypoint.index = waypointIdx;
-                    NarrationPlaybackController.instance
-                        .playWaypoint(waypointIdx);
-                  },
+                child: SafeArea(
+                  child: TourNavigationDrawer(
+                    key: _drawerKey,
+                    handleHeight: drawerHandleHeight,
+                    tour: widget.tour,
+                    playWaypoint: (waypointIdx) {
+                      _currentWaypoint.index = waypointIdx;
+                      NarrationPlaybackController.instance
+                          .playWaypoint(waypointIdx);
+                    },
+                  ),
                 ),
               ),
               Positioned(
                 left: 0.0,
                 right: 0.0,
                 bottom: 0.0,
-                child: SizedBox(
-                  height: bottomHeight,
-                  child: GestureDetector(
-                    child: NavigationPanel(tour: widget.tour),
-                    onVerticalDragStart: (details) =>
-                        _drawerKey.currentState?.onVerticalDragStart(details),
-                    onVerticalDragEnd: (details) =>
-                        _drawerKey.currentState?.onVerticalDragEnd(details),
-                    onVerticalDragUpdate: (details) =>
-                        _drawerKey.currentState?.onVerticalDragUpdate(details),
+                child: SafeArea(
+                  child: SizedBox(
+                    height: bottomHeight,
+                    child: GestureDetector(
+                      child: NavigationPanel(tour: widget.tour),
+                      onVerticalDragStart: (details) =>
+                          _drawerKey.currentState?.onVerticalDragStart(details),
+                      onVerticalDragEnd: (details) =>
+                          _drawerKey.currentState?.onVerticalDragEnd(details),
+                      onVerticalDragUpdate: (details) => _drawerKey.currentState
+                          ?.onVerticalDragUpdate(details),
+                    ),
                   ),
                 ),
               ),
