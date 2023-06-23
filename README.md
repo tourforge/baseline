@@ -13,3 +13,6 @@ We've had to use a workaround due to difficulties with installing the MapLibre d
 3. Find the directory titled `Mapbox.framework` under `Mapbox.xcframework/ios-arm64/Mapbox.framework`.
 4. Copy the `Mapbox.framework` directory to `example/ios/Mapbox.framework`.
 5. Now you're free to open the project in Xcode. Make sure you open `example/ios/Runner.xcworkspace`, not `example/ios/Runner.xcodeproj`.
+
+## Archiving a build in Xcode
+Until https://github.com/CocoaPods/CocoaPods/issues/11808 is fixed, follow the temporary solution in the thread to successfully archive the app.
