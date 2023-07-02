@@ -16,3 +16,6 @@ We've had to use a workaround due to difficulties with installing the MapLibre d
 
 ## Archiving a build in Xcode
 Until https://github.com/CocoaPods/CocoaPods/issues/11808 is fixed, follow the temporary solution in the thread to successfully archive the app.
+
+## Note
+When you put TomTom key into the asset directory, make sure you don't put a newline at the end because that will break satellite imagery feature.
