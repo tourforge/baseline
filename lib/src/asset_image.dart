@@ -1,7 +1,7 @@
 import 'package:flutter/painting.dart';
 
 import 'download_manager.dart';
-import 'models/data.dart';
+import 'data.dart';
 
 class AssetImage extends ImageProvider<FileImage> {
   AssetImage(this._asset, {this.scale = 1.0})

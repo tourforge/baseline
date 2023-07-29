@@ -8,8 +8,8 @@ import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
 import 'package:opentourguide/src/asset_garbage_collector.dart';
 import 'package:path/path.dart' as p;
 
-import '../asset_image.dart';
-import '../download_manager.dart';
+import 'asset_image.dart';
+import 'download_manager.dart';
 
 class TourIndex {
   TourIndex._({

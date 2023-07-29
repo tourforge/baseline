@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../download_manager.dart';
-import '../models/data.dart';
+import '../data.dart';
 import '../widgets/details_button.dart';
 import '../widgets/details_description.dart';
 import '../widgets/details_header.dart';

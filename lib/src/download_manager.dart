@@ -6,7 +6,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
-import 'models/data.dart';
+import 'data.dart';
 
 class DownloadFailedException implements Exception {}
 

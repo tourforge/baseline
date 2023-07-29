@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-import '../models/data.dart';
+import '../data.dart';
 import '../widgets/asset_image_builder.dart';
 
 class Gallery extends StatefulWidget {

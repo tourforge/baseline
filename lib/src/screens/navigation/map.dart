@@ -6,8 +6,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock/wakelock.dart';
 
+import '../../data.dart';
 import '../../models/current_location.dart';
-import '../../models/data.dart';
 import '../../models/fake_gps.dart';
 import '../../models/map_controlledness.dart';
 import '../../models/satellite_enabled.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/data.dart';
+import '../data.dart';
 
 class AssetImageBuilder extends StatefulWidget {
   const AssetImageBuilder(

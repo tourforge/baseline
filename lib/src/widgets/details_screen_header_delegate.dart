@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-import '../models/data.dart';
+import '../data.dart';
 import 'gallery.dart';
 
 class DetailsScreenHeaderDelegate extends SliverPersistentHeaderDelegate {

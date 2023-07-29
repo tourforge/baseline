@@ -11,7 +11,7 @@ import '../../controllers/navigation.dart';
 import '../../location.dart';
 import '../../models/current_location.dart';
 import '../../models/current_waypoint.dart';
-import '../../models/data.dart';
+import '../../data.dart';
 import '../../models/fake_gps.dart';
 import '../../models/map_controlledness.dart';
 import '../../models/satellite_enabled.dart';

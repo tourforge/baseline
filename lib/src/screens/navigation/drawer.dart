@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../config.dart';
 import '../../models/current_waypoint.dart';
-import '../../models/data.dart';
+import '../../data.dart';
 import '../../widgets/waypoint_card.dart';
 
 class TourNavigationDrawer extends StatefulWidget {

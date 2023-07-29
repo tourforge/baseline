@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../models/data.dart';
+import '../data.dart';
 import '../widgets/collapsible_section.dart';
 import '../widgets/details_button.dart';
 import '../widgets/details_description.dart';
