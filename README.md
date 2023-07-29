@@ -23,3 +23,23 @@ We've had to use a workaround on iOS due to difficulties with installing the Map
 6. When it's time to archive the app to submit it to the app store, and until https://github.com/CocoaPods/CocoaPods/issues/11808 is fixed, follow the temporary solution in the thread to successfully archive the app.
 
 It is important to note that our current workaround does not allow running the app in a simulator. You will need a physical device in order to run the application.
+
+### iOS Archive Instruction
+
+To build an app archive and upload to Apple, follow these sections at (https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases#Create-an-archive-of-your-app):
+- `Create an archive of your app`
+    - If you are creating an archive for the first time, follow the temporary solution in the thread (https://github.com/CocoaPods/CocoaPods/issues/11808) to successfully archive the app, then restart Xcode IDE. 
+- `Select a method for distribution`
+    - Select `TestFlight & App Store`, this will also upload the archive directly to Apple.
+
+### Android Build Signed Bundle Instruction
+
+Follow this documentation (https://docs.flutter.dev/deployment/android#create-an-upload-keystore). Take note on a couple of things:
+1. You may need to install JDK for the generating keystore command to work.
+2. It is going to ask a couple of identifying questions, doesn't matter how you answer it.
+3. Remember and save the password and the location for the keystore.
+4. Insert passwords and keystore location in the `key.properties` file and move it into `android/` directory.
+5. You can now create signed bundle by running the following command `flutter build appbundle`.
+6. Locate this signed bundle in `build/app/outputs/bundle/release/app.aab`.
+
+You only need to do this once. After that, simply rerun the command `flutter build appbundle`. You may now upload this signed bundle to Google Play Console.
