@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:flutter_map_dragmarker/dragmarker.dart';
+import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:wakelock/wakelock.dart';
@@ -178,10 +178,9 @@ class _FakeGpsPositionState extends State<_FakeGpsPosition> {
     return DragMarkers(
       markers: [
         DragMarker(
-          width: 64,
-          height: 64,
+          size: const Size(64, 64),
           point: _point,
-          builder: (context) => DecoratedBox(
+          builder: (context, pos, isDragging) => DecoratedBox(
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(32.0)),
               border: Border.all(
