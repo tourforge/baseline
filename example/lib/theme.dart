@@ -10,9 +10,9 @@ const lightColorScheme = ColorScheme(
   onSecondary: Color.fromARGB(255, 211, 233, 255),
   error: Colors.red,
   onError: Colors.white,
-  background: Colors.white,
+  background: Color.fromARGB(255, 248, 248, 248),
   onBackground: Colors.black,
-  surface: Color.fromARGB(255, 252, 252, 252),
+  surface: Colors.white,
   onSurface: Colors.black,
   surfaceTint: Colors.transparent,
 );
@@ -114,7 +114,7 @@ ThemeData get lightThemeData => ThemeData(
       ),
       appBarTheme: const AppBarTheme(
         foregroundColor: Colors.white,
-        backgroundColor: Color.fromARGB(255, 48, 48, 48),
+        backgroundColor: Color.fromARGB(255, 24, 24, 24),
         iconTheme: IconThemeData(color: Colors.white),
       ),
     );
