@@ -51,7 +51,7 @@ dependencies:
   url_launcher: ^6.1.10
   just_audio: ^0.9.34
   audio_service: ^0.18.7
-  audio_session: ^0.1.13
+  audio_session: ^0.1.16
   image: ^4.0.17
   wakelock: ^0.6.2
 
