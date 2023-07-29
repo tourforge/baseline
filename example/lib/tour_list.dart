@@ -24,30 +24,6 @@ class _TourListState extends State<TourList> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("OpenTourGuide"),
-        actions: [
-          PopupMenuButton(
-            icon: Icon(
-              Icons.more_vert,
-              color: Theme.of(context).appBarTheme.foregroundColor,
-            ),
-            tooltip: 'More',
-            elevation: 1.0,
-            itemBuilder: (_) => [
-              const PopupMenuItem(
-                value: "About",
-                child: Text("About"),
-              ),
-            ],
-            onSelected: (value) {
-              switch (value) {
-                case "About":
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const About()));
-                  break;
-              }
-            },
-          ),
-        ],
       ),
       body: FutureBuilder<TourIndex>(
         future: tourIndex,

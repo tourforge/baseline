@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
-late OtbGuideAppConfig appConfig;
+OtbGuideAppConfig get appConfig => _appConfig;
+
+late OtbGuideAppConfig _appConfig;
+
+void setAppConfig(OtbGuideAppConfig config) {
+  _appConfig = config;
+}
 
 class OtbGuideAppConfig {
   const OtbGuideAppConfig({

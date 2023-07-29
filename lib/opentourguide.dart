@@ -14,15 +14,15 @@ import 'src/controllers/narration_playback.dart';
 import 'src/download_manager.dart';
 
 export 'src/asset_image.dart' show AssetImage;
-export 'src/config.dart' show OtbGuideAppConfig;
+export 'src/config.dart' show OtbGuideAppConfig, appConfig;
 export 'src/location.dart' show requestGpsPermissions;
 export 'src/data.dart';
-export 'src/screens/about.dart' show About;
 export 'src/screens/tour_details.dart' show TourDetails;
 export 'src/widgets/asset_image_builder.dart' show AssetImageBuilder;
+export 'src/widgets/collapsible_section.dart' show CollapsibleSection;
 
 Future<void> otbGuideInit(OtbGuideAppConfig withAppConfig) async {
-  appConfig = withAppConfig;
+  setAppConfig(withAppConfig);
 
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid) {
