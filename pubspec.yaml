@@ -39,7 +39,7 @@ dependencies:
   flutter_map: ^3.0.0
   google_fonts: ^4.0.4
   photo_view: ^0.14.0
-  latlong2: ^0.8.1
+  latlong2: ^0.8.2
   maps_toolkit: ^2.0.1
   geolocator: ^9.0.2
   flutter_map_dragmarker: 4.1.2
