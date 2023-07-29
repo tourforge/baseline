@@ -50,7 +50,7 @@ dependencies:
   sliver_tools: ^0.2.10
   url_launcher: ^6.1.10
   just_audio: ^0.9.34
-  audio_service: ^0.18.7
+  audio_service: ^0.18.10
   audio_session: ^0.1.13
   image: ^4.0.17
   wakelock: ^0.6.2
