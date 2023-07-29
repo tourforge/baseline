@@ -34,7 +34,7 @@ To build an app archive and upload to Apple, follow these sections at (https://d
 
 ### Android Build Signed Bundle Instruction
 
-Follow this documentation (https://docs.flutter.dev/deployment/android#create-an-upload-keystore). Take note on a couple of things:
+When creating a signed release bundle for the first time, you must follow this documentation (https://docs.flutter.dev/deployment/android#create-an-upload-keystore). Take note on a couple of things:
 1. You may need to install JDK for the generating keystore command to work.
 2. It is going to ask a couple of identifying questions, doesn't matter how you answer it.
 3. Remember and save the password and the location for the keystore.
@@ -42,4 +42,4 @@ Follow this documentation (https://docs.flutter.dev/deployment/android#create-an
 5. You can now create signed bundle by running the following command `flutter build appbundle`.
 6. Locate this signed bundle in `build/app/outputs/bundle/release/app.aab`.
 
-You only need to do this once. After that, simply rerun the command `flutter build appbundle`. You may now upload this signed bundle to Google Play Console.
+You only need to do this once. After that, anytime that you need to build new bundle, simply rerun the command `flutter build appbundle`. You may now upload this signed bundle to Google Play Console.
