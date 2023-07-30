@@ -159,7 +159,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
       var tomtomKey = "";
       try {
         tomtomKey = (await assetBundle.loadString('assets/tomtom.txt')).trim();
-      } on Exception {
+      } catch (e) {
         if (kDebugMode) {
           print("Failed to load TomTom key. Proceeding with empty key.");
         }

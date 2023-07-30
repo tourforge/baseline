@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-OtbGuideAppConfig get appConfig => _appConfig;
+OpenTourGuideConfig get otgConfig => _otgConfig;
 
-late OtbGuideAppConfig _appConfig;
+late OpenTourGuideConfig _otgConfig;
 
-void setAppConfig(OtbGuideAppConfig config) {
-  _appConfig = config;
+void setOtgConfig(OpenTourGuideConfig config) {
+  _otgConfig = config;
 }
 
-class OtbGuideAppConfig {
-  const OtbGuideAppConfig({
+class OpenTourGuideConfig {
+  const OpenTourGuideConfig({
     required this.appName,
     this.appDesc,
     required this.baseUrl,
