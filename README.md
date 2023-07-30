@@ -8,7 +8,7 @@ If you want to create your own tour guide app, follow [our guide](https://github
 
 ## First-time Development Setup
 
-In order for the satellite imagery feature to work, you need to create a file under `example/assets/` called `tomtom.txt` and paste a TomTom API key into this file. Make sure you don't put a newline at the end of this file; otherwise, the API key won't be read properly.
+In order for the satellite imagery feature to work, you need to create a file under `example/assets/` called `tomtom.txt` and paste a TomTom API key into this file.
 
 ### iOS-specific Setup
 We've had to use a workaround on iOS due to difficulties with installing the MapLibre dependency via CocoaPods. Before you open the project for the first time in Xcode, follow these steps:
