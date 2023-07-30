@@ -17,23 +17,9 @@ class NavigationController {
   NavigationController({
     this.path = const <LatLng>[],
     required this.waypoints,
-  }) {
-    for (var waypoint in waypoints) {
-      var closest = 0;
-      var closestDistance = _distance(waypoint.position, path[0]);
-      for (var i = 1; i < path.length; i++) {
-        var distance = _distance(waypoint.position, path[i]);
-        if (distance < closestDistance) {
-          closest = i;
-          closestDistance = distance;
-        }
-      }
-      waypointIndexToPathIndex.add(closest);
-    }
-  }
+  });
 
   final List<LatLng> path;
-  final List<int> waypointIndexToPathIndex = [];
   final List<NavigationWaypoint> waypoints;
 
   int? _prevWaypoint;
