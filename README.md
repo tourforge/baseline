@@ -6,11 +6,11 @@ OpenTourGuide is a rebrandable GPS-guided tour app for Android and iOS, built us
 
 If you want to create your own tour guide app, follow [our guide](https://github.com/opentourbuilder/documentation/blob/main/Creating%20an%20app.md).
 
-## First-time Development Setup
+## First-Time Development Setup
 
 In order for the satellite imagery feature to work, you need to create a file under `example/assets/` called `tomtom.txt` and paste a TomTom API key into this file.
 
-### iOS-specific Setup
+### iOS-Specific Setup
 We've had to use a workaround on iOS due to difficulties with installing the MapLibre dependency via CocoaPods. Before you open the project for the first time in Xcode, follow these steps:
 
 1. Download the MapLibre iOS SDK; this is a zip file.
@@ -23,40 +23,40 @@ We've had to use a workaround on iOS due to difficulties with installing the Map
 
 Now you're free to open the project in Xcode. Make sure you open `example/ios/Runner.xcworkspace`, not ~~`example/ios/Runner.xcodeproj`~~. It is important to note that our current workaround does not allow running the app in a simulator. You will need a physical device in order to run the application.
 
-### Android-specific Setup
+### Android-Specific Setup
 
-Open a terminal in project directory and run `flutter pub get`.
+Open a terminal in the project directory and run `flutter pub get`.
 
-## Run App on Physical Device
+## Running the App on Physical Device
 
-### iPhone
+### iOS
 
 With Xcode open, follow this documentation (https://developer.apple.com/documentation/xcode/running-your-app-in-simulator-or-on-a-device#Connect-real-devices-to-your-Mac).
 
 ### Android
 
 - Connect the Android device to the development machine with an appropriate USB cable.
-  - If this is the first time, tap `Allow` when you see `Allow USB debugging?` box.
-- Open the terminal on Android Studio and run `flutter run`.
+  - If this is the first time, tap `Allow` when you see the `Allow USB debugging?` box.
+- Open the Android Studio terminal and run `flutter run`.
 
 ## Building Release Distributables
 
-### iOS Archive Instruction
+### iOS Archive Instructions
 
 To build an app archive and upload to Apple, follow these sections at (https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases#Create-an-archive-of-your-app):
 - `Create an archive of your app`
-    - If you are creating an archive for the first time, follow the temporary solution in the thread (https://github.com/CocoaPods/CocoaPods/issues/11808) to successfully archive the app, then restart Xcode IDE. 
+    - If you are creating an archive for the first time, follow the temporary solution in the thread (https://github.com/CocoaPods/CocoaPods/issues/11808) to successfully archive the app, then restart Xcode. 
 - `Select a method for distribution`
-    - Select `TestFlight & App Store`, this will also upload the archive directly to Apple.
+    - Select `TestFlight & App Store`; this will also upload the archive directly to Apple.
 
-### Android Build Signed Bundle Instruction
+### Android Build Signed Bundle Instructions
 
 When creating a signed release bundle for the first time, you must follow this documentation (https://docs.flutter.dev/deployment/android#create-an-upload-keystore). Take note on a couple of things:
-1. You may need to install JDK for the generating keystore command to work.
-2. It is going to ask a couple of identifying questions, doesn't matter how you answer it.
-3. Remember and save the password and the location for the keystore.
-4. Insert passwords and keystore location in the `key.properties` file and move it into `android/` directory.
-5. You can now create signed bundle by running the following command `flutter build appbundle`.
-6. Locate this signed bundle in `build/app/outputs/bundle/release/app.aab`.
+1. You may need to install the JDK for the generating keystore command to work.
+2. It is going to ask a couple of identifying questions, but it doesn't matter how you answer them.
+3. Remember to save the password and the location for the keystore.
+4. Insert the password and keystore location in the `key.properties` file and move the file into the `android/` directory.
+5. You can now create a signed bundle by running the following command: `flutter build appbundle`.
+6. The signed bundle can be found in `build/app/outputs/bundle/release/app.aab`.
 
-You only need to do this once. After that, anytime that you need to build new bundle, simply rerun the command `flutter build appbundle`. You may now upload this signed bundle to Google Play Console.
+You only need to do this once. After that, any time that you need to build new bundle, simply re-run the command `flutter build appbundle`. You may now upload this signed bundle to the Google Play Console.
