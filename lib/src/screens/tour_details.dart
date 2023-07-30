@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../download_manager.dart';
+import '../config.dart';
 import '../data.dart';
+import '../download_manager.dart';
 import '../widgets/details_button.dart';
 import '../widgets/details_description.dart';
 import '../widgets/details_header.dart';
 import '../widgets/details_screen_header_delegate.dart';
 import '../widgets/waypoint_card.dart';
+import 'help_slides.dart';
 import 'navigation/navigation.dart';
 
 class TourDetails extends StatefulWidget {
@@ -53,8 +55,8 @@ class _TourDetailsState extends State<TourDetails>
                 borderRadius: BorderRadius.all(Radius.circular(12.0)),
               ),
             )),
-        child: Row(
-          children: const [
+        child: const Row(
+          children: [
             SizedBox(width: 12.0),
             Icon(Icons.explore),
             SizedBox(width: 8.0),
@@ -85,6 +87,10 @@ class _TourDetailsState extends State<TourDetails>
                 gallery: widget.tour.gallery,
                 title: widget.tour.name,
                 action: action,
+                onHelpPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const _TourHelpScreen()));
+                },
               ),
             ),
             if (_isLoaded && !_isFullyDownloaded)
@@ -115,6 +121,106 @@ class _TourDetailsState extends State<TourDetails>
           ],
         ),
       ),
+    );
+  }
+}
+
+class _TourHelpScreen extends StatefulWidget {
+  const _TourHelpScreen({
+    super.key,
+  });
+
+  @override
+  State<_TourHelpScreen> createState() => _TourHelpScreenState();
+}
+
+class _TourHelpScreenState extends State<_TourHelpScreen> {
+  final HelpSlidesController _controller = HelpSlidesController();
+
+  @override
+  Widget build(BuildContext context) {
+    return HelpSlidesScreen(
+      controller: _controller,
+      onDone: () {
+        Navigator.of(context).pop();
+      },
+      slides: [
+        HelpSlide(
+          children: [
+            Text(
+              "Viewing a Tour",
+              style: Theme.of(context).textTheme.headlineSmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16.0),
+            Text(
+              "${otgConfig.appName} is primarily intended to guide you along "
+              "tours using audio narrations that automatically play "
+              "as you reach each stop.",
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16.0),
+            Text(
+              "However, before downloading a tour, you may read its description "
+              "and view each of its stops.",
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 12.0,
+                horizontal: 48.0,
+              ),
+              child: ElevatedButton(
+                onPressed: _controller.nextSlide,
+                child: Text(
+                  "Next",
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        HelpSlide(
+          children: [
+            Text(
+              "Starting a Tour",
+              style: Theme.of(context).textTheme.headlineSmall,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              "Once you've downloaded a tour by tapping the Download button, "
+              "the Start button can be used to enter navigation mode, which "
+              "includes a map of the tour.",
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 12.0,
+                horizontal: 48.0,
+              ),
+              child: ElevatedButton(
+                onPressed: _controller.finish,
+                child: Text(
+                  "Got it",
+                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -374,9 +480,9 @@ class _DownloadDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Download Tour'),
-      content: SingleChildScrollView(
+      content: const SingleChildScrollView(
         child: ListBody(
-          children: const <Widget>[
+          children: <Widget>[
             Text(
               'Downloading this tour may incur data charges. '
               'It is recommended to connect to WiFi before proceeding.',

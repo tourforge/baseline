@@ -14,12 +14,14 @@ class DetailsScreenHeaderDelegate extends SliverPersistentHeaderDelegate {
     required this.gallery,
     required this.title,
     this.action,
+    this.onHelpPressed,
   });
 
   final TickerProvider tickerProvider;
   final List<AssetModel> gallery;
   final String title;
   final Widget? action;
+  final void Function()? onHelpPressed;
 
   @override
   double get maxExtent => 384;
@@ -71,6 +73,31 @@ class DetailsScreenHeaderDelegate extends SliverPersistentHeaderDelegate {
             ),
           ),
         ),
+        if (onHelpPressed != null)
+          Positioned(
+            top: MediaQueryData.fromWindow(ui.window).padding.top,
+            right: 0,
+            child: IconButton(
+              tooltip: "Help",
+              onPressed: () {
+                onHelpPressed!();
+              },
+              padding: const EdgeInsets.all(8.0),
+              icon: DecoratedBox(
+                decoration: BoxDecoration(
+                    color: Theme.of(context).appBarTheme.backgroundColor,
+                    borderRadius:
+                        const BorderRadius.all(Radius.circular(160.0))),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.question_mark,
+                    color: Theme.of(context).appBarTheme.foregroundColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
         Positioned(
           top: MediaQueryData.fromWindow(ui.window).padding.top,
           left: 0,

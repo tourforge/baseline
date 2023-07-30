@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 
 class HelpSlide extends StatelessWidget {
   const HelpSlide({
@@ -16,31 +18,42 @@ class HelpSlide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-          left: 24.0, right: 24.0, top: 12.0, bottom: 24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (image != null)
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 16.0,
-                ),
-                child: Material(
-                  borderRadius: const BorderRadius.all(Radius.circular(24.0)),
-                  type: MaterialType.card,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(24.0)),
-                    child: image,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark
+          ? SystemUiOverlayStyle.light
+          : SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.only(
+              left: 24.0, right: 24.0, top: 12.0, bottom: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (image != null)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 16.0,
+                    ),
+                    child: Material(
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(24.0)),
+                      type: MaterialType.card,
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(24.0)),
+                        child: image,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ...children,
-        ],
+              ...children,
+            ],
+          ),
+        ),
       ),
     );
   }
