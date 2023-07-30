@@ -27,6 +27,18 @@ Now you're free to open the project in Xcode. Make sure you open `example/ios/Ru
 
 Open a terminal in project directory and run `flutter pub get`.
 
+## Run App on Physical Device
+
+### iPhone
+
+With Xcode open, follow this documentation (https://developer.apple.com/documentation/xcode/running-your-app-in-simulator-or-on-a-device#Connect-real-devices-to-your-Mac).
+
+### Android
+
+- Connect the Android device to the development machine with an appropriate USB cable.
+  - If this is the first time, tap `Allow` when you see `Allow USB debugging?` box.
+- Open the terminal on Android Studio and run `flutter run`.
+
 ## Building Release Distributables
 
 ### iOS Archive Instruction
