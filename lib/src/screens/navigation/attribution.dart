@@ -86,8 +86,7 @@ class _AttributionInfoState extends State<AttributionInfo> {
                         context: context,
                         builder: (context) => const AttributionDialog()));
                   },
-                  borderRadius:
-                      const BorderRadius.only(topRight: Radius.circular(16.0)),
+                  borderRadius: const BorderRadius.all(Radius.circular(16.0)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
