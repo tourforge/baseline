@@ -8,14 +8,15 @@ import 'package:provider/provider.dart';
 
 import '../../controllers/narration_playback.dart';
 import '../../controllers/navigation.dart';
+import '../../data.dart';
 import '../../location.dart';
 import '../../models/current_location.dart';
 import '../../models/current_waypoint.dart';
-import '../../data.dart';
 import '../../models/fake_gps.dart';
 import '../../models/map_controlledness.dart';
 import '../../models/satellite_enabled.dart';
 import '../../screens/navigation/drawer.dart';
+import '../../screens/navigation/help.dart';
 import '../../screens/navigation/map.dart';
 import '../../screens/navigation/panel.dart';
 import '../../screens/poi_details.dart';
@@ -359,7 +360,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                 child: SafeArea(
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: _SatelliteEnabledButton(),
+                    child: _HelpButton(),
                   ),
                 ),
               ),
@@ -374,7 +375,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
               ),
               if (kDebugMode)
                 const Positioned(
-                  bottom: bottomHeight + drawerHandleHeight + 72,
+                  bottom: bottomHeight + drawerHandleHeight + 72 * 2,
                   right: 0.0,
                   child: SafeArea(
                     child: Padding(
@@ -383,6 +384,16 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     ),
                   ),
                 ),
+              const Positioned(
+                bottom: bottomHeight + drawerHandleHeight + 72,
+                right: 0.0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: _SatelliteEnabledButton(),
+                  ),
+                ),
+              ),
               const Positioned(
                 bottom: bottomHeight + drawerHandleHeight,
                 right: 0.0,
@@ -449,7 +460,7 @@ class _SatelliteEnabledButton extends StatelessWidget {
 
     return Material(
       borderRadius: const BorderRadius.all(Radius.circular(30)),
-      color: Theme.of(context).colorScheme.secondary,
+      color: const Color.fromARGB(255, 48, 48, 48),
       child: SizedBox(
         width: 60,
         height: 60,
@@ -463,6 +474,34 @@ class _SatelliteEnabledButton extends StatelessWidget {
           icon: satelliteEnabled.value
               ? const Icon(Icons.layers_clear)
               : const Icon(Icons.layers),
+        ),
+      ),
+    );
+  }
+}
+
+class _HelpButton extends StatelessWidget {
+  const _HelpButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      borderRadius: const BorderRadius.all(Radius.circular(30)),
+      color: Theme.of(context).colorScheme.secondary,
+      child: SizedBox(
+        width: 60,
+        height: 60,
+        child: IconButton(
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const NavigationHelpScreen()));
+          },
+          iconSize: 32,
+          splashRadius: 30,
+          color: Theme.of(context).colorScheme.onSecondary,
+          icon: const Icon(Icons.question_mark),
         ),
       ),
     );
