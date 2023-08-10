@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:opentourguide/src/help_viewed.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../config.dart';
 import '../data.dart';
 import '../download_manager.dart';
 import '../widgets/details_button.dart';
@@ -155,6 +154,8 @@ class _TourHelpScreenState extends State<_TourHelpScreen> {
   @override
   Widget build(BuildContext context) {
     return HelpSlidesScreen(
+      dismissible: true,
+      title: "Help",
       controller: _controller,
       onDone: () {
         Navigator.of(context).pop();
@@ -167,56 +168,22 @@ class _TourHelpScreenState extends State<_TourHelpScreen> {
               style: Theme.of(context).textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 24.0),
             Text(
-              "${otgConfig.appName} is primarily intended to guide you along "
-              "tours using audio narrations that automatically play "
-              "as you reach each stop.",
-              style: Theme.of(context).textTheme.bodyLarge,
+              "Before downloading a tour, you can read its description "
+              "and view each of its stops on the tour details page.",
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 16.0),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16.0),
-            Text(
-              "However, before downloading a tour, you may read its description "
-              "and view each of its stops.",
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 12.0,
-                horizontal: 48.0,
-              ),
-              child: ElevatedButton(
-                onPressed: _controller.nextSlide,
-                child: Text(
-                  "Next",
-                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        HelpSlide(
-          children: [
-            Text(
-              "Starting a Tour",
-              style: Theme.of(context).textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 24.0),
             Text(
               "Once you've downloaded a tour by tapping the Download button, "
               "the Start button can be used to enter navigation mode, which "
               "includes a map of the tour.",
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 16.0),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 24.0),
             Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 12.0,

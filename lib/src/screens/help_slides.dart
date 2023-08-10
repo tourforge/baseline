@@ -85,9 +85,13 @@ class HelpSlidesScreen extends StatefulWidget {
     super.key,
     this.controller,
     this.onDone,
+    this.title = "Help",
+    this.dismissible = false,
     required this.slides,
   });
 
+  final String title;
+  final bool dismissible;
   final List<HelpSlide> slides;
   final void Function()? onDone;
   final HelpSlidesController? controller;
@@ -110,12 +114,25 @@ class _HelpSlidesScreenState extends State<HelpSlidesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-            child: PageView(
-      controller: _controller,
-      onPageChanged: _onPageChanged,
-      children: widget.slides,
-    )));
+      appBar: widget.dismissible
+          ? AppBar(
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.close),
+              ),
+              title: Text(widget.title),
+            )
+          : null,
+      body: SafeArea(
+        child: PageView(
+          controller: _controller,
+          onPageChanged: _onPageChanged,
+          children: widget.slides,
+        ),
+      ),
+    );
   }
 
   void _onPageChanged(int newPage) {

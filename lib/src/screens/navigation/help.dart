@@ -15,6 +15,8 @@ class _NavigationHelpScreenState extends State<NavigationHelpScreen> {
   @override
   Widget build(BuildContext context) {
     return HelpSlidesScreen(
+      dismissible: true,
+      title: "Help",
       controller: _controller,
       onDone: () {
         Navigator.of(context).pop();
@@ -34,27 +36,7 @@ class _NavigationHelpScreenState extends State<NavigationHelpScreen> {
               style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 12.0,
-                horizontal: 48.0,
-              ),
-              child: ElevatedButton(
-                onPressed: _controller.nextSlide,
-                child: Text(
-                  "Next",
-                  style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        HelpSlide(
-          children: [
+            const SizedBox(height: 32.0),
             Text(
               "Using the Map",
               style: Theme.of(context).textTheme.headlineSmall,
@@ -73,7 +55,7 @@ class _NavigationHelpScreenState extends State<NavigationHelpScreen> {
               style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8.0),
+            const SizedBox(height: 32.0),
             Padding(
               padding: const EdgeInsets.symmetric(
                 vertical: 12.0,
