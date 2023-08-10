@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:opentourguide/src/help_viewed.dart';
 import 'package:provider/provider.dart';
 
 import '../../controllers/narration_playback.dart';
@@ -164,6 +165,17 @@ class _NavigationScreenState extends State<NavigationScreen> {
     NarrationPlaybackController.instance.tour = widget.tour;
 
     _startGpsListening();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    (() async {
+      if (!await HelpViewed.viewed("navigation")) {
+        _launchHelp();
+      }
+    })();
   }
 
   @override
@@ -354,13 +366,15 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   ),
                 ),
               ),
-              const Positioned(
+              Positioned(
                 top: 0.0,
                 right: 0.0,
                 child: SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: _HelpButton(),
+                    padding: const EdgeInsets.all(8.0),
+                    child: _HelpButton(
+                      onPressed: _launchHelp,
+                    ),
                   ),
                 ),
               ),
@@ -447,6 +461,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
       ),
     );
   }
+
+  void _launchHelp() {
+    HelpViewed.markViewed("navigation");
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const NavigationHelpScreen()));
+  }
 }
 
 class _SatelliteEnabledButton extends StatelessWidget {
@@ -481,9 +501,9 @@ class _SatelliteEnabledButton extends StatelessWidget {
 }
 
 class _HelpButton extends StatelessWidget {
-  const _HelpButton({
-    Key? key,
-  }) : super(key: key);
+  const _HelpButton({Key? key, required this.onPressed}) : super(key: key);
+
+  final void Function() onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -494,10 +514,7 @@ class _HelpButton extends StatelessWidget {
         width: 60,
         height: 60,
         child: IconButton(
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => const NavigationHelpScreen()));
-          },
+          onPressed: onPressed,
           iconSize: 32,
           splashRadius: 30,
           color: Theme.of(context).colorScheme.onSecondary,

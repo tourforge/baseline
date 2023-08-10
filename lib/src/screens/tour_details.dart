@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:opentourguide/src/help_viewed.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
@@ -36,6 +37,17 @@ class _TourDetailsState extends State<TourDetails>
           _isLoaded = true;
           _isFullyDownloaded = value;
         }));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    (() async {
+      if (!await HelpViewed.viewed("tour_details")) {
+        _launchHelp();
+      }
+    })();
   }
 
   @override
@@ -87,10 +99,7 @@ class _TourDetailsState extends State<TourDetails>
                 gallery: widget.tour.gallery,
                 title: widget.tour.name,
                 action: action,
-                onHelpPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const _TourHelpScreen()));
-                },
+                onHelpPressed: _launchHelp,
               ),
             ),
             if (_isLoaded && !_isFullyDownloaded)
@@ -122,6 +131,12 @@ class _TourDetailsState extends State<TourDetails>
         ),
       ),
     );
+  }
+
+  void _launchHelp() {
+    HelpViewed.markViewed("tour_details");
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const _TourHelpScreen()));
   }
 }
 

@@ -14,6 +14,7 @@ import 'src/config.dart';
 import 'src/controllers/narration_playback.dart';
 import 'src/download_manager.dart';
 import 'src/screens/home.dart';
+import 'src/help_viewed.dart';
 
 export 'src/config.dart' show OpenTourGuideConfig;
 export 'src/location.dart' show requestGpsPermissions;
@@ -44,7 +45,7 @@ Future<void> runOpenTourGuide({
 
   await NarrationPlaybackController.init();
 
-  var onboarded = await _isOnboarded();
+  var onboarded = await HelpViewed.viewed("onboarding");
   runApp(_OpenTourGuideApp(onboarded ? null : onboarding));
 }
 
@@ -81,7 +82,7 @@ class _OpenTourGuideApp extends StatelessWidget {
   }
 
   void _finishOnboarding(BuildContext context) {
-    _markOnboarded();
+    HelpViewed.markViewed("onboarding");
     Navigator.of(context)
         .pushReplacement(MaterialPageRoute(builder: (context) => const Home()));
   }
@@ -94,15 +95,4 @@ class _BouncingScrollBehavior extends ScrollBehavior {
   ScrollPhysics getScrollPhysics(BuildContext context) {
     return const BouncingScrollPhysics();
   }
-}
-
-Future<bool> _isOnboarded() async {
-  return await File(
-          p.join((await getApplicationSupportDirectory()).path, "onboarded"))
-      .exists();
-}
-
-Future<void> _markOnboarded() async {
-  await File(p.join((await getApplicationSupportDirectory()).path, "onboarded"))
-      .create(recursive: true);
 }
