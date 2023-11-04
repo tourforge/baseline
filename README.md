@@ -19,9 +19,10 @@ We've had to use a workaround on iOS due to difficulties with installing the Map
 2. Extract the zip somewhere convenient so that you can access its internal files.
 3. Find the directory titled `Mapbox.framework` under `Mapbox.xcframework/ios-arm64/Mapbox.framework`.
 4. Copy the `Mapbox.framework` directory to `example/ios/Mapbox.framework`.
+- It is important to note that in order to run the app in a simulator, you need to copy `ios-arm64_x86_64-simulator` folder instead.
 5. Open a terminal in `example/ios`, run `flutter pub get && pod install`.
 
-Now you're free to open the project in Xcode. Make sure you open `example/ios/Runner.xcworkspace`, not ~~`example/ios/Runner.xcodeproj`~~. It is important to note that our current workaround does not allow running the app in a simulator. You will need a physical device in order to run the application.
+Now you're free to open the project in Xcode. Make sure you open `example/ios/Runner.xcworkspace`, not ~~`example/ios/Runner.xcodeproj`~~.
 
 ### Android-Specific Setup
 
@@ -38,6 +39,19 @@ With Xcode open, follow this documentation (https://developer.apple.com/document
 - Connect the Android device to the development machine with an appropriate USB cable.
   - If this is the first time, tap `Allow` when you see the `Allow USB debugging?` box.
 - Open the Android Studio terminal and run `flutter run`.
+
+## Running the App on Virtual Device
+
+### iOS
+
+With Xcode open, follow this documentation (https://developer.apple.com/documentation/xcode/running-your-app-in-simulator-or-on-a-device#Configure-the-list-of-simulated-devices).
+
+### Android
+
+- Initialize your desired system image and device here (https://developer.android.com/studio/run/managing-avds).
+  - If this is the first time, tap `Allow` when you see the `Allow USB debugging?` box.
+- Open the Android Studio terminal and run `flutter run`.
+- You may need to get the device ID, obtainable via command `flutter emulators`.
 
 ## Building Release Distributables
 
