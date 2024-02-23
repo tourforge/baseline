@@ -138,8 +138,8 @@ class MapLibrePlatformView(
             val cameraPosition = map.cameraPosition
             channel.invokeMethod(
                 "updateCameraPosition", mapOf(
-                    "lat" to cameraPosition.target.latitude,
-                    "lng" to cameraPosition.target.longitude,
+                    "lat" to cameraPosition.target?.latitude,
+                    "lng" to cameraPosition.target?.longitude,
                     "zoom" to cameraPosition.zoom + 1,
                 )
             )
@@ -178,7 +178,7 @@ class MapLibrePlatformView(
         when (call.method) {
             "updateLocation" -> {
                 locationGeoJson = call.arguments as String
-                locationSource.setGeoJson(locationGeoJson)
+                locationSource.setGeoJson(locationGeoJson!!)
                 result.success(null)
             }
             "moveCamera" -> {

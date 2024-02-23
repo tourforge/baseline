@@ -3,7 +3,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path/path.dart' as p;
@@ -238,8 +240,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
       builder: (context, snapshot) {
         if (snapshot.hasData && !snapshot.hasError) {
           // This is used in the platform side to register the view.
-          const String viewType =
-              'org.tourforge.guide.MapLibrePlatformView';
+          const String viewType = 'org.tourforge.guide.MapLibrePlatformView';
           // Pass parameters to the platform side.
           final Map<String, dynamic> creationParams = <String, dynamic>{
             "stylePath": snapshot.data,

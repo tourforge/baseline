@@ -142,17 +142,22 @@ class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
   Widget build(BuildContext context) {
     var fakeGpsEnabled = context.watch<FakeGpsModel>();
 
-    return FlutterMap(
-      mapController: controller,
-      options: const MapOptions(interactionOptions: InteractionOptions(flags: InteractiveFlag.none)),
-      children: [
-        if (kDebugMode && fakeGpsEnabled.value)
-          _FakeGpsPosition(
-            onPositionChanged: (ll) {
-              context.read<CurrentLocationModel>().value = ll;
-            },
-          ),
-      ],
+    return IgnorePointer(
+      child: FlutterMap(
+        mapController: controller,
+        options: const MapOptions(
+          interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
+          backgroundColor: Colors.transparent,
+        ),
+        children: [
+          if (kDebugMode && fakeGpsEnabled.value)
+            _FakeGpsPosition(
+              onPositionChanged: (ll) {
+                context.read<CurrentLocationModel>().value = ll;
+              },
+            ),
+        ],
+      ),
     );
   }
 }
