@@ -2,7 +2,7 @@ group 'org.tourforge.guide'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '1.9.22'
     repositories {
         google()
         mavenCentral()
@@ -26,6 +26,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 33
+    namespace 'org.tourforge.guide'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

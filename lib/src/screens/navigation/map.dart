@@ -1,10 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../data.dart';
 import '../../models/current_location.dart';
@@ -59,7 +61,7 @@ class NavigationMapState extends State<NavigationMap> {
   @override
   void initState() {
     super.initState();
-    Wakelock.enable();
+    WakelockPlus.enable();
     widget.controller._state = this;
 
     var currentLocation = context.read<CurrentLocationModel>();
@@ -75,7 +77,7 @@ class NavigationMapState extends State<NavigationMap> {
   @override
   void dispose() {
     removeListeners();
-    Wakelock.disable();
+    WakelockPlus.disable();
     super.dispose();
   }
 
@@ -119,7 +121,7 @@ class NavigationMapState extends State<NavigationMap> {
 
 // TODO: Implement this overlay *without* FlutterMap
 class _FakeGpsOverlay extends StatefulWidget {
-  const _FakeGpsOverlay({Key? key}) : super(key: key);
+  const _FakeGpsOverlay({super.key});
 
   @override
   State<_FakeGpsOverlay> createState() => _FakeGpsOverlayState();
@@ -132,8 +134,8 @@ class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
     controller.move(center, zoom);
   }
 
-  CustomPoint<num>? latLngToScreenPoint(LatLng latLng) {
-    return controller.latLngToScreenPoint(latLng);
+  Point<num>? latLngToScreenPoint(LatLng latLng) {
+    return controller.camera.latLngToScreenPoint(latLng);
   }
 
   @override
@@ -142,7 +144,7 @@ class _FakeGpsOverlayState extends State<_FakeGpsOverlay> {
 
     return FlutterMap(
       mapController: controller,
-      options: MapOptions(interactiveFlags: InteractiveFlag.none),
+      options: const MapOptions(interactionOptions: InteractionOptions(flags: InteractiveFlag.none)),
       children: [
         if (kDebugMode && fakeGpsEnabled.value)
           _FakeGpsPosition(
