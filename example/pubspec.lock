@@ -376,13 +376,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
-  opentourguide:
-    dependency: "direct main"
-    description:
-      path: ".."
-      relative: true
-    source: path
-    version: "1.0.0+1"
   path:
     dependency: transitive
     description:
@@ -604,6 +597,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.1"
+  tourforge:
+    dependency: "direct main"
+    description:
+      path: ".."
+      relative: true
+    source: path
+    version: "1.0.0+1"
   typed_data:
     dependency: transitive
     description:

@@ -5,7 +5,7 @@ import 'dart:io';
 
 import 'package:latlong2/latlong.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
-import 'package:opentourguide/src/asset_garbage_collector.dart';
+import 'package:tourforge/src/asset_garbage_collector.dart';
 import 'package:path/path.dart' as p;
 
 import 'asset_image.dart';

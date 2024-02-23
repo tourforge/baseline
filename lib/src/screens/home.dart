@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:opentourguide/src/config.dart';
+import 'package:tourforge/src/config.dart';
 
 import '/src/data.dart';
 import '/src/screens/tour_details.dart';
@@ -27,7 +27,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(otgConfig.appName),
+        title: Text(tourForgeConfig.appName),
         actions: [
           PopupMenuButton(
             icon: Icon(
@@ -71,7 +71,7 @@ class _HomeState extends State<Home> {
                   const SizedBox(height: 4.0),
                   Text(
                     "Below, you will find a list containing the tours currently available "
-                    "in ${otgConfig.appName}. Try tapping on one to take a look!",
+                    "in ${tourForgeConfig.appName}. Try tapping on one to take a look!",
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],

@@ -1,4 +1,4 @@
-package org.opentourbuilder.guide
+package org.tourforge.guide
 
 import androidx.annotation.NonNull
 
@@ -8,13 +8,13 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 
-/** OpenTourGuidePlugin */
-class OpenTourGuidePlugin: FlutterPlugin {
+/** TourForgePlugin */
+class TourForgePlugin: FlutterPlugin {
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         flutterPluginBinding.flutterEngine
             .platformViewsController
             .registry
-            .registerViewFactory("org.opentourbuilder.guide.MapLibrePlatformView",
+            .registerViewFactory("org.tourforge.guide.MapLibrePlatformView",
                 MapLibrePlatformViewFactory(flutterPluginBinding.flutterEngine.dartExecutor.binaryMessenger))
     }
 

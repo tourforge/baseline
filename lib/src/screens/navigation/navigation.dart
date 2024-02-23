@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:opentourguide/src/help_viewed.dart';
+import 'package:tourforge/src/help_viewed.dart';
 import 'package:provider/provider.dart';
 
 import '../../controllers/narration_playback.dart';
@@ -80,7 +80,7 @@ class DisclaimerScreen extends StatelessWidget {
               final height = width * aspect;
               return Image.asset(
                 "assets/traffic.png",
-                package: "opentourguide",
+                package: "tourforge",
                 width: width,
                 height: height,
               );

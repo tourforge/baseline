@@ -1,6 +1,6 @@
-# opentourguide_example
+# tourforge_example
 
-Demonstrates how to use the opentourguide plugin.
+Demonstrates how to use the tourforge plugin.
 
 ## Getting Started
 

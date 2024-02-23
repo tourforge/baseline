@@ -1,10 +1,10 @@
-# OpenTourGuide
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/opentourbuilder/guide/android.yml?branch=main&label=Android%20build&style=for-the-badge)](https://github.com/opentourbuilder/guide/actions/workflows/android.yml)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/opentourbuilder/guide/ios.yml?branch=main&label=iOS%20build&style=for-the-badge)](https://github.com/opentourbuilder/guide/actions/workflows/ios.yml)
+# TourForge
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tourforge/guide/android.yml?branch=main&label=Android%20build&style=for-the-badge)](https://github.com/tourforge/guide/actions/workflows/android.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tourforge/guide/ios.yml?branch=main&label=iOS%20build&style=for-the-badge)](https://github.com/tourforge/guide/actions/workflows/ios.yml)
 
-OpenTourGuide is a rebrandable GPS-guided tour app for Android and iOS, built using Flutter. This repository holds the generic, unbranded code, packaged as a Flutter library. You'll also find a sample application, used for testing purposes, under the `example/` directory. [Florence Navigator](https://github.com/opentourbuilder/florence-navigator) is OpenTourGuide's flagship application.
+TourForge is a rebrandable GPS-guided tour app for Android and iOS, built using Flutter. This repository holds the generic, unbranded code, packaged as a Flutter library. You'll also find a sample application, used for testing purposes, under the `example/` directory. [Florence Navigator](https://github.com/tourforge/florence-navigator) is TourForge's flagship application.
 
-If you want to create your own tour guide app, follow [our guide](https://github.com/opentourbuilder/documentation/blob/main/Creating%20an%20app.md).
+If you want to create your own tour guide app, follow [our guide](https://github.com/tourforge/documentation/blob/main/Creating%20an%20app.md).
 
 ## First-Time Development Setup
 

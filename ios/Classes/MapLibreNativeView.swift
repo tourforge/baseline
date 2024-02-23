@@ -44,7 +44,7 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
         binaryMessenger messenger: FlutterBinaryMessenger
     ) {
         _view = UIView()
-        _channel = FlutterMethodChannel(name: "opentourbuilder.org/guide/map", binaryMessenger: messenger)
+        _channel = FlutterMethodChannel(name: "tourforge.org/guide/map", binaryMessenger: messenger)
         _pathGeoJson = (args as! Dictionary<String, Any>)["pathGeoJson"] as! String
         _pointsGeoJson = (args as! Dictionary<String, Any>)["pointsGeoJson"] as! String
         _locationSource = MGLShapeSource(identifier: "current_location", shape: MGLShapeCollectionFeature())

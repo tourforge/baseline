@@ -23,10 +23,10 @@ class About extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          if (otgConfig.appDesc != null)
+          if (tourForgeConfig.appDesc != null)
             Padding(
               padding: const EdgeInsets.all(20.0),
-              child: Text(otgConfig.appDesc!,
+              child: Text(tourForgeConfig.appDesc!,
                   style: Theme.of(context).textTheme.bodyLarge),
             ),
           CollapsibleSection(

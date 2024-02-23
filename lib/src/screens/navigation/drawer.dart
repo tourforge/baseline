@@ -93,7 +93,7 @@ class TourNavigationDrawerState extends State<TourNavigationDrawer>
               child: SizedBox(
                 height: _innerSize,
                 child: Theme(
-                  data: otgConfig.darkThemeData,
+                  data: tourForgeConfig.darkThemeData,
                   child: Material(
                     child: OverflowBox(
                       child: Column(

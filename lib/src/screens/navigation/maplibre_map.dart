@@ -82,7 +82,7 @@ class MapLibreMap extends StatefulWidget {
 }
 
 class _MapLibreMapState extends State<MapLibreMap> {
-  static const _channel = MethodChannel("opentourbuilder.org/guide/map");
+  static const _channel = MethodChannel("tourforge.org/guide/map");
 
   late final String stylePath;
   late final String satStylePath;
@@ -151,7 +151,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
 
       if (!mounted) return satStylePath;
       var assetBundle = DefaultAssetBundle.of(context);
-      var assetPrefix = "packages/opentourguide";
+      var assetPrefix = "packages/tourforge";
       var styleText =
           await assetBundle.loadString('$assetPrefix/assets/style.json');
       var satStyleText = await assetBundle
@@ -239,7 +239,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
         if (snapshot.hasData && !snapshot.hasError) {
           // This is used in the platform side to register the view.
           const String viewType =
-              'org.opentourbuilder.guide.MapLibrePlatformView';
+              'org.tourforge.guide.MapLibrePlatformView';
           // Pass parameters to the platform side.
           final Map<String, dynamic> creationParams = <String, dynamic>{
             "stylePath": snapshot.data,

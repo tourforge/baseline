@@ -1,4 +1,4 @@
-package org.opentourbuilder.guide.opentourguide_example
+package org.tourforge.guide.tourforge_example
 
 import com.ryanheise.audioservice.AudioServiceActivity
 

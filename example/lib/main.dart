@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:opentourguide/opentourguide.dart';
+import 'package:tourforge/tourforge.dart';
 
 import '/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await runOpenTourGuide(
-    config: OpenTourGuideConfig(
-      appName: "OpenTourGuide Example",
+  await runTourForge(
+    config: TourForgeConfig(
+      appName: "TourForge Example",
       appDesc:
-          '''OpenTourGuide Example is the example app for the OpenTourGuide library.''',
+          '''TourForge Example is the example app for the TourForge library.''',
       baseUrl: "https://fsrv.fly.dev/v2",
       lightThemeData: lightThemeData,
       darkThemeData: darkThemeData,

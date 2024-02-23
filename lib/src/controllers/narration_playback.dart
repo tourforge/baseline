@@ -24,7 +24,7 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
     instance = await AudioService.init(
       builder: () => NarrationPlaybackController(),
       config: const AudioServiceConfig(
-        androidNotificationChannelId: 'org.opentourbuilder.guide.channel.audio',
+        androidNotificationChannelId: 'org.tourforge.guide.channel.audio',
         androidNotificationChannelName: 'Narration playback',
       ),
     );

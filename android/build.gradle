@@ -1,4 +1,4 @@
-group 'org.opentourbuilder.guide'
+group 'org.tourforge.guide'
 version '1.0-SNAPSHOT'
 
 buildscript {

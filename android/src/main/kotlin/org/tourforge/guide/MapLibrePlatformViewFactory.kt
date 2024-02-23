@@ -1,4 +1,4 @@
-package org.opentourbuilder.guide
+package org.tourforge.guide
 
 import android.content.Context
 import io.flutter.plugin.common.BinaryMessenger

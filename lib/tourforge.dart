@@ -1,4 +1,4 @@
-library opentourguide;
+library tourforge;
 
 import 'dart:io';
 
@@ -16,15 +16,15 @@ import 'src/download_manager.dart';
 import 'src/screens/home.dart';
 import 'src/help_viewed.dart';
 
-export 'src/config.dart' show OpenTourGuideConfig;
+export 'src/config.dart' show TourForgeConfig;
 export 'src/location.dart' show requestGpsPermissions;
 export 'src/screens/help_slides.dart';
 
-Future<void> runOpenTourGuide({
-  required OpenTourGuideConfig config,
+Future<void> runTourForge({
+  required TourForgeConfig config,
   Widget Function(BuildContext context, void Function() finish)? onboarding,
 }) async {
-  setOtgConfig(config);
+  setTourForgeConfig(config);
 
   WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isAndroid) {
@@ -37,7 +37,7 @@ Future<void> runOpenTourGuide({
       AssetGarbageCollector.base = base;
       return base;
     }),
-    Future.value(otgConfig.baseUrl),
+    Future.value(tourForgeConfig.baseUrl),
   );
 
   final session = await AudioSession.instance;
@@ -46,11 +46,11 @@ Future<void> runOpenTourGuide({
   await NarrationPlaybackController.init();
 
   var onboarded = await HelpViewed.viewed("onboarding");
-  runApp(_OpenTourGuideApp(onboarded ? null : onboarding));
+  runApp(_TourForgeApp(onboarded ? null : onboarding));
 }
 
-class _OpenTourGuideApp extends StatelessWidget {
-  const _OpenTourGuideApp(this.onboarding, {Key? key}) : super(key: key);
+class _TourForgeApp extends StatelessWidget {
+  const _TourForgeApp(this.onboarding, {Key? key}) : super(key: key);
 
   final Widget Function(BuildContext context, void Function() finish)?
       onboarding;
@@ -58,11 +58,11 @@ class _OpenTourGuideApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: otgConfig.appName,
+      title: tourForgeConfig.appName,
       theme: SchedulerBinding.instance.platformDispatcher.platformBrightness ==
               Brightness.dark
-          ? otgConfig.darkThemeData
-          : otgConfig.lightThemeData,
+          ? tourForgeConfig.darkThemeData
+          : tourForgeConfig.lightThemeData,
       builder: (context, child) {
         if (child != null) {
           return ScrollConfiguration(

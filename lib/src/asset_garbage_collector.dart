@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:opentourguide/src/data.dart';
+import 'package:tourforge/src/data.dart';
 
 /// Collects the garbage of unreferenced files.
 class AssetGarbageCollector {

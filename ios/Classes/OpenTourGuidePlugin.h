@@ -1,4 +1,4 @@
 #import <Flutter/Flutter.h>
 
-@interface OpenTourGuidePlugin : NSObject<FlutterPlugin>
+@interface TourForgePlugin : NSObject<FlutterPlugin>
 @end

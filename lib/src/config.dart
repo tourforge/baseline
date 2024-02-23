@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-OpenTourGuideConfig get otgConfig => _otgConfig;
+TourForgeConfig get tourForgeConfig => _tourForgeConfig;
 
-late OpenTourGuideConfig _otgConfig;
+late TourForgeConfig _tourForgeConfig;
 
-void setOtgConfig(OpenTourGuideConfig config) {
-  _otgConfig = config;
+void setTourForgeConfig(TourForgeConfig config) {
+  _tourForgeConfig = config;
 }
 
-class OpenTourGuideConfig {
-  const OpenTourGuideConfig({
+class TourForgeConfig {
+  const TourForgeConfig({
     required this.appName,
     this.appDesc,
     required this.baseUrl,
