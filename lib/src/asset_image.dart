@@ -26,11 +26,6 @@ class AssetImage extends ImageProvider<FileImage> {
 
   @override
   // ignore: deprecated_member_use
-  ImageStreamCompleter load(FileImage key, DecoderCallback decode) {
-    return key.load(key, decode);
-  }
-
-  @override
   ImageStreamCompleter loadBuffer(FileImage key, DecoderBufferCallback decode) {
     return key.loadBuffer(key, decode);
   }
