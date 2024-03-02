@@ -8,7 +8,11 @@ import 'package:path/path.dart' as p;
 
 import 'data.dart';
 
-class DownloadFailedException implements Exception {}
+class DownloadFailedException implements Exception {
+  DownloadFailedException(this.response);
+
+  final HttpClientResponse? response;
+}
 
 class DownloadManager {
   DownloadManager(this.localBaseFut, this.networkBaseFut) {
@@ -115,7 +119,7 @@ class DownloadManager {
           }
         }
 
-        throw DownloadFailedException();
+        throw DownloadFailedException(null);
       })(),
     );
   }
@@ -127,7 +131,7 @@ class DownloadManager {
     var resp = await req.close();
 
     if (resp.statusCode != 200) {
-      throw DownloadFailedException();
+      throw DownloadFailedException(resp);
     }
 
     var totalDownloadSize =

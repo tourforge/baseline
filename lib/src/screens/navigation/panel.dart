@@ -50,7 +50,7 @@ class NavigationPanel extends StatelessWidget {
                     ),
                     child: Text(
                       currentWaypoint.index != null
-                          ? "${currentWaypoint.index! + 1}. ${tour.waypoints[currentWaypoint.index!].name}"
+                          ? "${currentWaypoint.index! + 1}. ${tour.route[currentWaypoint.index!].title}"
                           : "No Narration Playing",
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
                             color: currentWaypoint.index == null

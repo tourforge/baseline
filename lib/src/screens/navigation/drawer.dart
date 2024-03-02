@@ -120,7 +120,7 @@ class TourNavigationDrawerState extends State<TourNavigationDrawer>
                                 children: [
                                   const SizedBox(height: 4),
                                   for (var entry
-                                      in widget.tour.waypoints.asMap().entries)
+                                      in widget.tour.route.asMap().entries)
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 8.0,

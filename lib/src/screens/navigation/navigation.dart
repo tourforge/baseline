@@ -148,7 +148,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     _navController = NavigationController(
       path: widget.tour.path,
-      waypoints: widget.tour.waypoints
+      waypoints: widget.tour.route
           .map((e) => NavigationWaypoint(
                 position: LatLng(e.lat, e.lng),
                 triggerRadius: e.triggerRadius,
@@ -290,7 +290,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   onPointClick: (index) {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
-                            WaypointDetails(widget.tour.waypoints[index])));
+                            WaypointDetails(widget.tour.route[index])));
                   },
                   onPoiClick: (index) {
                     Navigator.of(context).push(MaterialPageRoute(

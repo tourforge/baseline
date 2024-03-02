@@ -11,7 +11,7 @@ Future<void> main() async {
       appName: "TourForge Example",
       appDesc:
           '''TourForge Example is the example app for the TourForge library.''',
-      baseUrl: "https://fsrv.fly.dev/v2",
+      baseUrl: "http://192.168.4.248:8000/download/6a70129d-4560-498c-8f50-d25a8aa4623e",
       lightThemeData: lightThemeData,
       darkThemeData: darkThemeData,
     ),

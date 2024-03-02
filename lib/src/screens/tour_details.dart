@@ -95,7 +95,7 @@ class _TourDetailsState extends State<TourDetails>
               delegate: DetailsScreenHeaderDelegate(
                 tickerProvider: this,
                 gallery: widget.tour.gallery,
-                title: widget.tour.name,
+                title: widget.tour.title,
                 action: action,
                 onHelpPressed: _launchHelp,
               ),
@@ -414,13 +414,13 @@ class _WaypointList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        childCount: tour?.waypoints.length ?? 0,
+        childCount: tour?.route.length ?? 0,
         (context, index) {
           return Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
             child: WaypointCard(
-              waypoint: tour!.waypoints[index],
+              waypoint: tour!.route[index],
               index: index,
             ),
           );

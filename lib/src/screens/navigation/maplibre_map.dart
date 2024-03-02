@@ -3,9 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:path/path.dart' as p;
@@ -131,7 +129,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
     });
 
     center =
-        averagePoint(widget.tour.waypoints.map((w) => LatLng(w.lat, w.lng)));
+        averagePoint(widget.tour.route.map((w) => LatLng(w.lat, w.lng)));
     zoom = _calculateTourZoom(widget.tour);
   }
 
@@ -196,7 +194,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
       satStyle["sprite"] = "file://$spriteSatPath";
       style["sprite"] = "file://$spritePath";
       satStyle["sources"]["openmaptiles"]["url"] = style["sources"]
-          ["openmaptiles"]["url"] = "mbtiles://${widget.tour.tiles.localPath}";
+          ["openmaptiles"]["url"] = "mbtiles://${widget.tour.tiles!.localPath}";
       satStyle["sources"]["satellite"]["tiles"][0] =
           "https://api.tomtom.com/map/1/tile/sat/main/{z}/{x}/{y}.jpg?key=$tomtomKey";
 
@@ -245,7 +243,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
           final Map<String, dynamic> creationParams = <String, dynamic>{
             "stylePath": snapshot.data,
             "pathGeoJson": _pathToGeoJson(widget.tour.path),
-            "pointsGeoJson": _waypointsToGeoJson(widget.tour.waypoints),
+            "pointsGeoJson": _waypointsToGeoJson(widget.tour.route),
             "poisGeoJson": _poisToGeoJson(widget.tour.pois),
             "center": {"lat": center.latitude, "lng": center.longitude},
             "zoom": zoom,
@@ -332,8 +330,8 @@ String _poisToGeoJson(List<PoiModel> pois) {
 
 double _calculateTourZoom(TourModel tour) {
   var distance = const Distance();
-  var center = averagePoint(tour.waypoints.map((w) => LatLng(w.lat, w.lng)));
-  var minRadius = tour.waypoints
+  var center = averagePoint(tour.route.map((w) => LatLng(w.lat, w.lng)));
+  var minRadius = tour.route
       .map((w) => distance(LatLng(w.lat, w.lng), center))
       .reduce(max);
   return max(-log(minRadius) / ln2 + 25.25 - 1.5, 1);

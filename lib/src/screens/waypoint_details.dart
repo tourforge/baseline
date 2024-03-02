@@ -33,7 +33,7 @@ class _WaypointDetailsState extends State<WaypointDetails>
               delegate: DetailsScreenHeaderDelegate(
                 tickerProvider: this,
                 gallery: widget.waypoint.gallery,
-                title: widget.waypoint.name,
+                title: widget.waypoint.title,
                 action: ElevatedButton(
                   onPressed: () {
                     if (Platform.isIOS) {

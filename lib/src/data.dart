@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
 import 'package:tourforge/src/asset_garbage_collector.dart';
@@ -30,7 +31,7 @@ class TourIndex {
 
     try {
       indexJsonFile = await download.file;
-    } on DownloadFailedException {
+    } on DownloadFailedException catch (e) {
       if (preexistingIndexExists) {
         // don't care, continue executing since we have the preexisting file
       } else {
@@ -41,7 +42,12 @@ class TourIndex {
 
     AssetGarbageCollector.run();
 
-    return parse(jsonDecode(await indexJsonFile.readAsString()));
+    var idx = parse(jsonDecode(await indexJsonFile.readAsString()));
+    if (kDebugMode) {
+      print(idx);
+    }
+
+    return idx;
   }
 
   static TourIndex parse(dynamic json) => TourIndex._(
@@ -54,20 +60,26 @@ class TourIndex {
 
 class TourIndexEntry {
   TourIndexEntry._({
-    required this.name,
+    required this.title,
     required this.thumbnail,
     required this.content,
+    required this.type,
+    required this.stops,
   });
 
   static TourIndexEntry _parse(dynamic json) => TourIndexEntry._(
-        name: json["name"]! as String,
+        title: json["title"]! as String,
         thumbnail: AssetModel._(json["thumbnail"]),
         content: AssetModel._(json["content"]),
+        type: json["type"]! as String,
+        stops: json["stops"]! as int,
       );
 
-  final String name;
+  final String title;
   final AssetModel? thumbnail;
   final AssetModel content;
+  final String type;
+  final int stops;
 
   Future<TourModel> loadDetails() async {
     var download = DownloadManager.instance.download(content);
@@ -80,23 +92,24 @@ class TourIndexEntry {
 class TourModel {
   TourModel._({
     required this.id,
-    required this.name,
+    required this.title,
     required this.desc,
-    required this.waypoints,
+    required this.route,
     required this.gallery,
     required this.pois,
     required this.path,
     required this.tiles,
     required this.links,
+    required this.type,
   });
 
   static TourModel parse(String path, dynamic json) => TourModel._(
         id: path,
-        name: json["name"]! as String,
+        title: json["title"]! as String,
         desc: json["desc"]! as String,
-        waypoints: List<WaypointModel>.unmodifiable(
-            (json["waypoints"]! as List<dynamic>)
-                .where((element) => element["type"] == "waypoint")
+        route: List<WaypointModel>.unmodifiable(
+            (json["route"]! as List<dynamic>)
+                .where((element) => element["type"] == "stop")
                 .map(WaypointModel._parse)),
         gallery: List<AssetModel>.unmodifiable(
             (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
@@ -104,22 +117,24 @@ class TourModel {
             (json["pois"]! as List<dynamic>).map(PoiModel._parse)),
         path: List.unmodifiable(mtk.PolygonUtil.decode(json["path"]! as String)
             .map((e) => LatLng(e.latitude, e.longitude))),
-        tiles: AssetModel._(json["tiles"]),
+        tiles: json["tiles"] != null ? AssetModel._(json["tiles"]) : null,
         links: json["links"] != null
             ? (json["links"] as Map<String, dynamic>)
                 .map((key, value) => MapEntry(key, LinkModel._parse(value)))
             : {},
+        type: json["type"]! as String,
       );
 
   final String id;
-  final String name;
+  final String title;
   final String desc;
-  final List<WaypointModel> waypoints;
+  final List<WaypointModel> route;
   final List<AssetModel> gallery;
   final List<PoiModel> pois;
   final List<LatLng> path;
-  final AssetModel tiles;
+  final AssetModel? tiles;
   final Map<String, LinkModel> links;
+  final String type;
 
   Iterable<AssetModel> get allAssets =>
       HashSet<AssetModel>.from(_allAssets().followedBy(_allAssets()));
@@ -136,9 +151,11 @@ class TourModel {
     yield* gallery;
     yield* gallery
         .map((a) => AssetModel._("${a.name}.meta.json", required: false));
-    yield tiles;
+    if (tiles != null) {
+      yield tiles!;
+    }
 
-    for (final waypoint in waypoints) {
+    for (final waypoint in route) {
       yield* waypoint.gallery;
       yield* waypoint.gallery
           .map((a) => AssetModel._("${a.name}.meta.json", required: false));
@@ -158,7 +175,7 @@ class TourModel {
 
 class WaypointModel {
   WaypointModel._({
-    required this.name,
+    required this.title,
     required this.desc,
     required this.lat,
     required this.lng,
@@ -170,11 +187,11 @@ class WaypointModel {
   });
 
   static WaypointModel _parse(dynamic json) => WaypointModel._(
-        name: json["name"]! as String,
+        title: json["title"]! as String,
         desc: json["desc"]! as String,
         lat: json["lat"]! as double,
         lng: json["lng"]! as double,
-        triggerRadius: json["trigger_radius"]! as double,
+        triggerRadius: json["trigger_radius"]!.toDouble(),
         narration:
             json["narration"] != null ? AssetModel._(json["narration"]) : null,
         transcript: json["transcript"] as String?,
@@ -186,7 +203,7 @@ class WaypointModel {
             : {},
       );
 
-  final String name;
+  final String title;
   final String desc;
   final double lat;
   final double lng;

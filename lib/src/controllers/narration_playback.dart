@@ -38,7 +38,7 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
     _player.durationStream.listen((duration) {
       if (_currentIndex == null || duration == null) return;
 
-      buildMediaItem(tour.waypoints[_currentIndex!], duration)
+      buildMediaItem(tour.route[_currentIndex!], duration)
           .then(updateMediaItem);
     });
     _player.positionDiscontinuityStream.listen((event) {
@@ -87,11 +87,11 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
 
   Future<void> playWaypoint(int index) async {
     _currentIndex = index;
-    _currentNarration = tour.waypoints[index].narration;
+    _currentNarration = tour.route[index].narration;
 
     await _player.stop();
 
-    mediaItem.add(await buildMediaItem(tour.waypoints[index]));
+    mediaItem.add(await buildMediaItem(tour.route[index]));
     if (_currentNarration == null) {
       _onStateChanged.add(null);
       _updatePlaybackState();
@@ -125,9 +125,9 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
     }
 
     return MediaItem(
-      id: waypoint.narration?.localPath ?? "${tour.name}/${waypoint.name}",
-      title: waypoint.name,
-      album: tour.name,
+      id: waypoint.narration?.localPath ?? "${tour.title}/${waypoint.title}",
+      title: waypoint.title,
+      album: tour.title,
       artUri: artUri,
       duration: duration,
     );
@@ -163,7 +163,7 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> skipToNext() async {
-    if (_currentIndex == null || _currentIndex! >= tour.waypoints.length - 1) {
+    if (_currentIndex == null || _currentIndex! >= tour.route.length - 1) {
       return;
     }
 

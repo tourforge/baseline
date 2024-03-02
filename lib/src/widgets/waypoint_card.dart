@@ -100,7 +100,7 @@ class _WaypointCardState extends State<WaypointCard> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          widget.waypoint.name,
+                          widget.waypoint.title,
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall!
