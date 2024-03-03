@@ -167,6 +167,11 @@ class DownloadManager {
     ));
   }
 
+  Future<void> delete(AssetModel asset) async {
+    await asset.downloadedFile.delete();
+    _downloadedAssetNames.remove(asset.name);
+  }
+
   void _printDebug(String message) {
     if (kDebugMode) print(message);
   }

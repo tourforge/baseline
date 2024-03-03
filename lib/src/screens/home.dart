@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tourforge/src/asset_garbage_collector.dart';
 import 'package:tourforge/src/config.dart';
+import 'package:tourforge/src/download_manager.dart';
 
 import '/src/data.dart';
 import '/src/screens/tour_details.dart';
@@ -138,6 +140,49 @@ class _TourListItemState extends State<_TourListItem> {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => TourDetails(tourModel)));
           },
+          onLongPress: () {
+            showDialog<bool>(
+              context: context,
+              builder: (BuildContext context) => Dialog(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 24.0),
+                      const Text(
+                        "Would you like to delete the locally-downloaded content of this tour?\n\n"
+                        "You will still be able to redownload this tour in the future if desired.",
+                        softWrap: true,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await DownloadManager.instance.delete(widget.tour.content);
+                              await AssetGarbageCollector.run();
+
+                              if (!context.mounted) return;
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Delete'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8.0),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
           borderRadius: const BorderRadius.all(Radius.circular(16)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -207,7 +252,9 @@ class _TourListItemState extends State<_TourListItem> {
                       color: Color.fromARGB(255, 160, 160, 160),
                     ),
                     Text(
-                      widget.tour.type == "driving" ? "Driving Tour" : "Walking Tour",
+                      widget.tour.type == "driving"
+                          ? "Driving Tour"
+                          : "Walking Tour",
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(
                           color: const Color.fromARGB(255, 160, 160, 160)),
                     ),
