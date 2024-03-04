@@ -44,6 +44,7 @@ With Xcode open, follow this documentation (https://developer.apple.com/document
 
 ### iOS
 
+Make sure to back to the first-time setup for iOS section (https://github.com/tourforge/guide?tab=readme-ov-file#ios-specific-setup) and consult on step 4 to copy `ios-arm64_x86_64-simulator` instead.
 With Xcode open, follow this documentation (https://developer.apple.com/documentation/xcode/running-your-app-in-simulator-or-on-a-device#Configure-the-list-of-simulated-devices).
 
 ### Android
