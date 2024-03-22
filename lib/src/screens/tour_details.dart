@@ -277,7 +277,7 @@ class _DownloadButtonState extends State<_DownloadButton> {
           allDownloaded = false;
 
           var downloadInProgress =
-              DownloadManager.instance.downloadInProgress(asset.name);
+              DownloadManager.instance.downloadInProgress(asset.id);
 
           if (downloadInProgress == null) {
             inProgress = false;

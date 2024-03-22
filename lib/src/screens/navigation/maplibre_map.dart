@@ -151,7 +151,23 @@ class _MapLibreMapState extends State<MapLibreMap> {
 
       if (!mounted) return satStylePath;
       var assetBundle = DefaultAssetBundle.of(context);
-      var assetPrefix = "packages/tourforge";
+
+      // check if we have tiles for the whole app
+      ByteData? bundledTiles;
+      try {
+        bundledTiles = await assetBundle.load("assets/tiles.mbtiles");
+      } on Exception {
+        // an exception here simply means there are no bundled tiles
+        // bundledTiles is set to null by default so we can just continue onwards
+      }
+
+      String? bundledTilesPath;
+      if (bundledTiles != null) {
+        bundledTilesPath = p.join((await getTemporaryDirectory()).path, "tiles.mbtiles");
+        await File(bundledTilesPath).writeAsBytes(bundledTiles.buffer.asUint8List());
+      }
+
+      var assetPrefix = "packages/tourforge_baseline";
       var styleText =
           await assetBundle.loadString('$assetPrefix/assets/style.json');
       var satStyleText = await assetBundle
@@ -193,8 +209,13 @@ class _MapLibreMapState extends State<MapLibreMap> {
           style["glyphs"] = "file://$fontsBasePath/{fontstack}/{range}.pbf";
       satStyle["sprite"] = "file://$spriteSatPath";
       style["sprite"] = "file://$spritePath";
-      satStyle["sources"]["openmaptiles"]["url"] = style["sources"]
-          ["openmaptiles"]["url"] = "mbtiles://${widget.tour.tiles!.localPath}";
+      if (widget.tour.tiles != null) {
+        satStyle["sources"]["openmaptiles"]["url"] = style["sources"]
+            ["openmaptiles"]["url"] = "mbtiles://${widget.tour.tiles!.localPath}";
+      } else if (bundledTilesPath != null) {
+        satStyle["sources"]["openmaptiles"]["url"] = style["sources"]
+            ["openmaptiles"]["url"] = "mbtiles://$bundledTilesPath";
+      }
       satStyle["sources"]["satellite"]["tiles"][0] =
           "https://api.tomtom.com/map/1/tile/sat/main/{z}/{x}/{y}.jpg?key=$tomtomKey";
 

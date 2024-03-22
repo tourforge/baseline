@@ -12,26 +12,28 @@ import 'package:path/path.dart' as p;
 import 'asset_image.dart';
 import 'download_manager.dart';
 
-class TourIndex {
-  TourIndex._({
+class Project {
+  Project._({
     required this.tours,
+    required this.assets,
   });
 
-  final List<TourIndexEntry> tours;
+  final List<TourModel> tours;
+  final Map<String, AssetInfo> assets;
 
-  static Future<TourIndex> load() async {
-    var indexJsonFile = AssetModel._("index.json").downloadedFile;
-    var preexistingIndexExists = await indexJsonFile.exists();
+  static Future<Project> load() async {
+    var tourforgeJsonFile = AssetModel._fromId("tourforge.json").downloadedFile;
+    var preexistingIndexExists = await tourforgeJsonFile.exists();
 
     var download = DownloadManager.instance.download(
-      AssetModel._("index.json"),
+      AssetModel._fromId("tourforge.json"),
       reDownload: true,
       maxRetries: preexistingIndexExists ? 3 : null,
     );
 
     try {
-      indexJsonFile = await download.file;
-    } on DownloadFailedException catch (e) {
+      tourforgeJsonFile = await download.file;
+    } on DownloadFailedException {
       if (preexistingIndexExists) {
         // don't care, continue executing since we have the preexisting file
       } else {
@@ -42,7 +44,7 @@ class TourIndex {
 
     AssetGarbageCollector.run();
 
-    var idx = parse(jsonDecode(await indexJsonFile.readAsString()));
+    var idx = parse(jsonDecode(await tourforgeJsonFile.readAsString()));
     if (kDebugMode) {
       print(idx);
     }
@@ -50,43 +52,37 @@ class TourIndex {
     return idx;
   }
 
-  static TourIndex parse(dynamic json) => TourIndex._(
+  static Project parse(dynamic json) {
+    Map<String, AssetInfo> assetsMap = Map.unmodifiable((json["assets"] as Map<String, dynamic>).map<String, AssetInfo>((key, value) => MapEntry<String, AssetInfo>(key, AssetInfo._parse(value))));
+    return Project._(
         tours: List.unmodifiable(
           ((json as Map<String, dynamic>)["tours"] as List<dynamic>)
-              .map((e) => TourIndexEntry._parse(e)),
+              .map((e) => TourModel.parse(e, assetsMap)),
         ),
+        assets: Map.unmodifiable((json["assets"] as Map<String, dynamic>).map((key, value) => MapEntry(key, AssetInfo._parse(value)))),
       );
+  }
 }
 
-class TourIndexEntry {
-  TourIndexEntry._({
-    required this.title,
-    required this.thumbnail,
-    required this.content,
+class AssetInfo {
+  AssetInfo._({
+    required this.alt,
+    required this.attrib,
     required this.type,
-    required this.stops,
+    required this.hash,
   });
 
-  static TourIndexEntry _parse(dynamic json) => TourIndexEntry._(
-        title: json["title"]! as String,
-        thumbnail: AssetModel._(json["thumbnail"]),
-        content: AssetModel._(json["content"]),
-        type: json["type"]! as String,
-        stops: json["stops"]! as int,
-      );
-
-  final String title;
-  final AssetModel? thumbnail;
-  final AssetModel content;
+  final String alt;
+  final String attrib;
   final String type;
-  final int stops;
+  final String hash;
 
-  Future<TourModel> loadDetails() async {
-    var download = DownloadManager.instance.download(content);
-    var tourJsonFile = await download.file;
-    var tourJson = await tourJsonFile.readAsString();
-    return TourModel.parse(content.name, jsonDecode(tourJson));
-  }
+  static AssetInfo _parse(dynamic json) => AssetInfo._(
+    alt: json["alt"],
+    attrib: json["attrib"],
+    type: json["type"],
+    hash: json["hash"],
+  );
 }
 
 class TourModel {
@@ -103,21 +99,21 @@ class TourModel {
     required this.type,
   });
 
-  static TourModel parse(String path, dynamic json) => TourModel._(
-        id: path,
+  static TourModel parse(dynamic json, Map<String, AssetInfo> assetsMap) => TourModel._(
+        id: json["id"],
         title: json["title"]! as String,
         desc: json["desc"]! as String,
         route: List<WaypointModel>.unmodifiable(
             (json["route"]! as List<dynamic>)
                 .where((element) => element["type"] == "stop")
-                .map(WaypointModel._parse)),
+                .map((e) => WaypointModel._parse(e, assetsMap))),
         gallery: List<AssetModel>.unmodifiable(
-            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
+            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._fromName(e, assetsMap))),
         pois: List<PoiModel>.unmodifiable(
-            (json["pois"]! as List<dynamic>).map(PoiModel._parse)),
+            (json["pois"]! as List<dynamic>).map((e) => PoiModel._parse(e, assetsMap))),
         path: List.unmodifiable(mtk.PolygonUtil.decode(json["path"]! as String)
             .map((e) => LatLng(e.latitude, e.longitude))),
-        tiles: json["tiles"] != null ? AssetModel._(json["tiles"]) : null,
+        tiles: json["tiles"] != null ? AssetModel._fromName(json["tiles"], assetsMap) : null,
         links: json["links"] != null
             ? (json["links"] as Map<String, dynamic>)
                 .map((key, value) => MapEntry(key, LinkModel._parse(value)))
@@ -149,16 +145,12 @@ class TourModel {
 
   Iterable<AssetModel> _allAssets() sync* {
     yield* gallery;
-    yield* gallery
-        .map((a) => AssetModel._("${a.name}.meta.json", required: false));
     if (tiles != null) {
       yield tiles!;
     }
 
     for (final waypoint in route) {
       yield* waypoint.gallery;
-      yield* waypoint.gallery
-          .map((a) => AssetModel._("${a.name}.meta.json", required: false));
 
       if (waypoint.narration != null) {
         yield waypoint.narration!;
@@ -167,8 +159,6 @@ class TourModel {
 
     for (final poi in pois) {
       yield* poi.gallery;
-      yield* poi.gallery
-          .map((a) => AssetModel._("${a.name}.meta.json", required: false));
     }
   }
 }
@@ -186,17 +176,17 @@ class WaypointModel {
     required this.links,
   });
 
-  static WaypointModel _parse(dynamic json) => WaypointModel._(
+  static WaypointModel _parse(dynamic json, Map<String, AssetInfo> assetsMap) => WaypointModel._(
         title: json["title"]! as String,
         desc: json["desc"]! as String,
         lat: json["lat"]! as double,
         lng: json["lng"]! as double,
         triggerRadius: json["trigger_radius"]!.toDouble(),
         narration:
-            json["narration"] != null ? AssetModel._(json["narration"]) : null,
+            json["narration"] != null ? AssetModel._fromName(json["narration"], assetsMap) : null,
         transcript: json["transcript"] as String?,
         gallery: List<AssetModel>.unmodifiable(
-            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
+            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._fromName(e, assetsMap))),
         links: json["links"] != null
             ? (json["links"] as Map<String, dynamic>)
                 .map((key, value) => MapEntry(key, LinkModel._parse(value)))
@@ -224,13 +214,13 @@ class PoiModel {
     required this.links,
   });
 
-  static PoiModel _parse(dynamic json) => PoiModel._(
+  static PoiModel _parse(dynamic json, Map<String, AssetInfo> assetsMap) => PoiModel._(
         name: json["name"]! as String,
         desc: json["desc"]! as String,
         lat: json["lat"]! as double,
         lng: json["lng"]! as double,
         gallery: List<AssetModel>.unmodifiable(
-            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._(e))),
+            (json["gallery"]! as List<dynamic>).map((e) => AssetModel._fromName(e, assetsMap))),
         links: json["links"] != null
             ? (json["links"] as Map<String, dynamic>)
                 .map((key, value) => MapEntry(key, LinkModel._parse(value)))
@@ -258,34 +248,25 @@ class LinkModel {
 }
 
 class AssetModel {
-  AssetModel._(this.name, {this.required = true});
+  AssetModel._fromName(this.name, Map<String, AssetInfo> assetsMap, {this.required = true}) : id = assetsMap[name]!.hash, alt = assetsMap[name]!.alt, attrib = assetsMap[name]!.attrib;
+  AssetModel._fromId(this.id, {this.required = true}) : name = "", alt = "", attrib = "";
 
   final String name;
+  final String id;
+  final String alt;
+  final String attrib;
   final bool required;
 
-  Future<AssetMeta?> get meta async {
-    var metaModel = AssetModel._("$name.meta.json", required: false);
-    var metaFile = await DownloadManager.instance.download(metaModel).file;
-
-    if (await metaFile.exists()) {
-      var metaText = await metaFile.readAsString();
-      var metaJson = jsonDecode(metaText);
-      return AssetMeta._parse(metaJson);
-    } else {
-      return null;
-    }
-  }
-
-  String get localPath => p.join(DownloadManager.instance.localBase, name);
+  String get localPath => p.join(DownloadManager.instance.localBase, id);
   File get downloadedFile => File(localPath);
   Future<bool> get isDownloaded async => await File(localPath).exists();
   AssetImage get imageProvider => AssetImage(this);
 
   @override
-  bool operator ==(Object other) => other is AssetModel && name == other.name;
+  bool operator ==(Object other) => other is AssetModel && id == other.id;
 
   @override
-  int get hashCode => name.hashCode;
+  int get hashCode => id.hashCode;
 }
 
 class AssetMeta {

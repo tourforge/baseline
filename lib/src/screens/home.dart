@@ -16,13 +16,13 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late Future<TourIndex> tourIndex;
+  late Future<Project> tourIndex;
 
   @override
   void initState() {
     super.initState();
 
-    tourIndex = TourIndex.load();
+    tourIndex = Project.load();
   }
 
   @override
@@ -81,7 +81,7 @@ class _HomeState extends State<Home> {
             ),
           ),
           const SizedBox(height: 16.0),
-          FutureBuilder<TourIndex>(
+          FutureBuilder<Project>(
             future: tourIndex,
             builder: (context, snapshot) {
               var tours = snapshot.data?.tours;
@@ -118,7 +118,7 @@ class _HomeState extends State<Home> {
 class _TourListItem extends StatefulWidget {
   const _TourListItem(this.tour);
 
-  final TourIndexEntry tour;
+  final TourModel tour;
 
   @override
   State<_TourListItem> createState() => _TourListItemState();
@@ -133,12 +133,9 @@ class _TourListItemState extends State<_TourListItem> {
         elevation: 3,
         shadowColor: Colors.transparent,
         child: InkWell(
-          onTap: () async {
-            final tourModel = await widget.tour.loadDetails();
-            if (!mounted) return;
-
+          onTap: () {
             Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => TourDetails(tourModel)));
+                builder: (context) => TourDetails(widget.tour)));
           },
           onLongPress: () {
             showDialog<bool>(
@@ -166,7 +163,7 @@ class _TourListItemState extends State<_TourListItem> {
                           ),
                           TextButton(
                             onPressed: () async {
-                              await DownloadManager.instance.delete(widget.tour.content);
+                              //await DownloadManager.instance.delete(widget.tour.content);
                               await AssetGarbageCollector.run();
 
                               if (!context.mounted) return;
@@ -194,9 +191,9 @@ class _TourListItemState extends State<_TourListItem> {
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16),
                   ),
-                  child: widget.tour.thumbnail != null
+                  child: widget.tour.gallery.isNotEmpty
                       ? AssetImageBuilder(
-                          widget.tour.thumbnail!,
+                          widget.tour.gallery[0],
                           builder: (image) {
                             return Image(
                               image: image,
@@ -265,7 +262,7 @@ class _TourListItemState extends State<_TourListItem> {
                       color: Color.fromARGB(255, 160, 160, 160),
                     ),
                     Text(
-                      "${widget.tour.stops} Stops",
+                      "${widget.tour.route.length} Stops",
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(
                           color: const Color.fromARGB(255, 160, 160, 160)),
                     ),

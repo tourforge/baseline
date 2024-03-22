@@ -21,30 +21,15 @@ class AssetGarbageCollector {
     }
 
     try {
-      var index = TourIndex.parse(
-          jsonDecode(await File("$base/index.json").readAsString()));
+      var index = Project.parse(
+          jsonDecode(await File("$base/tourforge.json").readAsString()));
 
       var usedAssets = HashSet<String>();
 
-      usedAssets.add("index.json");
-
-      usedAssets.addAll(index.tours.map((e) => e.thumbnail).whereType());
+      usedAssets.add("tourforge.json");
 
       for (var tourEntry in index.tours) {
-        if (tourEntry.thumbnail != null) {
-          usedAssets.add(tourEntry.thumbnail!.name);
-        }
-
-        if (await File("$base/${tourEntry.content.name}").exists()) {
-          usedAssets.add(tourEntry.content.name);
-
-          var tour = TourModel.parse(
-              "$base/${tourEntry.content.name}",
-              jsonDecode(await File("$base/${tourEntry.content.name}")
-                  .readAsString()));
-
-          usedAssets.addAll(tour.allAssets.map((e) => e.name));
-        }
+        usedAssets.addAll(tourEntry.allAssets.map((e) => e.id));
       }
 
       await for (var entry in Directory(base).list()) {

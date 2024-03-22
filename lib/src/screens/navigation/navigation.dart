@@ -80,7 +80,7 @@ class DisclaimerScreen extends StatelessWidget {
               final height = width * aspect;
               return Image.asset(
                 "assets/traffic.png",
-                package: "tourforge",
+                package: "tourforge_baseline",
                 width: width,
                 height: height,
               );

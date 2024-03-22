@@ -180,70 +180,54 @@ class _GalleryScreenState extends State<GalleryScreen> {
   }
 }
 
-class _GalleryScreenMetadataOverlay extends StatefulWidget {
+class _GalleryScreenMetadataOverlay extends StatelessWidget {
   const _GalleryScreenMetadataOverlay({required this.image});
 
   final AssetModel image;
 
   @override
-  State<_GalleryScreenMetadataOverlay> createState() =>
-      _GalleryScreenMetadataOverlayState();
-}
-
-class _GalleryScreenMetadataOverlayState
-    extends State<_GalleryScreenMetadataOverlay> {
-  late final Future<AssetMeta?> meta = widget.image.meta;
-
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: meta,
-      builder: (context, snapshot) {
-        final meta = snapshot.data;
-
-        return IgnorePointer(
-          ignoring: true,
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: Material(
-                color: Colors.black45,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (meta?.alt != null)
-                          Text(
-                            meta!.alt!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                        if (meta?.alt != null && meta?.attribution != null)
-                          const SizedBox(height: 8.0),
-                        if (meta?.attribution != null)
-                          Text(
-                            meta!.attribution!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(color: Colors.white),
-                            textAlign: TextAlign.center,
-                          ),
-                      ],
-                    ),
-                  ),
+    return IgnorePointer(
+      ignoring: true,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: SafeArea(
+          child: Material(
+            color: Colors.black45,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (image.alt != "")
+                      Text(
+                        image.alt,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    if (image.alt != "" && image.attrib != "")
+                      const SizedBox(height: 8.0),
+                    if (image.attrib != "")
+                      Text(
+                        image.attrib,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                  ],
                 ),
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

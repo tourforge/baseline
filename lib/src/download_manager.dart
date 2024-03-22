@@ -55,7 +55,7 @@ class DownloadManager {
   /// exponential backoff in the case of network error.
   Download download(AssetModel asset,
       {bool reDownload = false, int? maxRetries}) {
-    var name = asset.name;
+    var name = asset.id;
 
     var currentDownload = _currentDownloads[name];
     if (currentDownload != null) return currentDownload;
@@ -169,7 +169,7 @@ class DownloadManager {
 
   Future<void> delete(AssetModel asset) async {
     await asset.downloadedFile.delete();
-    _downloadedAssetNames.remove(asset.name);
+    _downloadedAssetNames.remove(asset.id);
   }
 
   void _printDebug(String message) {

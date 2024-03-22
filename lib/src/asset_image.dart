@@ -13,7 +13,7 @@ class AssetImage extends ImageProvider<FileImage> {
 
   @override
   Future<FileImage> obtainKey(ImageConfiguration configuration) {
-    if (DownloadManager.instance.cachedIsDownloaded(_asset.name)) {
+    if (DownloadManager.instance.cachedIsDownloaded(_asset.id)) {
       return _fileImage.obtainKey(configuration);
     } else {
       return (() async {
@@ -36,10 +36,10 @@ class AssetImage extends ImageProvider<FileImage> {
       return false;
     }
     return other is AssetImage &&
-        other._asset.name == _asset.name &&
+        other._asset.id == _asset.id &&
         other.scale == scale;
   }
 
   @override
-  int get hashCode => Object.hash(_asset.name, scale);
+  int get hashCode => Object.hash(_asset.id, scale);
 }

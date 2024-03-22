@@ -107,7 +107,7 @@ class NarrationPlaybackController extends BaseAudioHandler with SeekHandler {
     Uri? artUri;
     if (waypoint.gallery.isNotEmpty) {
       var squarePath =
-          "${(await getTemporaryDirectory()).path}/square-${waypoint.gallery.first.name}";
+          "${(await getTemporaryDirectory()).path}/square-${waypoint.gallery.first.id}";
       artUri = Uri.file(squarePath);
 
       if (!await File(squarePath).exists()) {

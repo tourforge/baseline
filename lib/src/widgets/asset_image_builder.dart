@@ -23,7 +23,7 @@ class _AssetImageBuilderState extends State<AssetImageBuilder> {
   void didUpdateWidget(covariant AssetImageBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.asset.name != widget.asset.name) {
+    if (oldWidget.asset.id != widget.asset.id) {
       assetIsDownloaded = widget.asset.isDownloaded;
     }
   }
