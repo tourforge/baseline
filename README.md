@@ -6,7 +6,7 @@ TourForge Baseline is a rebrandable GPS-guided tour app for Android and iOS, bui
 
 You can also put your application code in a separate repository, which is the approach taken by TourForge's flagship [Florence Navigator](https://github.com/tourforge/florence-navigator) application. Technically, putting your application code into a separate repository loses the flexibility of being able to edit the internal code of TourForge Baseline, unless you also fork this repository and point to your copy in the `pubspec.yaml` file.
 
-More info is available on our [documentation site](https://tourforge.github.io/builder).
+More info is available on our [documentation site](https://tourforge.github.io/).
 
 ## First-Time Development Setup
 
