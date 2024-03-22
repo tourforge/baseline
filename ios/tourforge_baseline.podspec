@@ -3,7 +3,7 @@
 # Run `pod lib lint tourforge.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'tourforge'
+  s.name             = 'tourforge_baseline'
   s.version          = '0.0.1'
   s.summary          = 'A new Flutter plugin project.'
   s.description      = <<-DESC
