@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:tourforge/src/help_viewed.dart';
+import 'package:tourforge_baseline/src/help_viewed.dart';
 import 'package:provider/provider.dart';
 
 import '../../controllers/narration_playback.dart';

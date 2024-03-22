@@ -1,4 +1,4 @@
-group 'org.tourforge.guide'
+group 'org.tourforge.baseline'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -26,7 +26,7 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 33
-    namespace 'org.tourforge.guide'
+    namespace 'org.tourforge.baseline'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

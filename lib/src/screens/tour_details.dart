@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tourforge/src/help_viewed.dart';
+import 'package:tourforge_baseline/src/help_viewed.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data.dart';
 import '../download_manager.dart';

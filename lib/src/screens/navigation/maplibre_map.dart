@@ -82,7 +82,7 @@ class MapLibreMap extends StatefulWidget {
 }
 
 class _MapLibreMapState extends State<MapLibreMap> {
-  static const _channel = MethodChannel("tourforge.org/guide/map");
+  static const _channel = MethodChannel("tourforge.org/baseline/map");
 
   late final String stylePath;
   late final String satStylePath;
@@ -238,7 +238,7 @@ class _MapLibreMapState extends State<MapLibreMap> {
       builder: (context, snapshot) {
         if (snapshot.hasData && !snapshot.hasError) {
           // This is used in the platform side to register the view.
-          const String viewType = 'org.tourforge.guide.MapLibrePlatformView';
+          const String viewType = 'org.tourforge.baseline.MapLibrePlatformView';
           // Pass parameters to the platform side.
           final Map<String, dynamic> creationParams = <String, dynamic>{
             "stylePath": snapshot.data,

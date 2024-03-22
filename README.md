@@ -1,14 +1,16 @@
-# TourForge
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tourforge/guide/android.yml?branch=main&label=Android%20build&style=for-the-badge)](https://github.com/tourforge/guide/actions/workflows/android.yml)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tourforge/guide/ios.yml?branch=main&label=iOS%20build&style=for-the-badge)](https://github.com/tourforge/guide/actions/workflows/ios.yml)
+# TourForge Baseline
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tourforge/baseline/android.yml?branch=main&label=Android%20build&style=for-the-badge)](https://github.com/tourforge/baseline/actions/workflows/android.yml)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/tourforge/baseline/ios.yml?branch=main&label=iOS%20build&style=for-the-badge)](https://github.com/tourforge/baseline/actions/workflows/ios.yml)
 
-TourForge is a rebrandable GPS-guided tour app for Android and iOS, built using Flutter. This repository holds the generic, unbranded code, packaged as a Flutter library. You'll also find a sample application, used for testing purposes, under the `example/` directory. [Florence Navigator](https://github.com/tourforge/florence-navigator) is TourForge's flagship application.
+TourForge Baseline is a rebrandable GPS-guided tour app for Android and iOS, built using Flutter. This repository holds the generic, unbranded code, packaged as a Flutter library. Create your own tour guide app by forking this repository and editing the starter code in the `app/` subdirectory.
 
-If you want to create your own tour guide app, follow [our guide](https://github.com/tourforge/documentation/blob/main/Creating%20an%20app.md).
+You can also put your application code in a separate repository, which is the approach taken by TourForge's flagship [Florence Navigator](https://github.com/tourforge/florence-navigator) application. Technically, putting your application code into a separate repository loses the flexibility of being able to edit the internal code of TourForge Baseline, unless you also fork this repository and point to your copy in the `pubspec.yaml` file.
+
+More info is available on our [documentation site](https://tourforge.github.io/builder).
 
 ## First-Time Development Setup
 
-In order for the satellite imagery feature to work, you need to create a file under `example/assets/` called `tomtom.txt` and paste a TomTom API key into this file.
+In order for the satellite imagery feature to work, you need to create a file under `app/assets/` called `tomtom.txt` and paste a TomTom API key into this file.
 
 ### iOS-Specific Setup
 We've had to use a workaround on iOS due to difficulties with installing the MapLibre dependency via CocoaPods. Before you open the project for the first time in Xcode, follow these steps:
@@ -18,11 +20,11 @@ We've had to use a workaround on iOS due to difficulties with installing the Map
    You can either download the latest version from their [Releases page](https://github.com/maplibre/maplibre-native/releases), or you can download [v5.13.0](https://github.com/maplibre/maplibre-native/releases/tag/ios-v5.13.0), which is the version that had most recently been tested as working the last time this README was updated.
 2. Extract the zip somewhere convenient so that you can access its internal files.
 3. Find the directory titled `Mapbox.framework` under `Mapbox.xcframework/ios-arm64/Mapbox.framework`.
-4. Copy the `Mapbox.framework` directory to `example/ios/Mapbox.framework`.
+4. Copy the `Mapbox.framework` directory to `app/ios/Mapbox.framework`.
 - It is important to note that in order to run the app in a simulator, you need to copy `ios-arm64_x86_64-simulator` folder instead.
-5. Open a terminal in `example/ios`, run `flutter pub get && pod install`.
+5. Open a terminal in `app/ios`, run `flutter pub get && pod install`.
 
-Now you're free to open the project in Xcode. Make sure you open `example/ios/Runner.xcworkspace`, not ~~`example/ios/Runner.xcodeproj`~~.
+Now you're free to open the project in Xcode. Make sure you open `app/ios/Runner.xcworkspace`, not ~~`app/ios/Runner.xcodeproj`~~.
 
 ### Android-Specific Setup
 

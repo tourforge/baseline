@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tourforge/src/asset_garbage_collector.dart';
-import 'package:tourforge/src/config.dart';
-import 'package:tourforge/src/download_manager.dart';
+import 'package:tourforge_baseline/src/asset_garbage_collector.dart';
+import 'package:tourforge_baseline/src/config.dart';
+import 'package:tourforge_baseline/src/download_manager.dart';
 
 import '/src/data.dart';
 import '/src/screens/tour_details.dart';

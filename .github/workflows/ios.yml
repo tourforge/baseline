@@ -25,14 +25,14 @@ jobs:
         channel: 'stable'
         architecture: x64
     - run: flutter pub get
-      working-directory: ./example
+      working-directory: ./app
     - run: touch assets/tomtom.txt
-      working-directory: ./example
+      working-directory: ./app
     - run: wget https://github.com/maplibre/maplibre-native/releases/download/ios-v5.13.0/Mapbox-5.13.0.zip
-      working-directory: ./example/ios
+      working-directory: ./app/ios
     - run: unzip Mapbox-5.13.0.zip
-      working-directory: ./example/ios
+      working-directory: ./app/ios
     - run: mv Mapbox.xcframework/ios-arm64/Mapbox.framework .
-      working-directory: ./example/ios
+      working-directory: ./app/ios
     - run: flutter build ios --release --no-codesign
-      working-directory: ./example
+      working-directory: ./app
