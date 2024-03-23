@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tourforge_baseline/src/asset_garbage_collector.dart';
 import 'package:tourforge_baseline/src/config.dart';
-import 'package:tourforge_baseline/src/download_manager.dart';
 
 import '/src/data.dart';
 import '/src/screens/tour_details.dart';
@@ -163,8 +162,7 @@ class _TourListItemState extends State<_TourListItem> {
                           ),
                           TextButton(
                             onPressed: () async {
-                              //await DownloadManager.instance.delete(widget.tour.content);
-                              await AssetGarbageCollector.run();
+                              await AssetGarbageCollector.run(ignoredTours: {widget.tour.id});
 
                               if (!context.mounted) return;
                               Navigator.pop(context);

@@ -12,7 +12,12 @@ class AssetGarbageCollector {
   static late final String base;
   static bool isRunning = false;
 
-  static Future<void> run() async {
+  /// Runs the garbage collector.
+  ///
+  /// `ignoredTours` contains the list of tours that will be ignored when computing
+  /// the set of used assets. Hence, to delete assets which are only required by a
+  /// given tour or set of tours, include the IDs of those tours in ignoredTours.
+  static Future<void> run({Set<String>? ignoredTours}) async {
     if (isRunning) return;
     isRunning = true;
 
@@ -29,6 +34,10 @@ class AssetGarbageCollector {
       usedAssets.add("tourforge.json");
 
       for (var tourEntry in index.tours) {
+        if (ignoredTours != null && ignoredTours.contains(tourEntry.id)) {
+          continue;
+        }
+
         usedAssets.addAll(tourEntry.allAssets.map((e) => e.id));
       }
 
@@ -50,7 +59,7 @@ class AssetGarbageCollector {
       }
     } catch (e, stack) {
       if (kDebugMode) {
-        print("Unexpected rror while garbage collecting: $e");
+        print("Unexpected error while garbage collecting: $e");
         print("Garbage collection error stack trace: $stack");
       }
     } finally {
