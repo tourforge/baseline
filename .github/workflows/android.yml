@@ -39,12 +39,12 @@ jobs:
     - run: flutter build appbundle
       working-directory: ./app
     - name: Upload APK artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: apk
         path: app/build/app/outputs/flutter-apk/app-release.apk
     - name: Upload App Bundle artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: appbundle
         path: app/build/app/outputs/bundle/release/app-release.aab
