@@ -33,9 +33,12 @@ class Project {
 
     try {
       tourforgeJsonFile = await download.file;
-    } on DownloadFailedException {
+    } on DownloadFailedException catch (e) {
       if (preexistingIndexExists) {
         // don't care, continue executing since we have the preexisting file
+        if (kDebugMode) {
+          print("Ignoring exception because preexisting index exists: $e");
+        }
       } else {
         // this is an unexpected error
         rethrow;

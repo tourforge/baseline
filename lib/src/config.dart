@@ -13,6 +13,7 @@ class TourForgeConfig {
     required this.appName,
     this.appDesc,
     required this.baseUrl,
+    this.baseUrlIsIndirect = false,
     required this.lightThemeData,
     required this.darkThemeData,
   });
@@ -25,6 +26,9 @@ class TourForgeConfig {
 
   /// The base URL for downloading tours and tour assets.
   final String baseUrl;
+
+  /// Whether the base URL is in fact a URL that, when fetched, returns the real base URL.
+  final bool baseUrlIsIndirect;
 
   /// The light theme for the application.
   final ThemeData lightThemeData;
