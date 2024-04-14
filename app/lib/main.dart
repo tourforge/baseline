@@ -11,7 +11,7 @@ Future<void> main() async {
       appName: "TourForge Baseline App",
       appDesc:
           '''TourForge Baseline App is the starter app for the TourForge Baseline library.''',
-      baseUrl: "http://192.168.4.248:8000/",
+      baseUrl: "https://fmu-tourforge-data.s3.us-east-1.amazonaws.com/FMUCampusTour",
       lightThemeData: lightThemeData,
       darkThemeData: darkThemeData,
     ),
