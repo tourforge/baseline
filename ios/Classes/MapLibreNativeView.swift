@@ -86,12 +86,11 @@ class MapLibreNativeView: NSObject, FlutterPlatformView, MGLMapViewDelegate {
         var pathShape: MGLShape
         do {
             pathShape = try MGLShape(data: _pathGeoJson.data(using: String.Encoding.utf8)!, encoding: String.Encoding.utf8.rawValue)
+            let pathSource = MGLShapeSource(identifier: "tour_path", shape: pathShape)
+            style.addSource(pathSource)
         } catch {
             print("BAD")
-            return
         }
-        let pathSource = MGLShapeSource(identifier: "tour_path", shape: pathShape)
-        style.addSource(pathSource)
         
         var pointsShape: MGLShapeCollection
         do {
